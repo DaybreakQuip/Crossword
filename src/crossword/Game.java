@@ -78,6 +78,7 @@ public class Game {
         
         return "";
     }
+    
     /**
      * @return set of the names of all puzzles in the game
      */
