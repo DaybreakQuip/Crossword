@@ -73,10 +73,12 @@ public class Game {
      */
     public String getPuzzleForResponse(String name) {
         Puzzle puzzle = puzzles.get(name);
-
-        // TODO: Implement me!
-        
-        return "";
+        String puzzleString = "";
+        for (PuzzleEntry entry: puzzle.getEntries()) {
+            puzzleString += entry.getWord().length() + ", " + entry.getHint() + ", " + 
+        entry.getOrientation() + ", " + entry.getPosition().getRow() + ", " + entry.getPosition().getCol() + "\n";
+        }
+        return puzzleString.substring(0,puzzleString.length()-1);
     }
     
     /**
