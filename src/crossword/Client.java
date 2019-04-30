@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.stream.Collectors;
 /**
  * TODO
  */
@@ -76,6 +77,8 @@ public class Client {
                     continue;
                 default:
                     socketOut.println(command);
+                    while (!socketIn.ready()) {
+                    }
                     playGame(socketIn, System.out, showRaw);
                 }
             }
@@ -83,6 +86,11 @@ public class Client {
         }
     }
     private static void playGame(BufferedReader in, PrintStream out, boolean showRaw) throws IOException {
+        String wholePuzzle = "";
+        while (in.ready()) {
+            out.print(in.readLine());
+        }
+        out.println();
     }
     /**
      * Starter code to display a window with a CrosswordCanvas,

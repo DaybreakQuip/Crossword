@@ -127,7 +127,7 @@ public class TextServer {
             return "quit";
         }
         if (tokens[0].equals("look")) {
-            return "";
+            return game.getPuzzleForResponse("Easy");
         }
         // if we reach here, the client message did not follow the protocol
             throw new UnsupportedOperationException(input);
