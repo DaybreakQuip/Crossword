@@ -6,9 +6,9 @@ package crossword;
  */
 public class PuzzleEntry {
     private final String word;
-    private final Point position;
     private final String hint;
     private final Orientation orientation;
+    private final Point position;
     
     /**
      * Create a new PuzzleEntry object 
@@ -17,7 +17,7 @@ public class PuzzleEntry {
      * @param hint the hint for the word
      * @param orientation the orientation of this entry
      */
-    public PuzzleEntry(String word, Point position, String hint, Orientation orientation) {
+    public PuzzleEntry(String word, String hint, Orientation orientation, Point position) {
         this.word = word;
         this.position = position;
         this.hint = hint;

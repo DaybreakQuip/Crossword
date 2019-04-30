@@ -1,41 +1,28 @@
 package crossword;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Mutable Puzzle class representing a puzzle object
+ * Immutable Puzzle class representing a puzzle object
  *
  */
 public class Puzzle {
     private final String name; 
+    private final String description;
     private final Set<PuzzleEntry> entries;
     
     /**
      * Creates a new crossword Puzzle with pre-existing entries
-     * @param name the same of the puzzle
+     * @param name the name of the puzzle
+     * @param description the description of the puzzle
      * @param entries the entries of the puzzle
      */
-    public Puzzle(String name, Set<PuzzleEntry> entries) {
+    public Puzzle(String name, String description, Set<PuzzleEntry> entries) {
         this.name = name;
-        this.entries = new HashSet<>(entries); // Make a defensive copy of the entries
-    }
-    
-    /**
-     * Creates a new crossword Puzzle with no entries
-     * @param name the name of the puzzle
-     */
-    public Puzzle(String name) {
-        this.name = name;
-        entries = new HashSet<>();
-    }
-    
-    /**
-     * Adds a new puzzle entry to the puzzle
-     * @param entry the new puzzle entry
-     */
-    public void addEntry(PuzzleEntry entry) {
-        this.entries.add(entry);
+        this.description = description;
+        this.entries = Collections.unmodifiableSet(new HashSet<>(entries)); // Make a defensive, unmodifiable copy of the entries
     }
     
     /**
