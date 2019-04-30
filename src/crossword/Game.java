@@ -65,6 +65,20 @@ public class Game {
     }
     
     /**
+     * Returns a puzzle with a specific format where every entry is separate by new lines and no 
+     * words are revealed
+     * @param name the name of the puzzle
+     * @return string with format: length, hint, orientation, row, col\n
+     *         e.g: "4, "twinkle twinkle", ACROSS, 0, 1\n"
+     */
+    public String getPuzzleForResponse(String name) {
+        Puzzle puzzle = puzzles.get(name);
+
+        // TODO: Implement me!
+        
+        return "";
+    }
+    /**
      * @return set of the names of all puzzles in the game
      */
     public Set<String> getPuzzleNames() {
