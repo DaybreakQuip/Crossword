@@ -117,16 +117,18 @@ public class TextServer {
             return "quit";
         }
         if (tokens[0].equals("GET")) {
-            /*StringBuilder allPuzzles = new StringBuilder();
+            StringBuilder allPuzzles = new StringBuilder();
             for (String puzzle: puzzleNames) {
                 allPuzzles.append(puzzle + ",");
             }
             allPuzzles.deleteCharAt(allPuzzles.length()-1);
-            return allPuzzles.toString();*/
-            return "Easy";
+            return allPuzzles.toString();
         }
         if (puzzleNames.contains(tokens[0])) {
             return game.getPuzzleForResponse(tokens[0]);
+        }
+        if (!puzzleNames.contains(tokens[0])) {
+            return tokens[0];
         }
         // if we reach here, the client message did not follow the protocol
         throw new UnsupportedOperationException(input);

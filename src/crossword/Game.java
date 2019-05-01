@@ -28,7 +28,7 @@ public class Game {
      * @throws IOException if .puzzle file cannot be opened
      */
     public static void main(final String[] args) throws UnableToParseException, IOException {
-        System.out.println(Game.parseGameFromFiles("puzzles/"));
+        System.out.println(Game.parseGameFromFiles("puzzles/").getPuzzleNames());
     }
     /**
      * @param directory the folder to the puzzles

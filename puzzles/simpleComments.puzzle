@@ -1,4 +1,4 @@
->> "Easy" "An easy puzzle to get started"
+>> "SimpleComments" "An easy puzzle to get started"
 
 // Comment in its own line
 (star, "twinkle twinkle", ACROSS, 1, 0) // Comment next to entry
