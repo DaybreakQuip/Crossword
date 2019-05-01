@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.mit.eecs.parserlib.ParseTree;
 import edu.mit.eecs.parserlib.Parser;
@@ -23,7 +25,7 @@ public class PuzzleParser {
      */
     public static void main(final String[] args) throws UnableToParseException, IOException {
         // TODO: Open a file here for the example puzzle
-        String filename = "simple.puzzle";
+        String filename = "inconsistent.puzzle";
         BufferedReader reader = new BufferedReader(new FileReader("puzzles/" + filename));
         StringBuilder inputBuilder = new StringBuilder();
         String line;
@@ -36,12 +38,12 @@ public class PuzzleParser {
         System.out.println("The input is: \n" + input);
         final Puzzle puzzle = PuzzleParser.parse(input);
         
-        System.out.println(puzzle);
+        System.out.println("The parsed puzzle is: \n" + puzzle);
     }
     
     // the nonterminals of the grammar
     private static enum PuzzleGrammar {
-        FILE, NAME, DESCRIPTION, ENTRY, COMMENT, WORDNAME, CLUE, DIRECTION, ROW, COL, STRING, STRINGINDENT, INT, WHITESPACE, NEWLINE
+        FILE, COMMENT, NAME, DESCRIPTION, ENTRY, WORDNAME, CLUE, DIRECTION, ROW, COL, STRING, STRINGINDENT, INT, WHITESPACE
     }
     
     private static Parser<PuzzleGrammar> parser = makeParser();
@@ -85,7 +87,7 @@ public class PuzzleParser {
 
         // make a puzzle from the parse tree
         final Puzzle puzzle = makePuzzle(parseTree);
-        // System.out.println("Puzzle: " + expression);
+        // System.out.println("Puzzle: " + puzzle);
         
         return puzzle;
     }
@@ -94,18 +96,74 @@ public class PuzzleParser {
      * Convert a parse tree into an puzzle object.
      * 
      * @param parseTree constructed according to the grammar in Puzzle.g
-     * @return puzzle object corresponding to parseTree
+     * @return puzzle corresponding to parseTree
      */
     private static Puzzle makePuzzle(final ParseTree<PuzzleGrammar> parseTree) {
         switch (parseTree.name()) {
-        case FILE: // ">>" name description "\n" entry*
-            // TODO: Change this
-            return Puzzle.makeDummyPuzzle();
+        case FILE: // ">>" name description entry*
+            // Create a puzzle from this file
+            final List<ParseTree<PuzzleGrammar>> children = parseTree.children();
+            // Initialize variables for the puzzle
+            String name = "";
+            String description = "";
+            List<PuzzleEntry> entries = new ArrayList<>();
+            // Populate the puzzle variables by parsing the children of the file
+            for (ParseTree<PuzzleGrammar> child : children) {
+                /* Print for debugging use only
+                 System.out.println("NAME:" + child.name());
+                 System.out.println("STRING:" + child.text());
+                 System.out.println("----------");
+                */
+                switch (child.name()) {
+                    case NAME: // '"' [^"\r\n\t\\]* '"'
+                        String nameWithQuotes = child.text();
+                        name = nameWithQuotes.substring(1, nameWithQuotes.length()-1);
+                        break;
+                    case DESCRIPTION: // string "\n"
+                        String descWithNewline = child.text();
+                        description = descWithNewline.substring(0, descWithNewline.length()-1);
+                        break;
+                    case ENTRY: // "("  wordname ","  clue "," direction "," row "," col ")"
+                        entries.add(makeEntry(child));
+                    case COMMENT:
+                        break;
+                    default:
+                        System.out.println(parseTree.name());
+                        throw new AssertionError("File has unexpected child");
+                }
+            }
+            // Create and return the new puzzle we just parsed
+            return new Puzzle(name, description, entries);
         default:
             System.out.println(parseTree.name());
-            throw new AssertionError("should never get here");
+            throw new AssertionError("makePuzzle: should never get here");
         }
-
+    }
+    
+    /**
+     * Convert a parse tree into a PuzzleEntry object.
+     * 
+     * @param parseTree constructed according to the grammar in Puzzle.g
+     * @return puzzle entry corresponding to parseTree
+     */
+    private static PuzzleEntry makeEntry(final ParseTree<PuzzleGrammar> parseTree) {
+        // entry ::= "("  wordname ","  clue "," direction "," row "," col ")"
+        List<ParseTree<PuzzleGrammar>> children = parseTree.children();
+        // Extract word, clue, 
+        final int wordIndex = 0;
+        final int clueIndex = 1;
+        final int orientationIndex = 2;
+        final int rowIndex = 3;
+        final int colIndex = 4;
+        
+        String word = children.get(wordIndex).text();
+        String clue = children.get(clueIndex).text();
+        Orientation orientation = Orientation.valueOf(children.get(orientationIndex).text());
+        int row = Integer.valueOf(children.get(rowIndex).text());
+        int col = Integer.valueOf(children.get(colIndex).text());
+        Point point = new Point(row, col);
+        
+        return new PuzzleEntry(word, clue, orientation, point);
     }
 
 }
