@@ -53,6 +53,23 @@ public class PuzzleEntry {
     }
     
     @Override
+    public int hashCode() {
+        return word.length() + hint.length();
+    }
+    
+    @Override
+    public boolean equals(Object that) {
+        if (!(that instanceof PuzzleEntry)) return false;
+        else {
+            PuzzleEntry other = (PuzzleEntry) that;
+            return this.word.equals(other.word) 
+                    && this.hint.equals(other.hint) 
+                    && this.orientation == other.orientation
+                    && this.position.equals(other.position);
+        }
+    }
+    
+    @Override
     public String toString() {
         return "(" + word + ", " + hint + ", " + orientation + ", " + position + ")";
     }
