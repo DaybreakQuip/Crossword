@@ -122,7 +122,6 @@ public class PuzzleParser {
                     case DESCRIPTION: // string "\n"
                         String descWithNewline = child.text();
                         description = descWithNewline.substring(1, descWithNewline.length()-2);
-                        System.out.println("description: " + description);
                         break;
                     case ENTRY: // "("  wordname ","  clue "," direction "," row "," col ")"
                         entries.add(makeEntry(child));

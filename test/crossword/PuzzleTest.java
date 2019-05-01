@@ -66,9 +66,15 @@ public class PuzzleTest {
     
     // Test covers whether simple puzzle is consistent
     @Test
-    public void testConsistentSimplePuzzle() {
+    public void testConsistentSimplePuzzle() throws IOException, UnableToParseException {
+        // Test with premade puzzle objects
         Puzzle puzzle = makeSimplePuzzle();
         assertTrue(puzzle.isConsistent(), "Expected simple puzzle to be consistent");
+        
+        // Test with puzzles made by parser
+        Puzzle parsedPuzzle = Puzzle.parseFromFile("puzzles/simple.puzzle");
+        assertTrue(parsedPuzzle.isConsistent(), "Expected parsed simple puzzle to be consistent");
+        
     }
     
     @Test

@@ -5,7 +5,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.mit.eecs.parserlib.UnableToParseException;
 
@@ -132,6 +134,33 @@ public class Puzzle {
      * @return true if the puzzle is consistent and false otherwise
      */
     public boolean isConsistent() {
+        // check whether intersections are constant 
+        Map<Point, Character> pointToLetter = new HashMap<>();
+        for (int i = 0; i < entries.size(); i++) {
+            PuzzleEntry entry = entries.get(i);
+            String word = entry.getWord();
+            Orientation orientation = entry.getOrientation();
+            Point position = entry.getPosition();
+            for (int j = 0; j < word.length(); j++) {
+                Point letterPosition; // Position of the letter in the word
+                if (orientation == Orientation.ACROSS) {
+                    // getCol() + j represents the column of the letter
+                    letterPosition = new Point(position.getRow(), position.getCol() + j);  
+                } else { 
+                    // getRow() + j represents the row of the letter
+                    letterPosition = new Point(position.getRow() + j, position.getCol());
+                }
+                
+                // If the point is already in the map and the letters do not match, return false
+                //  otherwise add the point and letter pair to the map
+                if (pointToLetter.containsKey(letterPosition) && pointToLetter.get(letterPosition) != word.charAt(j)) {
+                    return false;
+                } else {
+                    pointToLetter.put(letterPosition, word.charAt(j));
+                }
+            }
+        }
+        
         for (int i = 0; i < entries.size(); i++) {
             PuzzleEntry currentPuzzle = entries.get(i);
             for (int j = i + 1; j < entries.size(); j++) {
@@ -140,6 +169,7 @@ public class Puzzle {
                 // words must be unique
                 if (currentPuzzle.getWord().equals(otherPuzzle.getWord()) 
                         && !currentPuzzle.equals(otherPuzzle)) {
+                    System.out.println("Unique");
                     return false;
                 }
                 
@@ -148,49 +178,24 @@ public class Puzzle {
                 final Point otherPosition = otherPuzzle.getPosition();
                 final String currentWord = currentPuzzle.getWord();
                 final String otherWord = otherPuzzle.getWord();
-                                
-                // different orientation: at most one intersection
-                if (currentOrientation != otherPuzzle.getOrientation()) {
-                    int intersectRow, intersectCol;
-                    // check if words intersect at the same letter
-                    if (currentOrientation == Orientation.ACROSS) {
-                        if (currentPosition.getCol() + currentWord.length() < otherPosition.getCol()
-                                || currentPosition.getCol() > otherPosition.getCol()) {
-                            continue;
-                        }
-                        
-                        intersectRow = currentPosition.getRow();
-                        intersectCol = otherPosition.getCol();
-                        
-                        if (!(currentWord.charAt(intersectCol - currentPosition.getCol())
-                                == otherWord.charAt(intersectRow - otherPosition.getRow()))) {
-                            return false;
-                        }
-                    } else {
-                        if (!(otherPosition.getCol() + otherWord.length() < currentPosition.getCol()
-                                || otherPosition.getCol() > currentPosition.getCol())) {
-                            intersectRow = otherPosition.getRow();
-                            intersectCol = currentPosition.getCol();
-                            
-                            if (!(currentWord.charAt(intersectRow - currentPosition.getRow())
-                                    == otherWord.charAt(intersectCol - otherPosition.getCol()))) {
-                                return false;
-                            }
-                        }
-                    }
-                } else { // check if words overlap
+                
+                if (currentOrientation == otherPuzzle.getOrientation()) {
+                    // Check for overlaps
                     if (currentOrientation == Orientation.ACROSS) {
                         if (currentPosition.getRow() == otherPosition.getRow() && 
                                 !(currentPosition.getCol() + currentWord.length() < otherPosition.getCol()
                                 || currentPosition.getCol() > otherPosition.getCol() + otherWord.length())) {
+                            System.out.println("First overlap");
                             return false;
                         }
                     } else {
                         if (currentPosition.getCol() == otherPosition.getCol() &&
                                 !(currentPosition.getRow() + currentWord.length() < otherPosition.getRow()
                                 || currentPosition.getRow() > otherPosition.getRow() + otherWord.length())) {
+                            System.out.println("Second overlap");
                             return false;
                         }
+                    
                     }
                 }
             }
