@@ -23,7 +23,7 @@ public class Puzzle {
     //Rep Invariant:
     //true
     //Safety From Rep Exposure:
-    //  name and description is private and final
+    //  name and description is private and final and immutable
     //  entries is only accessed through getter methods like getentries which creates a copy before returning to the client
     private final String name; 
     private final String description;
