@@ -51,4 +51,9 @@ public class PuzzleEntry {
     public Orientation getOrientation() {
         return orientation;
     }
+    
+    @Override
+    public String toString() {
+        return "(" + word + ", " + hint + ", " + orientation + ", " + position + ")";
+    }
 }

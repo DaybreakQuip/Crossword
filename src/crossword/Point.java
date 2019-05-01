@@ -30,4 +30,9 @@ public class Point {
     public int getCol() {
         return col;
     }
+    
+    @Override
+    public String toString() {
+        return "(" + row + ", " + col + ")";
+    }
 }
