@@ -44,7 +44,9 @@ public class Game {
         for (File file : listofPuzzles) {
             if (file.isFile()) {
                 Puzzle newPuzzle = PuzzleParser.parse(puzzleFromFile(file.getName()));
-                puzzles.put(newPuzzle.getName(), newPuzzle);
+                if (newPuzzle.isConsistent()) {
+                    puzzles.put(newPuzzle.getName(), newPuzzle);
+                }
             }
         }
         return new Game(puzzles);
@@ -137,4 +139,5 @@ public class Game {
     public boolean sameValue(Game other) {
         return puzzles.equals(other.puzzles);
     }
+    
 }
