@@ -36,6 +36,9 @@ public class Client {
 
     /**
      * Start a Crossword Extravaganza client.
+     * 
+     * Command to connect client: java -cp bin crossword.Client localhost 4444
+     * 
      * @param args The command line arguments should include only the server address.
      * @throws IOException not connected
      */
@@ -98,7 +101,8 @@ public class Client {
      */
     private static void launchGameWindow() {
 
-        CrosswordCanvas canvas = new CrosswordCanvas();
+        Game game = Game.createDummyGame();
+        CrosswordCanvas canvas = new CrosswordCanvas(game.getPuzzleForResponse("Easy"));
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
         JButton enterButton = new JButton("Enter");

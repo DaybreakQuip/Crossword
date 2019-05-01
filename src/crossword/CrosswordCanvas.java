@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.swing.JComponent;
 
@@ -48,6 +50,16 @@ class CrosswordCanvas extends JComponent {
      */
     private final Font textFont = new Font("Arial", Font.PLAIN, 16);
 
+    private final String puzzle;
+    
+    /**
+     * 
+     * @param puzzle TODO
+     */
+    public CrosswordCanvas(String puzzle) {
+        this.puzzle = puzzle;
+    }
+    
     /**
      * Draw a cell at position (row, col) in a crossword.
      * @param row Row where the cell is to be placed.
@@ -155,6 +167,64 @@ class CrosswordCanvas extends JComponent {
         g.setColor(oldColor);
         ++line;
     }
+    
+    //private List<String> acrossAns = List.of("star", "kettle", "bee", "treasure", "troll");
+    //private List<String> downAns = List.of("market", "extra", "loss");
+    
+    private void printPuzzle(Graphics g) {
+        int across = 0;
+        int down = 0;
+        List<String> acrossHints = new ArrayList<>();
+        List<String> downHints = new ArrayList<>();
+        
+        String[] entries = puzzle.split("\n");
+        for (String entry: entries) {
+            // info has the following format: length, hint, orientation, row, col\n
+            String[] info = entry.split(", ");
+            int length = Integer.parseInt(info[0]);
+            int row = Integer.parseInt(info[3]);
+            int col = Integer.parseInt(info[4]);
+            
+            // draw cells for across and record hint
+            if (info[2].equals("ACROSS")) {
+                horizontalId(Integer.toString(across), row, col, g);
+                acrossHints.add(across + ". " + info[1] + "\n");
+                
+                for (int i = 0; i < length; i++) {
+                    drawCell(row, col + i, g);
+                    //letterInCell(acrossAns.get(across).substring(i, i+1).toUpperCase(), row, col + i, g);
+                }
+                across++;
+            } else { // draw cells for down and record hint
+                verticalId(Integer.toString(down), row, col, g);
+                downHints.add(down + ". " + info[1] + "\n");
+                
+                for (int i = 0; i < length; i++) {
+                    drawCell(row + i, col, g);
+                    //letterInCell(downAns.get(down).substring(i, i+1).toUpperCase(), row + i, col, g);
+                }
+                
+                down++;
+            }
+        }
+        
+        // print hints for across and down words
+        resetLine();
+        if (across > 0) {
+            println("Across\n", g);
+            for (String hint: acrossHints) {
+                println(hint, g);
+            }
+        }
+        
+        println("\n", g);
+        if (down > 0) {
+            println("Down\n", g);
+            for (String hint: downHints) {
+                println(hint, g);
+            }
+        }
+    }
 
     private int x = 1;
 
@@ -168,6 +238,8 @@ class CrosswordCanvas extends JComponent {
      */
     @Override
     public void paint(Graphics g) {
+        printPuzzle(g);
+        /*
         for (int i = 0; i < x; ++i) {
             drawCell(i, i, g);
             letterInCell(Character.toString(i + 65), i, i, g);
@@ -182,5 +254,6 @@ class CrosswordCanvas extends JComponent {
             printlnFancy("Have some fun with your UI!", g);
         }
         x = x + 1;
+        */
     }
 }
