@@ -140,4 +140,15 @@ public class Game {
         return puzzles.equals(other.puzzles);
     }
     
+    @Override
+    public String toString() {
+        StringBuilder gameString = new StringBuilder();
+        for (String puzzleName : puzzles.keySet()) {
+            Puzzle puzzle = puzzles.get(puzzleName);
+            gameString.append(puzzleName + "\n" + puzzle.toString() + "\n\n");
+        }
+
+        // Remove the string minus the newline at the end
+        return gameString.substring(0,  gameString.length()-1);
+    }
 }
