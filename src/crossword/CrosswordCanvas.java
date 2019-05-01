@@ -179,11 +179,13 @@ class CrosswordCanvas extends JComponent {
         
         String[] entries = puzzle.split("\n");
         for (String entry: entries) {
+            // info has the following format: length, hint, orientation, row, col\n
             String[] info = entry.split(", ");
             int length = Integer.parseInt(info[0]);
             int row = Integer.parseInt(info[3]);
             int col = Integer.parseInt(info[4]);
             
+            // draw cells for across and record hint
             if (info[2].equals("ACROSS")) {
                 horizontalId(Integer.toString(across), row, col, g);
                 acrossHints.add(across + ". " + info[1] + "\n");
@@ -193,7 +195,7 @@ class CrosswordCanvas extends JComponent {
                     //letterInCell(acrossAns.get(across).substring(i, i+1).toUpperCase(), row, col + i, g);
                 }
                 across++;
-            } else {
+            } else { // draw cells for down and record hint
                 verticalId(Integer.toString(down), row, col, g);
                 downHints.add(down + ". " + info[1] + "\n");
                 
@@ -206,6 +208,7 @@ class CrosswordCanvas extends JComponent {
             }
         }
         
+        // print hints for across and down words
         resetLine();
         if (across > 0) {
             println("Across\n", g);

@@ -21,13 +21,15 @@ public class Server {
     
     /**
      * Start a Crossword Extravaganza server.
+     * 
+     * Command to connect server: java -ea -cp bin crossword.Server text 4444 puzzles
+     * 
      * @param args The command line arguments should include only the folder where
      *             the puzzles are located.
      */
     public static void main(String[] args) throws IOException {
         final Queue<String> arguments = new LinkedList<>(Arrays.asList(args));
         final int port;
-        //final String directory = "/Users/Firec/Documents/6.031/crossword-jyj-yanniw-zehang/puzzles";
         final String directory;
         final Game game;
 
