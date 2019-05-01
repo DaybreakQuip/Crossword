@@ -66,9 +66,7 @@ public class Client {
             boolean showRaw = false;
             if (!socket.isClosed()) {
                 socketOut.println("GET");
-                while (!socketIn.ready()) {
-                }
-                getPuzzles(socketIn, System.out, showRaw);
+                System.out.println(socketIn.readLine());
                 System.out.print("? ");
                 final String command = systemIn.readLine();
                 socketOut.println(command);
@@ -91,12 +89,6 @@ public class Client {
             }
             System.out.println("connection closed");
         }
-    }
-    private static void getPuzzles(BufferedReader in, PrintStream out, boolean showRaw) throws IOException {
-        while (in.ready()) {
-            out.print(in.readLine());
-        }
-        out.println();
     }
     /**
      * Starter code to display a window with a CrosswordCanvas,
