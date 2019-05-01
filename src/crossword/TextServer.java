@@ -49,19 +49,6 @@ public class TextServer {
      */
     public void serve() throws IOException {
         System.err.println("Server listening on " + serverSocket.getLocalSocketAddress());
-        /*while (true) {
-            // block until a client connects
-            Socket socket = serverSocket.accept();
-            
-            // handle the client
-            try {
-                handleConnection(socket);
-            } catch (IOException ioe) {
-                ioe.printStackTrace(); // but do not stop serving
-            } finally {
-                socket.close();
-            }
-        }*/
         while (true) {  
             Socket socket = serverSocket.accept();
             try {
@@ -130,7 +117,12 @@ public class TextServer {
             return "quit";
         }
         if (tokens[0].equals("GET")) {
-            return "Easy";
+            StringBuilder allPuzzles = new StringBuilder();
+            for (String puzzle: puzzleNames) {
+                allPuzzles.append(puzzle + ",");
+            }
+            allPuzzles.deleteCharAt(allPuzzles.length()-1);
+            return allPuzzles.toString();
         }
         if (puzzleNames.contains(tokens[0])) {
             return game.getPuzzleForResponse(tokens[0]);

@@ -1,0 +1,18 @@
+>> "Metamorphic" "I can't solve this"
+
+(magma, "molten rock", ACROSS, 0, 2)
+(limestone, "A type of sedimentary rock made of calcium carbonate", ACROSS, 3, 0)
+(metaphormic, "Marble and slate are examples of this type of rock", ACROSS, 5, 4)
+(pressure, "Metaphormic rocks form under high temperature and ...", ACROSS, 7, 7)
+(ontop, "The youngest layer of sedimentary rock is usually found here", ACROSS, 10, 1)
+(cement, "This building material is made by roasting powdered limestone and clay", ACROSS, 10, 9)
+(core, "In the inner part of this is solid", ACROSS, 12, 1)
+(fossils, "Traces of dead plants and animals found in sedimentary rocks", ACROSS, 13, 6)
+(volcanoes, "These may form if tectonic plates move towards each other", DOWN, 1, 0)
+(igneous, "This type of rock consists of randomly arranged interlocking crystals", DOWN, 8, 2)
+(mudstone, "This rock can become slate", DOWN, 5, 4)
+(mantle, "Viscous layer found under 12 down", DOWN, 0, 5)
+(crust, "The rocky outer layer of the Earth's surface", DOWN, 10, 9)
+(extrusive, "THe type of igneous rock forms on the Earth's surface", DOWN, 2, 10)
+(earthquake, "These may form if tectonic plates slide past one another", DOWN, 1, 12)
+(nickel, "Iron and this metal are found in the Earth's core", DOWN, 3, 14)
