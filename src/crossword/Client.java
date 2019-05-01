@@ -28,7 +28,7 @@ import javax.swing.WindowConstants;
  * TODO
  */
 public class Client {
-
+    
     private static final int CANVAS_WIDTH = 1200;
     private static final int CANVAS_HEIGHT = 900;
 

@@ -11,19 +11,30 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Set;
-    /**
-     * Text-protocol game server.
-     * 
-     * <p>PS4 instructions: the specifications of {{@link #TextServer(Board, int)},
-     * {@link #port()}, and {@link #serve()} are required.
-     */
+
+
+/**
+ * Text-protocol game server.
+ */
 public class TextServer {
+    // Abstraction function:
+    //    AF(serverSocket, game, nextID) --> TextServer Object having the ability to connect two  players to a Crossword Puzzle game. 
+    //                                        One serverSocket (a rep) is able to run multiple connections, game is the game class for
+    //                                        the Crowssword game, and a nextID for the next players for concurrency
+    // Representation invariant:
+    //  true
+    // Safety from rep exposure:
+    //  serversocket is private and final
+    //  game is private and final
+    //  nextID is never given to the client
+    //  Only method that can be accessed is flip, and textServerPrint which is done internally
+    //  client can never access board's functions
     
     private final ServerSocket serverSocket;
     private final Game game;
     private int nextID = 1;
     /**
-     * Make a new text game server using board that listens for connections on port.
+     * Make a new text game server using game that listens for connections on port.
      * 
      * @param game shared crossword puzzles
      * @param port server port number
