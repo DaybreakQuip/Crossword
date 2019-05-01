@@ -52,6 +52,17 @@ public class Game {
         return new Game(puzzles);
     }
     
+    // Abstraction function:
+    //    AF(puzzles) = a crossword game with multiple crossword puzzles, where each entry in puzzles 
+    //                  represents a mapping of puzzle name to the crossword puzzle it represents
+    // Representation invariant:
+    //  true
+    // Safety from rep exposure:
+    //  all fields are final and private
+    //  puzzles map is mutable, but defensive copies are made in getPuzzles() to not return the original
+    //      puzzles
+    //  puzzles's keys and values are immutable types (String and Puzzle respectively)
+    
     /**
      * Returns a game meant for testing purposes
      * @return a new dummy game with puzzle entries from simple.puzzle
