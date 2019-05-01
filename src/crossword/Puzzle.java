@@ -132,6 +132,7 @@ public class Puzzle {
      * @return true if the puzzle is consistent and false otherwise
      */
     public boolean isConsistent() {
+        
         for (int i = 0; i < entries.size(); i++) {
             PuzzleEntry currentPuzzle = entries.get(i);
             for (int j = i + 1; j < entries.size(); j++) {
@@ -154,21 +155,25 @@ public class Puzzle {
                     int intersectRow, intersectCol;
                     // check if words intersect at the same letter
                     if (currentOrientation == Orientation.ACROSS) {
-                        if (currentPosition.getCol() + currentWord.length() < otherPosition.getCol()
-                                || currentPosition.getCol() > otherPosition.getCol()) {
+                        if ((currentPosition.getCol() + currentWord.length() < otherPosition.getCol()
+                                || currentPosition.getCol() > otherPosition.getCol()) 
+                                || currentPosition.getRow() < otherPosition.getRow() 
+                                  || otherPosition.getRow() + otherWord.length() < currentPosition.getRow()) {
                             continue;
                         }
                         
                         intersectRow = currentPosition.getRow();
                         intersectCol = otherPosition.getCol();
-                        
+
                         if (!(currentWord.charAt(intersectCol - currentPosition.getCol())
                                 == otherWord.charAt(intersectRow - otherPosition.getRow()))) {
                             return false;
                         }
                     } else {
-                        if (!(otherPosition.getCol() + otherWord.length() < currentPosition.getCol()
-                                || otherPosition.getCol() > currentPosition.getCol())) {
+                        if (!((otherPosition.getCol() + otherWord.length() < currentPosition.getCol()
+                                || otherPosition.getCol() > currentPosition.getCol()) 
+                                || otherPosition.getRow() < currentPosition.getRow() 
+                                  || currentPosition.getRow() + currentWord.length() < otherPosition.getRow())) {
                             intersectRow = otherPosition.getRow();
                             intersectCol = currentPosition.getCol();
                             
@@ -226,5 +231,18 @@ public class Puzzle {
         }
         // Remove the string minus the newline at the end
         return puzzleString.substring(0,  puzzleString.length()-1);
+    }
+    
+    /**
+     * 
+     * @param args ?
+     */
+    public static void main(String[] args) {
+        try {
+            Puzzle c = parseFromFile("puzzles/Reactions.puzzle");
+            System.out.println("c: " + c.isConsistent());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
