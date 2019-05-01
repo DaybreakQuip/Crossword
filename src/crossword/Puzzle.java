@@ -169,7 +169,6 @@ public class Puzzle {
                 // words must be unique
                 if (currentPuzzle.getWord().equals(otherPuzzle.getWord()) 
                         && !currentPuzzle.equals(otherPuzzle)) {
-                    System.out.println("Unique");
                     return false;
                 }
                 
@@ -185,14 +184,12 @@ public class Puzzle {
                         if (currentPosition.getRow() == otherPosition.getRow() && 
                                 !(currentPosition.getCol() + currentWord.length() < otherPosition.getCol()
                                 || currentPosition.getCol() > otherPosition.getCol() + otherWord.length())) {
-                            System.out.println("First overlap");
                             return false;
                         }
                     } else {
                         if (currentPosition.getCol() == otherPosition.getCol() &&
                                 !(currentPosition.getRow() + currentWord.length() < otherPosition.getRow()
                                 || currentPosition.getRow() > otherPosition.getRow() + otherWord.length())) {
-                            System.out.println("Second overlap");
                             return false;
                         }
                     
