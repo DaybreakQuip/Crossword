@@ -1,8 +1,8 @@
 @skip WHITESPACE {
-	FILE ::= ">>" NAME DESCRIPTION "\n" ENTRY*
-	NAME ::= StringIdent
-	DESCRIPTION ::= String
-	ENTRY ::= "("  WORDNAME ","  CLUE "," DIRECTION "," ROW "," COL ")"
+    FILE ::= ">>" NAME DESCRIPTION "\n" ENTRY*
+    NAME ::= StringIdent
+    DESCRIPTION ::= String
+    ENTRY ::= "("  WORDNAME ","  CLUE "," DIRECTION "," ROW "," COL ")"
 }
 
 COMMENT = ("//" [^\r\n]*)?
