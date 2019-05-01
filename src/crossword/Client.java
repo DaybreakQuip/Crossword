@@ -11,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -25,7 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 /**
- * TODO
+ * Text-protocol game client.
  */
 public class Client {
     
