@@ -94,8 +94,8 @@ public class Client {
      * Starter code to display a window with a CrosswordCanvas,
      * a text box to enter commands and an Enter button.
      */
-    private static void launchGameWindow(String puzzleName) {
-        CrosswordCanvas canvas = new CrosswordCanvas(puzzleName);
+    private static void launchGameWindow(String puzzle) {
+        CrosswordCanvas canvas = new CrosswordCanvas(puzzle);
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
         JButton enterButton = new JButton("Enter");
