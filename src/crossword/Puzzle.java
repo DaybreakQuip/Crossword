@@ -97,6 +97,13 @@ public class Puzzle {
     }
     
     /**
+     * @return description of the puzzle
+     */
+    public String getDescription() {
+        return description;
+    }
+    
+    /**
      * @return true if the puzzle is consistent and false otherwise
      */
     public boolean isConsistent() {
@@ -164,6 +171,24 @@ public class Puzzle {
             }
         }
         return true;
+    }
+    
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof Puzzle && sameValue((Puzzle) other);
+    }
+
+    /**
+     * @param other the other puzzle to compare to
+     * @return true if this and other puzzle are equal and false otherwise
+     */
+    public boolean sameValue(Puzzle other) {
+        return name.equals(other.name) && description.equals(other.description) && entries.equals(other.entries); 
+    }
+    
+    @Override
+    public int hashCode() {
+        return name.hashCode() + description.hashCode() + entries.hashCode();
     }
     
     @Override
