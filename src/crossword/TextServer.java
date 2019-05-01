@@ -117,12 +117,13 @@ public class TextServer {
             return "quit";
         }
         if (tokens[0].equals("GET")) {
-            StringBuilder allPuzzles = new StringBuilder();
+            /*StringBuilder allPuzzles = new StringBuilder();
             for (String puzzle: puzzleNames) {
                 allPuzzles.append(puzzle + ",");
             }
             allPuzzles.deleteCharAt(allPuzzles.length()-1);
-            return allPuzzles.toString();
+            return allPuzzles.toString();*/
+            return "Easy";
         }
         if (puzzleNames.contains(tokens[0])) {
             return game.getPuzzleForResponse(tokens[0]);
