@@ -49,7 +49,7 @@ public class Server {
             }
         }*/
         game = Game.createDummyGame();
-       new TextServer(game, port).serve();
+        new TextServer(game, port).serve();
   
     }
    

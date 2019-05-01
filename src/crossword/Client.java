@@ -98,7 +98,8 @@ public class Client {
      */
     private static void launchGameWindow() {
 
-        CrosswordCanvas canvas = new CrosswordCanvas();
+        Game game = Game.createDummyGame();
+        CrosswordCanvas canvas = new CrosswordCanvas(game.getPuzzleForResponse("Easy"));
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
         JButton enterButton = new JButton("Enter");
