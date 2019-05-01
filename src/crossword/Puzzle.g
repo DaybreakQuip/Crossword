@@ -5,7 +5,7 @@
 	ENTRY ::= "("  WORDNAME ","  CLUE "," DIRECTION "," ROW "," COL ")"
 }
 
-COMMENT = ("\\\\" [^\r\n]*)?
+COMMENT = ("//" [^\r\n]*)?
 WORDNAME ::= [a-z\-]+
 CLUE ::= String
 DIRECTION ::= "DOWN" | "ACROSS"
