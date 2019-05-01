@@ -32,9 +32,9 @@ public class Puzzle {
         entries.add(new PuzzleEntry("troll", "Everyone's favorite twitter pastime", Orientation.ACROSS, new Point(4, 4)));
         entries.add(new PuzzleEntry("loss", "This is not a gain", Orientation.DOWN, new Point(3, 6)));
         //entries.add(new PuzzleEntry("moo", "cows", Orientation.ACROSS, new Point(0, 2)));
-        Puzzle dummyPuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
+        Puzzle simplePuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
         
-        return dummyPuzzle;
+        return simplePuzzle;
     }
     
     /**
@@ -51,9 +51,9 @@ public class Puzzle {
         entries.add(new PuzzleEntry("troll", "Everyone's favorite twitter pastime", Orientation.ACROSS, new Point(4, 4)));
         entries.add(new PuzzleEntry("loss", "This is not a gain", Orientation.DOWN, new Point(3, 6)));
         //entries.add(new PuzzleEntry("moo", "cows", Orientation.ACROSS, new Point(0, 2)));
-        Puzzle dummyPuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
+        Puzzle simplePuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
         
-        return dummyPuzzle;
+        return simplePuzzle;
     }
     
     /**
@@ -70,17 +70,17 @@ public class Puzzle {
         entries.add(new PuzzleEntry("troll", "Everyone's favorite twitter pastime", Orientation.ACROSS, new Point(4, 4)));
         entries.add(new PuzzleEntry("loss", "This is not a gain", Orientation.DOWN, new Point(3, 6)));
         entries.add(new PuzzleEntry("rye", "Bread", Orientation.ACROSS, new Point(1, 3)));
-        Puzzle dummyPuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
+        Puzzle simplePuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
         
-        return dummyPuzzle;
+        return simplePuzzle;
     }
     
     /**
      * Returns a new Puzzle by parsing a file
      * @param filename the name of the .puzzle file
      * @return a new Puzzle parsed from the file
-     * @throws IOException 
-     * @throws UnableToParseException
+     * @throws IOException if there is a problem with reading the file
+     * @throws UnableToParseException if there is a problem with parsing
      */
     public static Puzzle parseFromFile(String filename) throws IOException, UnableToParseException{
         BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -219,6 +219,8 @@ public class Puzzle {
     @Override
     public String toString() {
         StringBuilder puzzleString = new StringBuilder();
+        puzzleString.append("Name: " + name + "\n");
+        puzzleString.append("Description: " + description + "\n");
         for (PuzzleEntry entry : entries) {
             puzzleString.append(entry.toString() + "\n");
         }

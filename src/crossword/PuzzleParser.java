@@ -117,11 +117,12 @@ public class PuzzleParser {
                 switch (child.name()) {
                     case NAME: // '"' [^"\r\n\t\\]* '"'
                         String nameWithQuotes = child.text();
-                        name = nameWithQuotes.substring(1, nameWithQuotes.length()-1);
+                        name = nameWithQuotes.substring(1, nameWithQuotes.length()-2);
                         break;
                     case DESCRIPTION: // string "\n"
                         String descWithNewline = child.text();
-                        description = descWithNewline.substring(0, descWithNewline.length()-1);
+                        description = descWithNewline.substring(1, descWithNewline.length()-2);
+                        System.out.println("description: " + description);
                         break;
                     case ENTRY: // "("  wordname ","  clue "," direction "," row "," col ")"
                         entries.add(makeEntry(child));
@@ -149,15 +150,16 @@ public class PuzzleParser {
     private static PuzzleEntry makeEntry(final ParseTree<PuzzleGrammar> parseTree) {
         // entry ::= "("  wordname ","  clue "," direction "," row "," col ")"
         List<ParseTree<PuzzleGrammar>> children = parseTree.children();
-        // Extract word, clue, 
+        // indices for different parts of entries
         final int wordIndex = 0;
         final int clueIndex = 1;
         final int orientationIndex = 2;
         final int rowIndex = 3;
         final int colIndex = 4;
-        
+        // Extract word, clue, orientation, row, and col from the parseTree
         String word = children.get(wordIndex).text();
-        String clue = children.get(clueIndex).text();
+        String clueWithQuotes = children.get(clueIndex).text();
+        String clue = clueWithQuotes.substring(1, clueWithQuotes.length()-1);
         Orientation orientation = Orientation.valueOf(children.get(orientationIndex).text());
         int row = Integer.valueOf(children.get(rowIndex).text());
         int col = Integer.valueOf(children.get(colIndex).text());
