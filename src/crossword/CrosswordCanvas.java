@@ -50,6 +50,16 @@ class CrosswordCanvas extends JComponent {
      */
     private final Font textFont = new Font("Arial", Font.PLAIN, 16);
 
+    // Abstraction function:
+    //  AF(originX, originY, delta, mainFont, indexFont, textFont, puzzle) = canvas representing the crossword puzzle starting at originX, originY 
+    //                                                                      with puzzle cells of size delta and text using mainFont, indexFont, and textFont.
+    //                                                                      puzzle represents puzzle entries separated by ENTRY_DELIM and
+    //                                                                      puzzle parts of each entry separated by WORD_DELIM.
+    // Representation invariant:
+    //  true
+    // Safety from rep exposure:
+    //  All fields are private, final, and immutable
+    
     private final String puzzle;
     private static final String ENTRY_DELIM = "~";
     private static final String WORD_DELIM = "`";
