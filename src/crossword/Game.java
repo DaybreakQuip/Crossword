@@ -43,7 +43,7 @@ public class Game {
         File[] listofPuzzles = folder.listFiles();
         for (File file : listofPuzzles) {
             if (file.isFile()) {
-                Puzzle newPuzzle = PuzzleParser.parse(puzzleFromFile(file.getName()));
+                Puzzle newPuzzle = Puzzle.parseFromFile(directory + file.getName()); 
                 if (newPuzzle.isConsistent()) {
                     puzzles.put(newPuzzle.getName(), newPuzzle);
                 }
@@ -51,22 +51,7 @@ public class Game {
         }
         return new Game(puzzles);
     }
-    /**
-     * 
-     * @param filename the filename of the puzzle String to be extracted from
-     * @return String of the files to be parsed
-     * @throws IOException 
-     */
-    private static String puzzleFromFile(String filename) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader("puzzles/" + filename));
-        StringBuilder inputBuilder = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            inputBuilder.append(line + "\n");
-        }
-        reader.close();
-        return inputBuilder.toString();
-    }
+    
     /**
      * Returns a game meant for testing purposes
      * @return a new dummy game with puzzle entries from simple.puzzle
