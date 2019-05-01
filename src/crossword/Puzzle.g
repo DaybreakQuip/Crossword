@@ -1,17 +1,18 @@
-@skip WHITESPACE {
-    FILE ::= ">>" NAME DESCRIPTION "\n" ENTRY*
-    NAME ::= StringIdent
-    DESCRIPTION ::= String
-    ENTRY ::= "("  WORDNAME ","  CLUE "," DIRECTION "," ROW "," COL ")"
+@skip whitespace {
+    file ::= ">>" name description entry+;
+    name ::= stringIndent;
+    description ::= string;
+    entry ::= "("  wordname ","  clue "," direction "," row "," col ")";
 }
 
-COMMENT = ("//" [^\r\n]*)?
-WORDNAME ::= [a-z\-]+
-CLUE ::= String
-DIRECTION ::= "DOWN" | "ACROSS"
-ROW ::= Int
-COL ::= Int
-String::= '"' ([^"\r\n\\] | '\\' [\\nrt] )* '"'
-StringIdent ::= '"' [^"\r\n\t\\]* '"'
-Int ::= [0-9]+
-WHITESPACE ::= [ \t\r\n]+;
+comment ::= ("//" [^\r\n]*)?;
+wordname ::= [a-z\-]+;
+clue ::= string;
+direction ::= "DOWN" | "ACROSS";
+row ::= int;
+col ::= int;
+string ::= '"' ([^"\r\n\\] | '\\' [\\nrt] )* '"';
+stringIndent ::= '"' [^"\r\n\t\\]* '"';
+int ::= [0-9]+;
+whitespace ::= [ \t\r\n]+;
+newline ::= "\n";
