@@ -3,16 +3,10 @@
  */
 package crossword;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.WindowConstants;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.awt.BorderLayout;
+import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,12 +14,16 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.text.BreakIterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.stream.Collectors;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 /**
  * TODO
  */
@@ -66,8 +64,17 @@ public class Client {
                 BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in));
         ) {
             boolean showRaw = false;
-            launchGameWindow();
-            while ( ! socket.isClosed()) {
+            if (!socket.isClosed()) {
+                socketOut.println("GET");
+                while (!socketIn.ready()) {
+                }
+                getPuzzles(socketIn, System.out, showRaw);
+                System.out.print("? ");
+                final String command = systemIn.readLine();
+                socketOut.println(command);
+                launchGameWindow(socketIn.readLine());
+            }
+            while (!socket.isClosed()) {
                 System.out.print("? ");
                 final String command = systemIn.readLine();
                 switch (command) {
@@ -80,16 +87,12 @@ public class Client {
                     continue;
                 default:
                     socketOut.println(command);
-                    while (!socketIn.ready()) {
-                    }
-                    playGame(socketIn, System.out, showRaw);
                 }
             }
             System.out.println("connection closed");
         }
     }
-    private static void playGame(BufferedReader in, PrintStream out, boolean showRaw) throws IOException {
-        String wholePuzzle = "";
+    private static void getPuzzles(BufferedReader in, PrintStream out, boolean showRaw) throws IOException {
         while (in.ready()) {
             out.print(in.readLine());
         }
@@ -99,10 +102,8 @@ public class Client {
      * Starter code to display a window with a CrosswordCanvas,
      * a text box to enter commands and an Enter button.
      */
-    private static void launchGameWindow() {
-
-        Game game = Game.createDummyGame();
-        CrosswordCanvas canvas = new CrosswordCanvas(game.getPuzzleForResponse("Easy"));
+    private static void launchGameWindow(String puzzleName) {
+        CrosswordCanvas canvas = new CrosswordCanvas(puzzleName);
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
         JButton enterButton = new JButton("Enter");

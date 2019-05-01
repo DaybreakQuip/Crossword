@@ -178,14 +178,10 @@ class CrosswordCanvas extends JComponent {
         int down = 0;
         List<String> acrossHints = new ArrayList<>();
         List<String> downHints = new ArrayList<>();
-        
-        System.out.println(puzzle);
-        
+                
         String[] entries = puzzle.split(ENTRY_DELIM);
         
-        System.out.println("after split entries");
         for (String entry: entries) {
-            System.out.println(entry);
             // info has the following format: 
             //     length WORD_DELIM hint WORD_DELIM orientation WORD_DELIM 
             //     row WORD_DELIM col ENTRY_DELIM

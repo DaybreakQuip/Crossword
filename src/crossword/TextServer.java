@@ -9,6 +9,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Set;
     /**
      * Text-protocol game server.
      * 
@@ -123,13 +125,18 @@ public class TextServer {
      */
     private String handleRequest(String input, String playerID) throws IOException {
         String[] tokens = input.split(" ");
+        Set<String> puzzleNames = game.getPuzzleNames();
+        System.out.println(puzzleNames);
         if (tokens[0].equals("quit")) {
             return "quit";
         }
-        if (tokens[0].equals("look")) {
-            return game.getPuzzleForResponse("Easy");
+        if (tokens[0].equals("GET")) {
+            return "Easy";
+        }
+        if (puzzleNames.contains(tokens[0])) {
+            return game.getPuzzleForResponse(tokens[0]);
         }
         // if we reach here, the client message did not follow the protocol
-            throw new UnsupportedOperationException(input);
-        }
+        throw new UnsupportedOperationException(input);
+    }
 }
