@@ -18,17 +18,15 @@ import java.util.Set;
  */
 public class TextServer {
     // Abstraction function:
-    //    AF(serverSocket, game, nextID) --> TextServer Object having the ability to connect two  players to a Crossword Puzzle game. 
+    //    AF(serverSocket, game, nextID) --> TextServer Object having the ability to connect one player to a Crossword Puzzle game. 
     //                                        One serverSocket (a rep) is able to run multiple connections, game is the game class for
-    //                                        the Crowssword game, and a nextID for the next players for concurrency
+    //                                        the Crossword game, and a nextID for the next players for concurrency
     // Representation invariant:
     //  true
     // Safety from rep exposure:
-    //  serversocket is private and final
+    //  serverSocket is private and final
     //  game is private and final
     //  nextID is never given to the client
-    //  Only method that can be accessed is flip, and textServerPrint which is done internally
-    //  client can never access board's functions
     
     private final ServerSocket serverSocket;
     private final Game game;
