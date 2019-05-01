@@ -2,26 +2,17 @@
  * Redistribution of original or derived work requires permission of course staff.
  */
 package crossword;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Queue;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import edu.mit.eecs.parserlib.UnableToParseException;
 /**
- * TODO
+ * Game server runner.
  */
 public class ServerMain {
-    
     /**
      * Start a Crossword Extravaganza server.
      * 

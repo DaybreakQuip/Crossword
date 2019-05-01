@@ -232,4 +232,17 @@ public class Puzzle {
         // Remove the string minus the newline at the end
         return puzzleString.substring(0,  puzzleString.length()-1);
     }
+    
+    /**
+     * 
+     * @param args ?
+     */
+    public static void main(String[] args) {
+        try {
+            Puzzle c = parseFromFile("puzzles/Reactions.puzzle");
+            System.out.println("c: " + c.isConsistent());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

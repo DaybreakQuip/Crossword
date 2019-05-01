@@ -74,7 +74,10 @@ public class PuzzleTest {
         // Test with puzzles made by parser
         Puzzle parsedPuzzle = Puzzle.parseFromFile("puzzles/simple.puzzle");
         assertTrue(parsedPuzzle.isConsistent(), "Expected parsed simple puzzle to be consistent");
-        
+        Puzzle parsedMetamorphicConsistent = Puzzle.parseFromFile("puzzles/Metamorphic.puzzle");
+        assertTrue(parsedMetamorphicConsistent.isConsistent(), "Expected puzzle to be consistent");
+        Puzzle parsedReactionsConsistent = Puzzle.parseFromFile("puzzles/Reactions.puzzle");
+        assertTrue(parsedReactionsConsistent.isConsistent(), "Expected puzzle to be consistent");
     }
     
     @Test
@@ -90,6 +93,10 @@ public class PuzzleTest {
         assertFalse(parsedSimpleInconsistentPuzzle.isConsistent(), "Expected parsed simple inconsistent puzzle to be inconsistent");
         Puzzle parsedSimpleOverlapPuzzle = Puzzle.parseFromFile("puzzles/overlap.puzzle");
         assertFalse(parsedSimpleOverlapPuzzle.isConsistent(), "Expected parsed simple overlapping puzzle to be inconsistent");
+        Puzzle parsedMetamorphicInconsistent = Puzzle.parseFromFile("puzzles/MetamorphicInconsistent.puzzle");
+        assertFalse(parsedMetamorphicInconsistent.isConsistent(), "Expected puzzle to be inconsistent");
+        Puzzle parsedReactionsInconsistent = Puzzle.parseFromFile("puzzles/ReactionsInconsistent.puzzle");
+        assertFalse(parsedReactionsInconsistent.isConsistent(), "Expected puzzle to be inconsistent");
     }
     
     // Covers parsing simple.puzzle
