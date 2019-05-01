@@ -54,19 +54,21 @@ public class PuzzleEntry {
     
     @Override
     public int hashCode() {
-        return word.length() + clue.length();
+        return word.hashCode() + clue.hashCode() + orientation.hashCode() + position.hashCode();
     }
     
     @Override
-    public boolean equals(Object that) {
-        if (!(that instanceof PuzzleEntry)) return false;
-        else {
-            PuzzleEntry other = (PuzzleEntry) that;
-            return this.word.equals(other.word) 
-                    && this.clue.equals(other.clue) 
-                    && this.orientation == other.orientation
-                    && this.position.equals(other.position);
-        }
+    public boolean equals(Object other) {
+        return other instanceof PuzzleEntry && sameValue((PuzzleEntry) other);
+    }
+
+    /**
+     * @param other the other puzzle entry to compare to
+     * @return true if this and other puzzle entry are equal and false otherwise
+     */
+    public boolean sameValue(PuzzleEntry other) {
+        return word.equals(other.word) && clue.equals(other.clue) 
+                && orientation == other.orientation && position.equals(other.position);
     }
     
     @Override

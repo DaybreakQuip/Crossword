@@ -119,4 +119,22 @@ public class Game {
     public Set<String> getPuzzleNames() {
         return puzzles.keySet();
     }
+    
+    @Override
+    public int hashCode() {
+        return puzzles.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof Game && sameValue((Game) other);
+    }
+
+    /**
+     * @param other the other game to compare to
+     * @return true if this and other game are equal and false otherwise
+     */
+    public boolean sameValue(Game other) {
+        return puzzles.equals(other.puzzles);
+    }
 }
