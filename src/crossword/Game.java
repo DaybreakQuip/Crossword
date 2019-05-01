@@ -13,6 +13,8 @@ import java.util.Set;
  */
 public class Game {
     private final Map<String, Puzzle> puzzles; // map of name : puzzle
+    private static final String ENTRY_DELIM = "~";
+    private static final String WORD_DELIM = "`";
     
     /**
      * @return a new Game with all puzzles parsed from files inside puzzles/
@@ -76,8 +78,9 @@ public class Game {
         Puzzle puzzle = puzzles.get(name);
         String puzzleString = "";
         for (PuzzleEntry entry: puzzle.getEntries()) {
-            puzzleString += entry.getWord().length() + ", " + entry.getHint() + ", " + 
-        entry.getOrientation() + ", " + entry.getPosition().getRow() + ", " + entry.getPosition().getCol() + "\n";
+            puzzleString += entry.getWord().length() + WORD_DELIM + entry.getHint() + WORD_DELIM + 
+                            entry.getOrientation() + WORD_DELIM + entry.getPosition().getRow() 
+                            + WORD_DELIM + entry.getPosition().getCol() + ENTRY_DELIM;
         }
         return puzzleString.substring(0,puzzleString.length()-1);
     }

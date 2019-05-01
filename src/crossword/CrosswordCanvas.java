@@ -51,6 +51,8 @@ class CrosswordCanvas extends JComponent {
     private final Font textFont = new Font("Arial", Font.PLAIN, 16);
 
     private final String puzzle;
+    private static final String ENTRY_DELIM = "~";
+    private static final String WORD_DELIM = "`";
     
     /**
      * 
@@ -177,10 +179,17 @@ class CrosswordCanvas extends JComponent {
         List<String> acrossHints = new ArrayList<>();
         List<String> downHints = new ArrayList<>();
         
-        String[] entries = puzzle.split("\n");
+        System.out.println(puzzle);
+        
+        String[] entries = puzzle.split(ENTRY_DELIM);
+        
+        System.out.println("after split entries");
         for (String entry: entries) {
-            // info has the following format: length, hint, orientation, row, col\n
-            String[] info = entry.split(", ");
+            System.out.println(entry);
+            // info has the following format: 
+            //     length WORD_DELIM hint WORD_DELIM orientation WORD_DELIM 
+            //     row WORD_DELIM col ENTRY_DELIM
+            String[] info = entry.split(WORD_DELIM);
             int length = Integer.parseInt(info[0]);
             int row = Integer.parseInt(info[3]);
             int col = Integer.parseInt(info[4]);
