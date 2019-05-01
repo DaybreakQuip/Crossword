@@ -129,6 +129,7 @@ public class TextServer {
         }
         if (tokens[0].equals("GET")) {
             StringBuilder allPuzzles = new StringBuilder();
+            allPuzzles.append("Puzzles Available: ");
             for (String puzzle: puzzleNames) {
                 allPuzzles.append(puzzle + ",");
             }
