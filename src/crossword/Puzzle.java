@@ -16,6 +16,15 @@ import edu.mit.eecs.parserlib.UnableToParseException;
  *
  */
 public class Puzzle {
+    //Abstraction Function:
+    //AF(name, description, entries) --> A Puzzle representing a crossword puzzle with a name and a description for the crossword. 
+    //                                   There is a list of PuzzleEntries that represents each word in the puzzle.
+    //                                    
+    //Rep Invariant:
+    //true
+    //Safety From Rep Exposure:
+    //  name and description is private and final and immutable
+    //  entries is only accessed through getter methods like getentries which creates a copy before returning to the client
     private final String name; 
     private final String description;
     private final List<PuzzleEntry> entries;
