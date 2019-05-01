@@ -7,6 +7,13 @@ public class Point {
     private final int row;
     private final int col;
     
+    // Abstraction function:
+    //    AF(row, col) = a point representing a location on the crossword board located at ith row and jth column where i = row and j = col
+    // Representation invariant:
+    //  true
+    // Safety from rep exposure:
+    //  all fields are final, private, and immutable
+      
     /**
      * Create a new point representing location at (row, col)
      * @param row the row of the point
