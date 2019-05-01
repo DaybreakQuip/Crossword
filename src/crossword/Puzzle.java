@@ -1,8 +1,13 @@
 package crossword;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import edu.mit.eecs.parserlib.UnableToParseException;
 
 /**
  * Immutable Puzzle class representing a puzzle object
@@ -68,6 +73,26 @@ public class Puzzle {
         Puzzle dummyPuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
         
         return dummyPuzzle;
+    }
+    
+    /**
+     * Returns a new Puzzle by parsing a file
+     * @param filename the name of the .puzzle file
+     * @return a new Puzzle parsed from the file
+     * @throws IOException 
+     * @throws UnableToParseException
+     */
+    public static Puzzle parseFromFile(String filename) throws IOException, UnableToParseException{
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        StringBuilder inputBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            inputBuilder.append(line + "\n");
+        }
+        
+        reader.close();
+        String input = inputBuilder.toString();
+        return PuzzleParser.parse(input);
     }
     
     /**
