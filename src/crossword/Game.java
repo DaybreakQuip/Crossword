@@ -1,10 +1,17 @@
 package crossword;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import edu.mit.eecs.parserlib.UnableToParseException;
 
 /**
  * TODO: Make this class mutable for future milestones (?)
@@ -15,17 +22,51 @@ public class Game {
     private final Map<String, Puzzle> puzzles; // map of name : puzzle
     private static final String ENTRY_DELIM = "~";
     private static final String WORD_DELIM = "`";
-    
     /**
-     * @return a new Game with all puzzles parsed from files inside puzzles/
+     * Main method. Makes the Game from Puzzle objects from parsing.
+     * 
+     * @param args command line arguments, not used
+     * @throws UnableToParseException if example expression can't be parsed
+     * @throws IOException if .puzzle file cannot be opened
      */
-    public static Game parseGameFromFiles() {
-        // TODO: Fix this function to actually parse from file
-        // Do something
-        
-        return new Game(new HashMap<String, Puzzle>());
+    public static void main(final String[] args) throws UnableToParseException, IOException {
+        System.out.println(Game.parseGameFromFiles("puzzles/"));
     }
-    
+    /**
+     * @param directory the folder to the puzzles
+     * @return a new Game with all puzzles parsed from files inside puzzles/
+     * @throws UnableToParseException Puzzle cannot be parsed
+     * @throws IOException File cannot be read
+     */
+    public static Game parseGameFromFiles(String directory) throws UnableToParseException, IOException {
+        // Do something
+        HashMap<String, Puzzle> puzzles = new HashMap<>();
+        File folder = new File(directory);
+        File[] listofPuzzles = folder.listFiles();
+        for (File file : listofPuzzles) {
+            if (file.isFile()) {
+                Puzzle newPuzzle = PuzzleParser.parse(puzzleFromFile(file.getName()));
+                puzzles.put(newPuzzle.getName(), newPuzzle);
+            }
+        }
+        return new Game(puzzles);
+    }
+    /**
+     * 
+     * @param filename the filename of the puzzle String to be extracted from
+     * @return String of the files to be parsed
+     * @throws IOException 
+     */
+    private static String puzzleFromFile(String filename) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader("puzzles/" + filename));
+        StringBuilder inputBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            inputBuilder.append(line + "\n");
+        }
+        reader.close();
+        return inputBuilder.toString();
+    }
     /**
      * Returns a game meant for testing purposes
      * @return a new dummy game with puzzle entries from simple.puzzle

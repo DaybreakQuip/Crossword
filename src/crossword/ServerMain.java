@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,20 +15,24 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import edu.mit.eecs.parserlib.UnableToParseException;
 /**
  * TODO
  */
-public class Server {
+public class ServerMain {
     
     /**
      * Start a Crossword Extravaganza server.
      * 
-     * Command to connect server: java -ea -cp bin crossword.Server text 4444 puzzles
-     * 
+     * Command to connect server: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
+     * Command to Client: java -cp bin crossword.Client localhost 4444
      * @param args The command line arguments should include only the folder where
      *             the puzzles are located.
+     * @throws IOException Server won't connect
+     * @throws UnableToParseException Unable to Parse Exception
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, UnableToParseException {
         final Queue<String> arguments = new LinkedList<>(Arrays.asList(args));
         final int port;
         final String directory;
@@ -35,6 +40,7 @@ public class Server {
 
         try {
             directory = arguments.remove();
+            game = Game.parseGameFromFiles(directory);
         } catch (NoSuchElementException | NumberFormatException e) {
             throw new IllegalArgumentException("missing or invalid PORT", e);
         }
@@ -43,14 +49,6 @@ public class Server {
         } catch (NoSuchElementException | NumberFormatException e) {
             throw new IllegalArgumentException("missing or invalid PORT", e);
         }
-        /*File folder = new File(directory);
-        File[] listOfFiles = folder.listFiles();
-        for (File file : listOfFiles) {
-            if (file.isFile()) {
-                System.out.println(file.getName());
-            }
-        }*/
-        game = Game.createDummyGame();
         new TextServer(game, port).serve();
   
     }
