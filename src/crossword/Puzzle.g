@@ -1,11 +1,11 @@
 @skip whitespace {
-    file ::= ">>" name description entry*;
-    name ::= stringIndent;
-    description ::= string;
+    file ::= ">>" name description (comment | entry)*;
     entry ::= "("  wordname ","  clue "," direction "," row "," col ")";
+    name ::= stringIndent;
 }
 
-comment ::= ("//" [^\r\n]*)?;
+description ::= string "\n";
+comment ::= "//" [^\r\n]* "\n";
 wordname ::= [a-z\-]+;
 clue ::= string;
 direction ::= "DOWN" | "ACROSS";
@@ -15,4 +15,3 @@ string ::= '"' ([^"\r\n\\] | '\\' [\\nrt] )* '"';
 stringIndent ::= '"' [^"\r\n\t\\]* '"';
 int ::= [0-9]+;
 whitespace ::= [ \t\r\n]+;
-newline ::= "\n";

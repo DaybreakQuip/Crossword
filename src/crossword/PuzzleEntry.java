@@ -6,7 +6,7 @@ package crossword;
  */
 public class PuzzleEntry {
     private final String word;
-    private final String hint;
+    private final String clue;
     private final Orientation orientation;
     private final Point position;
     
@@ -14,13 +14,13 @@ public class PuzzleEntry {
      * Create a new PuzzleEntry object 
      * @param word the word of this entry
      * @param position the position of this entry
-     * @param hint the hint for the word
+     * @param clue the clue for the word
      * @param orientation the orientation of this entry
      */
-    public PuzzleEntry(String word, String hint, Orientation orientation, Point position) {
+    public PuzzleEntry(String word, String clue, Orientation orientation, Point position) {
         this.word = word;
         this.position = position;
-        this.hint = hint;
+        this.clue = clue;
         this.orientation = orientation;
     }
     
@@ -39,10 +39,10 @@ public class PuzzleEntry {
     }
     
     /**
-     * @return this entry's hint
+     * @return this entry's clue
      */
-    public String getHint() {
-        return hint;
+    public String getClue() {
+        return clue;
     }
     
     /**
@@ -54,7 +54,7 @@ public class PuzzleEntry {
     
     @Override
     public int hashCode() {
-        return word.length() + hint.length();
+        return word.length() + clue.length();
     }
     
     @Override
@@ -63,7 +63,7 @@ public class PuzzleEntry {
         else {
             PuzzleEntry other = (PuzzleEntry) that;
             return this.word.equals(other.word) 
-                    && this.hint.equals(other.hint) 
+                    && this.clue.equals(other.clue) 
                     && this.orientation == other.orientation
                     && this.position.equals(other.position);
         }
@@ -71,6 +71,6 @@ public class PuzzleEntry {
     
     @Override
     public String toString() {
-        return "(" + word + ", " + hint + ", " + orientation + ", " + position + ")";
+        return "(" + word + ", " + clue + ", " + orientation + ", " + position + ")";
     }
 }

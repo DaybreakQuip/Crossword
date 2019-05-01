@@ -2,9 +2,7 @@ package crossword;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Immutable Puzzle class representing a puzzle object
@@ -54,6 +52,25 @@ public class Puzzle {
     }
     
     /**
+     * @return an inconsistent dummy puzzle for testing 
+     */
+    public static Puzzle makeInconsistentPuzzleOverlap() {
+        List<PuzzleEntry> entries = new ArrayList<>();
+        entries.add(new PuzzleEntry("star", "twinkle twinkle", Orientation.ACROSS, new Point(1, 0)));
+        entries.add(new PuzzleEntry("market", "Farmers ______", Orientation.DOWN, new Point(0, 2)));
+        entries.add(new PuzzleEntry("kettle", "It's tea time!", Orientation.ACROSS, new Point(3, 2)));
+        entries.add(new PuzzleEntry("extra", "more", Orientation.DOWN, new Point(1, 5)));
+        entries.add(new PuzzleEntry("bee", "Everyone loves honey", Orientation.ACROSS, new Point(4, 0)));
+        entries.add(new PuzzleEntry("treasure", "Every pirate's dream", Orientation.ACROSS, new Point(5, 2)));
+        entries.add(new PuzzleEntry("troll", "Everyone's favorite twitter pastime", Orientation.ACROSS, new Point(4, 4)));
+        entries.add(new PuzzleEntry("loss", "This is not a gain", Orientation.DOWN, new Point(3, 6)));
+        entries.add(new PuzzleEntry("rye", "Bread", Orientation.ACROSS, new Point(1, 3)));
+        Puzzle dummyPuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
+        
+        return dummyPuzzle;
+    }
+    
+    /**
      * Creates a new crossword Puzzle with pre-existing entries
      * @param name the name of the puzzle
      * @param description the description of the puzzle
@@ -94,16 +111,15 @@ public class Puzzle {
                     return false;
                 }
                 
-                // different orientation: at most one intersection
                 final Orientation currentOrientation = currentPuzzle.getOrientation();
+                final Point currentPosition = currentPuzzle.getPosition();
+                final Point otherPosition = otherPuzzle.getPosition();
+                final String currentWord = currentPuzzle.getWord();
+                final String otherWord = otherPuzzle.getWord();
+                                
+                // different orientation: at most one intersection
                 if (currentOrientation != otherPuzzle.getOrientation()) {
-                    final Point currentPosition = currentPuzzle.getPosition();
-                    final Point otherPosition = otherPuzzle.getPosition();
-                    final String currentWord = currentPuzzle.getWord();
-                    final String otherWord = otherPuzzle.getWord();
-
                     int intersectRow, intersectCol;
-                    
                     // check if words intersect at the same letter
                     if (currentOrientation == Orientation.ACROSS) {
                         if (currentPosition.getCol() + currentWord.length() < otherPosition.getCol()
@@ -114,26 +130,40 @@ public class Puzzle {
                         intersectRow = currentPosition.getRow();
                         intersectCol = otherPosition.getCol();
                         
-                        return currentWord.charAt(intersectCol - currentPosition.getCol())
-                                == otherWord.charAt(intersectRow - otherPosition.getRow());
-                    } else {
-                        if (otherPosition.getCol() + otherWord.length() < currentPosition.getCol()
-                                || otherPosition.getCol() > currentPosition.getCol()) {
-                            continue;
+                        if (!(currentWord.charAt(intersectCol - currentPosition.getCol())
+                                == otherWord.charAt(intersectRow - otherPosition.getRow()))) {
+                            return false;
                         }
-                        
-                        intersectRow = otherPosition.getRow();
-                        intersectCol = currentPosition.getCol();
-                        
-                        return currentWord.charAt(intersectRow - currentPosition.getRow())
-                                == otherWord.charAt(intersectCol - otherPosition.getCol());
+                    } else {
+                        if (!(otherPosition.getCol() + otherWord.length() < currentPosition.getCol()
+                                || otherPosition.getCol() > currentPosition.getCol())) {
+                            intersectRow = otherPosition.getRow();
+                            intersectCol = currentPosition.getCol();
+                            
+                            if (!(currentWord.charAt(intersectRow - currentPosition.getRow())
+                                    == otherWord.charAt(intersectCol - otherPosition.getCol()))) {
+                                return false;
+                            }
+                        }
                     }
-                } else {
-                    //TODO
+                } else { // check if words overlap
+                    if (currentOrientation == Orientation.ACROSS) {
+                        if (currentPosition.getRow() == otherPosition.getRow() && 
+                                !(currentPosition.getCol() + currentWord.length() < otherPosition.getCol()
+                                || currentPosition.getCol() > otherPosition.getCol() + otherWord.length())) {
+                            return false;
+                        }
+                    } else {
+                        if (currentPosition.getCol() == otherPosition.getCol() &&
+                                !(currentPosition.getRow() + currentWord.length() < otherPosition.getRow()
+                                || currentPosition.getRow() > otherPosition.getRow() + otherWord.length())) {
+                            return false;
+                        }
+                    }
                 }
             }
         }
-        return false;
+        return true;
     }
     
     @Override
@@ -145,13 +175,4 @@ public class Puzzle {
         // Remove the string minus the newline at the end
         return puzzleString.substring(0,  puzzleString.length()-1);
     }
-    
-    /**
-     * 
-     * @param args test
-     */
-    public static void main(String args[]) 
-    { 
-        System.out.println("Hello world");
-    } 
 }

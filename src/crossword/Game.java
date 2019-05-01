@@ -99,14 +99,14 @@ public class Game {
      * Returns a puzzle with a specific format where every entry is separate by new lines and no 
      * words are revealed
      * @param name the name of the puzzle
-     * @return string with format: length, hint, orientation, row, col\n
+     * @return string with format: length, clue, orientation, row, col\n
      *         e.g: "4, "twinkle twinkle", ACROSS, 0, 1\n"
      */
     public String getPuzzleForResponse(String name) {
         Puzzle puzzle = puzzles.get(name);
         String puzzleString = "";
         for (PuzzleEntry entry: puzzle.getEntries()) {
-            puzzleString += entry.getWord().length() + WORD_DELIM + entry.getHint() + WORD_DELIM + 
+            puzzleString += entry.getWord().length() + WORD_DELIM + entry.getClue() + WORD_DELIM + 
                             entry.getOrientation() + WORD_DELIM + entry.getPosition().getRow() 
                             + WORD_DELIM + entry.getPosition().getCol() + ENTRY_DELIM;
         }
