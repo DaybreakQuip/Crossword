@@ -1,0 +1,18 @@
+>> "Reactions" "Fun With Chem"
+
+(products, "These substances are made in reactions", ACROSS, 0, 2)
+(catalysts, "These substances increase the rate of a reaction but do not get used up", ACROSS, 2, 5)
+(enzymes, "These proteins are biological catalysts", ACROSS, 4, 0)
+(collide, "Particles must do this so they can react together", ACROSS, 5, 8)
+(exothermic, "These reactions transfer energy to the surroundings, usually by heating", ACROSS, 7, 0)
+(reactants, "These substances are used up in reactions", ACROSS, 9, 6)
+(reversible, "This type of reaction can go in both directions, with a forward reaction and a reverse reaction", ACROSS, 11, 2)
+(dynamic, "In this type of equilibrium, the forward and reverse reactions continue to happen", ACROSS, 13, 6)
+(areas, "Powders have large surface ____ compared to their volumes", ACROSS, 14, 0)
+(energy, "This is released when chemical bonds are made", ACROSS, 15, 8)
+(increased, "In an endothermic reaction, you get more product if the temperature is...", DOWN, 0, 0)
+(equal, "The rates of the forward and reverse reactions at equilibrium are this", DOWN, 11, 3)
+(deceased, "In an exothermic reaction, you get more product if the temperature is...", DOWN, 0, 5)
+(activation, "The minimum amount of energy needed for particles to react", DOWN, 4, 8)
+(lechatelier, "Scientist whose principle lets you predict the effect on the position of equilibrium when you change the reaction conditions", DOWN, 5, 11)
+(goesfaster, "The rates of the forward and reverse reactions at equilibrium are this", DOWN, 3, 14)
