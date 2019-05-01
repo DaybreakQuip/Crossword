@@ -32,6 +32,24 @@ public class Point {
     }
     
     @Override
+    public boolean equals(Object other) {
+        return other instanceof Point && sameValue((Point) other);
+    }
+    
+    /**
+     * @param other point to compare to
+     * @return true of this and other point are equal and false otherwise
+     */
+    public boolean sameValue(Point other) {
+        return this.row == other.row && this.col == other.col;
+    }
+    
+    @Override
+    public int hashCode() {
+        return this.row + this.col;
+    }
+    
+    @Override
     public String toString() {
         return "(" + row + ", " + col + ")";
     }
