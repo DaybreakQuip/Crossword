@@ -1,5 +1,5 @@
 @skip whitespace {
-    file ::= ">>" name description entry+;
+    file ::= ">>" name description entry*;
     name ::= stringIndent;
     description ::= string;
     entry ::= "("  wordname ","  clue "," direction "," row "," col ")";

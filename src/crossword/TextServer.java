@@ -126,7 +126,6 @@ public class TextServer {
     private String handleRequest(String input, String playerID) throws IOException {
         String[] tokens = input.split(" ");
         Set<String> puzzleNames = game.getPuzzleNames();
-        System.out.println(puzzleNames);
         if (tokens[0].equals("quit")) {
             return "quit";
         }
