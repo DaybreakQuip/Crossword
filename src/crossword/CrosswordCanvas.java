@@ -51,7 +51,7 @@ class CrosswordCanvas extends JComponent {
     private final Font textFont = new Font("Arial", Font.PLAIN, 16);
 
     // Abstraction function:
-    //  AF(originX, originY, delta, mainFont, indexFont, textFont, puzzle, state) = canvas representing the crossword puzzle starting at originX, originY 
+    //  AF(originX, originY, delta, mainFont, indexFont, textFont, puzzle, state, puzzleList) = canvas representing the crossword puzzle starting at originX, originY 
     //                                                                      with puzzle cells of size delta and text using mainFont, indexFont, and textFont.
     //                                                                      puzzle represents puzzle entries separated by ENTRY_DELIM and
     //                                                                      puzzle parts of each entry separated by WORD_DELIM.
@@ -64,6 +64,7 @@ class CrosswordCanvas extends JComponent {
     private static final String ENTRY_DELIM = "~";
     private static final String WORD_DELIM = "`";
     private State state;
+    private String puzzleList;
     
     /**
      * @param puzzle string representation of the crossword puzzle
@@ -93,6 +94,13 @@ class CrosswordCanvas extends JComponent {
      */
     public void setPuzzle(String puzzle) {
         this.puzzle = puzzle;
+    }
+    
+    /**
+     * @param puzzleList the list of valid puzzle names
+     */
+    public void setPuzzleList(String puzzleList) {
+        this.puzzleList = puzzleList;
     }
     
     /**
@@ -293,7 +301,7 @@ class CrosswordCanvas extends JComponent {
         case CHOOSE:
             {
                 println("Choose state:", g);
-                println("Please type in a command into the text box and hit the Enter button.", g);
+                println(puzzleList, g);
                 break;
             }
         case WAIT:

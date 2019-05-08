@@ -88,8 +88,12 @@ public class Client {
      * Transition crossword canvas from start state to choose state
      * @param canvas crossword canvas to modify
      */
-    private static void transitionStartState(CrosswordCanvas canvas) {
+    private static void transitionStartState(CrosswordCanvas canvas, BufferedReader socketIn, PrintWriter socketOut) {
         canvas.setState(State.CHOOSE);
+        socketOut.println("GET");
+        try {
+            canvas.setPuzzleList(socketIn.readLine());
+        } catch (IOException ioe) {}
     }
     
     /**
@@ -130,7 +134,7 @@ public class Client {
             switch (canvas.getState()) {
             case START:
                 {
-                    transitionStartState(canvas);
+                    transitionStartState(canvas, socketIn, socketOut);
                     break;
                 }
             case CHOOSE:
