@@ -60,15 +60,42 @@ class CrosswordCanvas extends JComponent {
     // Safety from rep exposure:
     //  All fields are private, final, and immutable
     
-    private final String puzzle;
+    private String puzzle;
     private static final String ENTRY_DELIM = "~";
     private static final String WORD_DELIM = "`";
+    private State state;
     
     /**
      * 
      * @param puzzle TODO
      */
     public CrosswordCanvas(String puzzle) {
+        this.puzzle = puzzle;
+        this.state = State.START;
+    }
+    
+    /**
+     * 
+     * @return TODO
+     */
+    public State getState() {
+        return state;
+    }
+    
+    /**
+     * 
+     * @param state TODO
+     */
+    public void setState(State state) {
+        this.state = state;
+    }
+    
+    
+    /**
+     * 
+     * @param state TODO
+     */
+    public void setPuzzle(String puzzle) {
         this.puzzle = puzzle;
     }
     
@@ -253,7 +280,42 @@ class CrosswordCanvas extends JComponent {
      */
     @Override
     public void paint(Graphics g) {
-        printPuzzle(g);
+        resetLine();
+        switch (state) {
+        case START:
+            {
+                println("Start state:", g);
+                println("Please type in a valid ID into the text box and hit the Enter button.", g);
+                println("Valid ID requirements: alphanumeric, at least one character long", g);
+                break;
+            }
+        case CHOOSE:
+            {
+                println("Choose state:", g);
+                println("Please type in a command into the text box and hit the Enter button.", g);
+                break;
+            }
+        case WAIT:
+            {
+                println("Wait state:", g);
+                break;
+            }
+        case PLAY:
+            {
+                printPuzzle(g);
+                break;
+            }
+        case SHOW_SCORE:
+            {
+                println("Show score state:", g);
+                break;
+            }
+        default:
+            {
+                throw new AssertionError("should never get here");
+            }
+        }
+        
         /*
         for (int i = 0; i < x; ++i) {
             drawCell(i, i, g);

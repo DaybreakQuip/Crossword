@@ -62,15 +62,8 @@ public class Client {
                 PrintWriter socketOut = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), UTF_8), true);
                 BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in));
         ) {
+            launchGameWindow(socket, socketIn, socketOut, systemIn);
             boolean showRaw = false;
-            if (!socket.isClosed()) {
-                socketOut.println("GET");
-                System.out.println(socketIn.readLine());
-                System.out.print("? ");
-                final String command = systemIn.readLine();
-                socketOut.println(command);
-                launchGameWindow(socketIn.readLine());
-            }
             while (!socket.isClosed()) {
                 System.out.print("? ");
                 final String command = systemIn.readLine();
@@ -87,28 +80,68 @@ public class Client {
                 }
             }
             System.out.println("connection closed");
+            
         }
     }
     /**
      * Starter code to display a window with a CrosswordCanvas,
      * a text box to enter commands and an Enter button.
      */
-    private static void launchGameWindow(String puzzle) {
-        CrosswordCanvas canvas = new CrosswordCanvas(puzzle);
+    private static void launchGameWindow(Socket socket, BufferedReader socketIn, PrintWriter socketOut, BufferedReader systemIn) {
+        CrosswordCanvas canvas = new CrosswordCanvas("");
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
+        JTextField textbox = new JTextField(30);
+        textbox.setFont(new Font("Arial", Font.BOLD, 20));
+        
         JButton enterButton = new JButton("Enter");
         enterButton.addActionListener((event) -> {
             // This code executes every time the user presses the Enter
             // button. Recall from reading 24 that this code runs on the
             // Event Dispatch Thread, which is different from the main
             // thread.
+            String text = textbox.getText();
             canvas.repaint();
+            switch (canvas.getState()) {
+            case START:
+                {
+                    if (text.matches("[A-Za-z0-9]+")) {
+                        // TODO check for unique ID
+                        canvas.setState(State.CHOOSE);
+                        
+                    }
+                    break;
+                }
+            case CHOOSE:
+                {
+                    if (text.matches("[\\w]+")) {
+                        canvas.setState(State.PLAY);
+                        socketOut.println(text);
+                        try {
+                            canvas.setPuzzle(socketIn.readLine());
+                        } catch (IOException ioe) {}
+                    }
+                    break;
+                }
+            case WAIT:
+                {
+                    break;
+                }
+            case PLAY:
+                {
+                    break;
+                }
+            case SHOW_SCORE:
+                {
+                    break;
+                }
+            default:
+                {
+                    throw new AssertionError("should never get here");
+                }
+            }
         });
         enterButton.setSize(10, 10);
-
-        JTextField textbox = new JTextField(30);
-        textbox.setFont(new Font("Arial", Font.BOLD, 20));
 
         JFrame window = new JFrame("Crossword Client");
         window.setLayout(new BorderLayout());
