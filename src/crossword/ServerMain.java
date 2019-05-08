@@ -17,7 +17,7 @@ public class ServerMain {
      * Start a Crossword Extravaganza server.
      * 
      * Command to connect server: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
-     *      via Mac: java -cp bin:lib/parserlib.jar crossword.ServerMain puzzles 4444
+     *      via Mac: java -cp bin:lib/parserlib.jar crossword.ServerMain puzzles/ 4444
      * Command to Client: java -cp bin crossword.Client localhost 4444
      * @param args The command line arguments should include only the folder where
      *             the puzzles are located.
