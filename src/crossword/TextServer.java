@@ -139,25 +139,24 @@ public class TextServer {
         if (!puzzleNames.contains(tokens[0])) {
             return tokens[0];
         }
-        //TODOS FOR CLIENT RESPONSE
-        /*if (tokens[0].equals("LOGIN")) {
-            //TODO
+        if (tokens[0].equals("LOGIN")) {
+            throw new RuntimeException("Not Implemented");
         }
         if (tokens[0].equals("PLAY")) {
-            //TODO
+            throw new RuntimeException("Not Implemented");
         }
         if (tokens[0].equals("LOGOUT")) {
-            //TODO
+            throw new RuntimeException("Not Implemented");
         }
         if (tokens[0].equals("TRY")) {
-            //TODO
+            throw new RuntimeException("Not Implemented");
         }
         if (tokens[0].equals("CHALLENGE")) {
-            //TODO
+            throw new RuntimeException("Not Implemented");
         }
         if (tokens[0].equals("NEW_MATCH")) {
-            //TODO
-        }*/
+            throw new RuntimeException("Not Implemented");
+        }
         // if we reach here, the client message did not follow the protocol
         throw new UnsupportedOperationException(input);
     }

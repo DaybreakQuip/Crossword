@@ -110,7 +110,69 @@ public class Game {
         }
         return puzzleString.substring(0,puzzleString.length()-1);
     }
+    /**
+     * Gets names of all puzzles that are awaiting another player
+     * @return set of names of puzzles that need another player
+     */
+    public Set<String> getMatchedPuzzleNames(){
+        throw new RuntimeException("Not Implemented");
+    }
     
+    /**
+     * Gets names of all puzzles available
+     * @return set of names of puzzles that are available
+     */
+    public Set<String> getAllPuzzleNames(){
+        throw new RuntimeException("Not Implemented");
+
+    }
+    /**
+     * Allows a new player into the game
+     * @param playerID player name
+     * @return true if player managed to join the game, false otherwise
+     */
+    public boolean login(String playerID) {
+        throw new RuntimeException("Not Implemented");
+    }
+    /**
+     * Player tries to join a game by a match's name
+     * @param playerID ID of the player who wants to join a game
+     * @param matchID ID of the puzzle that the player wants to join
+     * @return true if successfully joined, false otherwise
+     */
+    public boolean joinGame(String playerID, String matchID) {
+        throw new RuntimeException("Not Implemented");
+    }
+    
+    /**
+     * Player tries to create a game with mathID as the name
+     * @param playerID ID of the player who wants to join a game
+     * @param matchID ID of the puzzle that the player wants to join
+     * @return true if successfully joined, false otherwise
+     */
+    public boolean createGame(String playerID, String matchID) {
+        throw new RuntimeException("Not Implemented");
+    }
+    
+    /**
+     * Disconnects a player from the game
+     * @param playerID player name
+     * @return true if player managed to quit the game, false otherwise
+     */
+    public boolean logout(String playerID) {
+        throw new RuntimeException("Not Implemented");
+    }
+    
+    /**
+     * Player tries to guess a word in the puzzle
+     * @param playerID player name
+     * @param wordID the ID of the word to attempt to solve
+     * @param word the word that is guessed
+     * @return true if player managed to guess, false otherwise
+     */
+    public boolean tryWord(String playerID, String wordID, String word) {
+        throw new RuntimeException("Not Implemented");
+    }
     /**
      * @return set of the names of all puzzles in the game
      */
