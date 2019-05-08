@@ -141,22 +141,22 @@ public class Game {
         throw new RuntimeException("Not Implemented");
     }
     /**
-     * Player tries to join a game by a match's name
+     * Player tries to join a match by a match's name
      * @param playerID ID of the player who wants to join a game
      * @param matchID ID of the puzzle that the player wants to join
      * @return true if successfully joined, false otherwise
      */
-    public boolean joinGame(String playerID, String matchID) {
+    public boolean joinMatch(String playerID, String matchID) {
         throw new RuntimeException("Not Implemented");
     }
     
     /**
-     * Player tries to create a game with mathID as the name
+     * Player tries to create a match with matchID as the name
      * @param playerID ID of the player who wants to join a game
      * @param matchID ID of the puzzle that the player wants to join
      * @return true if successfully joined, false otherwise
      */
-    public boolean createGame(String playerID, String matchID) {
+    public boolean createMatch(String playerID, String matchID) {
         throw new RuntimeException("Not Implemented");
     }
     
@@ -206,7 +206,16 @@ public class Game {
     public Set<String> getPuzzleNames() {
         return puzzles.keySet();
     }
-    
+    /**
+     * Returns a PlayablePuzzle with a specific format where every entry is separate by new lines and no 
+     * words are revealed
+     * @param playerID name of player
+     * @return string with format: length, clue, orientation, row, col\n
+     *         e.g: "4, "twinkle twinkle", ACROSS, 0, 1\n"
+     */
+    public String getMatchPuzzleForResponse(String playerID) {
+        throw new RuntimeException("Not Implemented");
+    }
     @Override
     public int hashCode() {
         return puzzles.hashCode();
