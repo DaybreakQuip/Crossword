@@ -74,9 +74,9 @@ public class PuzzleTest {
         // Test with puzzles made by parser
         Puzzle parsedPuzzle = Puzzle.parseFromFile("puzzles/simple.puzzle");
         assertTrue(parsedPuzzle.isConsistent(), "Expected parsed simple puzzle to be consistent");
-        Puzzle parsedMetamorphicConsistent = Puzzle.parseFromFile("puzzles/Metamorphic.puzzle");
+        Puzzle parsedMetamorphicConsistent = Puzzle.parseFromFile("puzzles/metamorphic.puzzle");
         assertTrue(parsedMetamorphicConsistent.isConsistent(), "Expected puzzle to be consistent");
-        Puzzle parsedReactionsConsistent = Puzzle.parseFromFile("puzzles/Reactions.puzzle");
+        Puzzle parsedReactionsConsistent = Puzzle.parseFromFile("puzzles/reactions.puzzle");
         assertTrue(parsedReactionsConsistent.isConsistent(), "Expected puzzle to be consistent");
     }
     
@@ -89,21 +89,13 @@ public class PuzzleTest {
         assertFalse(simpleOverlapPuzzle.isConsistent(), "Expected simple overlapping puzzle to be inconsistent");
         
         // Test with puzzles made by parser
-        Puzzle parsedSimpleInconsistentPuzzle = Puzzle.parseFromFile("puzzles/inconsistent.puzzle");
+        Puzzle parsedSimpleInconsistentPuzzle = Puzzle.parseFromFile("puzzles/simpleInconsistent.puzzle");
         assertFalse(parsedSimpleInconsistentPuzzle.isConsistent(), "Expected parsed simple inconsistent puzzle to be inconsistent");
-        Puzzle parsedSimpleOverlapPuzzle = Puzzle.parseFromFile("puzzles/overlap.puzzle");
+        Puzzle parsedSimpleOverlapPuzzle = Puzzle.parseFromFile("puzzles/simpleOverlap.puzzle");
         assertFalse(parsedSimpleOverlapPuzzle.isConsistent(), "Expected parsed simple overlapping puzzle to be inconsistent");
-        Puzzle parsedMetamorphicInconsistent = Puzzle.parseFromFile("puzzles/MetamorphicInconsistent.puzzle");
+        Puzzle parsedMetamorphicInconsistent = Puzzle.parseFromFile("puzzles/metamorphicInconsistent.puzzle");
         assertFalse(parsedMetamorphicInconsistent.isConsistent(), "Expected puzzle to be inconsistent");
-        Puzzle parsedReactionsInconsistent = Puzzle.parseFromFile("puzzles/ReactionsInconsistent.puzzle");
+        Puzzle parsedReactionsInconsistent = Puzzle.parseFromFile("puzzles/reactionsInconsistent.puzzle");
         assertFalse(parsedReactionsInconsistent.isConsistent(), "Expected puzzle to be inconsistent");
-    }
-    
-    // Covers parsing simple.puzzle
-    @Test
-    public void testParserSimple() throws IOException, UnableToParseException {
-        Puzzle expected = makeSimplePuzzle();
-        Puzzle result = Puzzle.parseFromFile("puzzles/simple.puzzle");
-        assertEquals(expected, result);
     }
 }

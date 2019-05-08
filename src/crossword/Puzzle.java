@@ -61,7 +61,6 @@ public class Puzzle {
         entries.add(new PuzzleEntry("treasure", "Every pirate's dream", Orientation.ACROSS, new Point(5, 2)));
         entries.add(new PuzzleEntry("troll", "Everyone's favorite twitter pastime", Orientation.ACROSS, new Point(4, 4)));
         entries.add(new PuzzleEntry("loss", "This is not a gain", Orientation.DOWN, new Point(3, 6)));
-        //entries.add(new PuzzleEntry("moo", "cows", Orientation.ACROSS, new Point(0, 2)));
         Puzzle simplePuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
         
         return simplePuzzle;
@@ -94,16 +93,7 @@ public class Puzzle {
      * @throws UnableToParseException if there is a problem with parsing
      */
     public static Puzzle parseFromFile(String filename) throws IOException, UnableToParseException{
-        BufferedReader reader = new BufferedReader(new FileReader(filename));
-        StringBuilder inputBuilder = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            inputBuilder.append(line + "\n");
-        }
-        
-        reader.close();
-        String input = inputBuilder.toString();
-        return PuzzleParser.parse(input);
+        return PuzzleParser.parseFromFile(filename);
     }
     
     /**

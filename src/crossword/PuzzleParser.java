@@ -69,6 +69,26 @@ public class PuzzleParser {
             throw new RuntimeException("the grammar has a syntax error", e);
         }
     }
+    
+    /**
+     * Returns a new Puzzle by parsing a file
+     * @param filename the name of the .puzzle file
+     * @return a new Puzzle parsed from the file
+     * @throws IOException if there is a problem with reading the file
+     * @throws UnableToParseException if there is a problem with parsing
+     */
+    public static Puzzle parseFromFile(String filename) throws IOException, UnableToParseException{
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        StringBuilder inputBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            inputBuilder.append(line + "\n");
+        }
+        
+        reader.close();
+        String input = inputBuilder.toString();
+        return PuzzleParser.parse(input);
+    }
 
     /**
      * Parse a string into an puzzle.
