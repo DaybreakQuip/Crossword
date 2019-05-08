@@ -140,6 +140,7 @@ public class TextServer {
         if (!puzzleNames.contains(tokens[0])) {
             return tokens[0];
         }
+        //TODO
         if (tokens[0].equals("LOGIN")) {
             throw new RuntimeException("Not Implemented");
         }
