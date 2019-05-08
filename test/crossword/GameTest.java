@@ -25,8 +25,9 @@ public class GameTest {
     @Test
     public void testSimpleGame() {
         Game test = createSimpleGame();
-        assertEquals("4`twinkle twinkle`ACROSS`1`0~6`Farmers ______`DOWN`0`2~6`It's tea time!`"
-                + "ACROSS`3`2~5`more`DOWN`1`5~3`Everyone loves honey`ACROSS`4`0~8`Every pirate's dream"
-                + "`ACROSS`5`2~5`Everyone's favorite twitter pastime`ACROSS`4`4~4`This is not a gain`DOWN`3`6", test.getPuzzleForResponse("Easy"), "not correct Puzzle entries");
+        assertEquals("0`4`twinkle twinkle`ACROSS`1`0~1`6`Farmers ______`DOWN`0`2~2`6`It's tea time!"
+                + "`ACROSS`3`2~3`5`more`DOWN`1`5~4`3`Everyone loves honey`ACROSS`4`0~5`8`Every pirate's dream`"
+                + "ACROSS`5`2~6`5`Everyone's favorite twitter pastime`ACROSS`4`4~7`4`This is not a gain`DOWN`3`6", 
+                test.getPuzzleForResponse("Easy"), "not correct Puzzle entries");
     }
 }
