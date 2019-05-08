@@ -16,6 +16,8 @@ import edu.mit.eecs.parserlib.UnableToParseException;
  */
 public class Game {
     private final Map<String, Puzzle> puzzles; // map of name : puzzle
+    //private final Map<String, String> playerToMatch;
+    //private final Map<String, Match> matches;
     private static final String ENTRY_DELIM = "~";
     private static final String WORD_DELIM = "`";
     /**
@@ -51,8 +53,10 @@ public class Game {
     }
     
     // Abstraction function:
-    //    AF(puzzles) = a crossword game with multiple crossword puzzles, where each entry in puzzles 
-    //                  represents a mapping of puzzle name to the crossword puzzle it represents
+    //    AF(puzzles, playerToMatch, matches) = a crossword game with multiple crossword puzzles, where each entry in puzzles 
+    //                  represents a mapping of puzzle name to the crossword puzzle it represents, and each entry in playerToMatch represents
+    //                  a mapping of a current player to the match it represents, and matches represents a mapping of a match name to an object
+    //                  representation of a match 
     // Representation invariant:
     //  true
     // Safety from rep exposure:
@@ -60,6 +64,8 @@ public class Game {
     //  puzzles map is mutable, but defensive copies are made in getPuzzles() to not return the original
     //      puzzles
     //  puzzles's keys and values are immutable types (String and Puzzle respectively)
+    //Thread Safety Argument:
+    //TODO: Monitor pattern
     
     /**
      * Returns a game meant for testing purposes
