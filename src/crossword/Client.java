@@ -62,7 +62,7 @@ public class Client {
                 PrintWriter socketOut = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), UTF_8), true);
                 BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in));
         ) {
-            launchGameWindow(socket, socketIn, socketOut, systemIn);
+            launchGameWindow(socketIn, socketOut);
             boolean showRaw = false;
             while (!socket.isClosed()) {
                 System.out.print("? ");
@@ -83,11 +83,35 @@ public class Client {
             
         }
     }
+    
+    /**
+     * Transition crossword canvas from start state to choose state
+     * @param canvas crossword canvas to modify
+     */
+    private static void transitionStartState(CrosswordCanvas canvas) {
+        canvas.setState(State.CHOOSE);
+    }
+    
+    /**
+     * Transition crossword canvas from choose state to play state
+     * @param canvas crossword canvas to modify
+     * @param puzzle name of the puzzle to play
+     * @param socketIn buffered reader to read input from server
+     * @param socketOut print writer to write to the server
+     */
+    private static void transitionChooseState(CrosswordCanvas canvas, String puzzle, BufferedReader socketIn, PrintWriter socketOut) {
+        canvas.setState(State.PLAY);
+        socketOut.println(puzzle);
+        try {
+            canvas.setPuzzle(socketIn.readLine());
+        } catch (IOException ioe) {}
+    }
+    
     /**
      * Starter code to display a window with a CrosswordCanvas,
      * a text box to enter commands and an Enter button.
      */
-    private static void launchGameWindow(Socket socket, BufferedReader socketIn, PrintWriter socketOut, BufferedReader systemIn) {
+    private static void launchGameWindow(BufferedReader socketIn, PrintWriter socketOut) {
         CrosswordCanvas canvas = new CrosswordCanvas("");
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -101,26 +125,17 @@ public class Client {
             // Event Dispatch Thread, which is different from the main
             // thread.
             String text = textbox.getText();
+            textbox.setText("");
             canvas.repaint();
             switch (canvas.getState()) {
             case START:
                 {
-                    if (text.matches("[A-Za-z0-9]+")) {
-                        // TODO check for unique ID
-                        canvas.setState(State.CHOOSE);
-                        
-                    }
+                    transitionStartState(canvas);
                     break;
                 }
             case CHOOSE:
                 {
-                    if (text.matches("[\\w]+")) {
-                        canvas.setState(State.PLAY);
-                        socketOut.println(text);
-                        try {
-                            canvas.setPuzzle(socketIn.readLine());
-                        } catch (IOException ioe) {}
-                    }
+                    transitionChooseState(canvas, text, socketIn, socketOut);
                     break;
                 }
             case WAIT:
