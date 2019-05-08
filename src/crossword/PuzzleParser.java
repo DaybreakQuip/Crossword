@@ -24,7 +24,6 @@ public class PuzzleParser {
      * @throws IOException if .puzzle file cannot be opened
      */
     public static void main(final String[] args) throws UnableToParseException, IOException {
-        // TODO: Open a file here for the example puzzle
         String filename = "inconsistent.puzzle";
         BufferedReader reader = new BufferedReader(new FileReader("puzzles/" + filename));
         StringBuilder inputBuilder = new StringBuilder();

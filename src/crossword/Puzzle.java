@@ -14,15 +14,17 @@ import edu.mit.eecs.parserlib.UnableToParseException;
  *
  */
 public class Puzzle {
-    //Abstraction Function:
-    //AF(name, description, entries) --> A Puzzle representing a crossword puzzle with a name and a description for the crossword. 
+    // Abstraction Function:
+    // AF(name, description, entries) --> A Puzzle representing a crossword puzzle with a name and a description for the crossword. 
     //                                   There is a map of ID to PuzzleEntries that represents each word in the puzzle.
     //                                    
-    //Rep Invariant:
-    //true
-    //Safety From Rep Exposure:
+    // Rep Invariant:
+    // true
+    // Safety From Rep Exposure:
     //  name and description is private and final and immutable
-    //  entries is only accessed through getter methods like getentries which creates a copy before returning to the client
+    //  entries is only accessed through getter methods like getEntries which creates a copy before returning to the client
+    // Thread safety argument:
+    //  This class is immutable
     private final String name; 
     private final String description;
     private final Map<Integer, PuzzleEntry> entries;
@@ -233,18 +235,5 @@ public class Puzzle {
         }
         // Remove the string minus the newline at the end
         return puzzleString.substring(0,  puzzleString.length()-1);
-    }
-    
-    /**
-     * 
-     * @param args ?
-     */
-    public static void main(String[] args) {
-        try {
-            Puzzle c = parseFromFile("puzzles/Reactions.puzzle");
-            System.out.println("c: " + c.isConsistent());
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
     }
 }

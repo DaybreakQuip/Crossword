@@ -59,6 +59,8 @@ class CrosswordCanvas extends JComponent {
     //  true
     // Safety from rep exposure:
     //  All fields are private, final, and immutable
+    // Thread safety argument:
+    //  This uses the monitor pattern
     
     private String puzzle;
     private static final String ENTRY_DELIM = "~";
