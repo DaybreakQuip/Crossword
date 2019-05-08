@@ -18,19 +18,19 @@ import java.util.Set;
  */
 public class TextServer {
     // Abstraction function:
-    //    AF(serverSocket, game, nextID) --> TextServer Object having the ability to connect one player to a Crossword Puzzle game. 
+    //    AF(serverSocket, game) --> TextServer Object having the ability to connect one player to a Crossword Puzzle game. 
     //                                        One serverSocket (a rep) is able to run multiple connections, game is the game class for
-    //                                        the Crossword game, and a nextID for the next players for concurrency
+    //                                        the Crossword game
     // Representation invariant:
     //  true
     // Safety from rep exposure:
     //  serverSocket is private and final
     //  game is private and final
-    //  nextID is never given to the client
+    // Thread Safety Argument:
+    //  
     
     private final ServerSocket serverSocket;
     private final Game game;
-    private int nextID = 1;
     /**
      * Make a new text game server using game that listens for connections on port.
      * 
@@ -64,7 +64,7 @@ public class TextServer {
             new Thread(new Runnable() {
                 public void run() {
                     try {
-                        handleConnection(socket, Integer.toString(nextID));
+                        handleConnection(socket);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -82,7 +82,6 @@ public class TextServer {
             catch (Exception e) {
                 e.printStackTrace();
             }
-            nextID++;
         }
     }
     
@@ -93,13 +92,13 @@ public class TextServer {
      * @param socket socket connected to client
      * @throws IOException if the connection encounters an error or closes unexpectedly
      */
-    private void handleConnection(Socket socket, String playerID) throws IOException {
+    private void handleConnection(Socket socket) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), UTF_8));
         PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), UTF_8), true);
         
         try {
             for (String input = in.readLine(); input != null; input = in.readLine()) {
-                String output = handleRequest(input, playerID);
+                String output = handleRequest(input);
                 if (output.equals("quit")) {
                     break;
                 }
@@ -119,7 +118,7 @@ public class TextServer {
      * @return output message to client
      * @throws IOException 
      */
-    private String handleRequest(String input, String playerID) throws IOException {
+    private String handleRequest(String input) throws IOException {
         String[] tokens = input.split(" ");
         Set<String> puzzleNames = game.getPuzzleNames();
         if (tokens[0].equals("quit")) {
@@ -140,6 +139,25 @@ public class TextServer {
         if (!puzzleNames.contains(tokens[0])) {
             return tokens[0];
         }
+        //TODOS FOR CLIENT RESPONSE
+        /*if (tokens[0].equals("LOGIN")) {
+            //TODO
+        }
+        if (tokens[0].equals("PLAY")) {
+            //TODO
+        }
+        if (tokens[0].equals("LOGOUT")) {
+            //TODO
+        }
+        if (tokens[0].equals("TRY")) {
+            //TODO
+        }
+        if (tokens[0].equals("CHALLENGE")) {
+            //TODO
+        }
+        if (tokens[0].equals("NEW_MATCH")) {
+            //TODO
+        }*/
         // if we reach here, the client message did not follow the protocol
         throw new UnsupportedOperationException(input);
     }
