@@ -222,6 +222,12 @@ public class Puzzle {
         return name.hashCode() + description.hashCode() + entries.hashCode();
     }
     
+    /**
+     * @return puzzle with the name of the puzzle, followed by the puzzle's description and
+     *         all puzzle entries in the form (id, word, clue, orientation, (row, column))
+     *         where each puzzle entry is separated by a newline 
+     *         (without the trailing newline at the very end)
+     */
     @Override
     public String toString() {
         StringBuilder puzzleString = new StringBuilder();
