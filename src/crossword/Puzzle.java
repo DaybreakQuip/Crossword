@@ -1,7 +1,5 @@
 package crossword;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +16,7 @@ import edu.mit.eecs.parserlib.UnableToParseException;
 public class Puzzle {
     //Abstraction Function:
     //AF(name, description, entries) --> A Puzzle representing a crossword puzzle with a name and a description for the crossword. 
-    //                                   There is a list of PuzzleEntries that represents each word in the puzzle.
+    //                                   There is a map of ID to PuzzleEntries that represents each word in the puzzle.
     //                                    
     //Rep Invariant:
     //true
@@ -27,7 +25,7 @@ public class Puzzle {
     //  entries is only accessed through getter methods like getentries which creates a copy before returning to the client
     private final String name; 
     private final String description;
-    private final List<PuzzleEntry> entries;
+    private final Map<Integer, PuzzleEntry> entries;
     
     /**
      * @return a dummy puzzle for testing
@@ -105,14 +103,19 @@ public class Puzzle {
     public Puzzle(String name, String description, List<PuzzleEntry> entries) {
         this.name = name;
         this.description = description;
-        this.entries = Collections.unmodifiableList(new ArrayList<>(entries)); // Make a defensive, unmodifiable copy of the entries
+        // Create the entries map for the puzzle that maps a unique id to each entry
+        Map<Integer, PuzzleEntry> tempEntries = new HashMap<>();
+        for (int i = 0; i < entries.size(); i++) {
+            tempEntries.put(i,  entries.get(i));
+        }
+        this.entries = Collections.unmodifiableMap(tempEntries); // Wrap the entries with an unmodifiable map
     }
     
     /**
-     * @return set of entries in the puzzle
+     * @return map of entries in the puzzle
      */
-    public List<PuzzleEntry> getEntries() {
-        return new ArrayList<>(entries);
+    public Map<Integer, PuzzleEntry> getEntries() {
+        return entries;
     }
     
     /**
@@ -222,8 +225,11 @@ public class Puzzle {
         StringBuilder puzzleString = new StringBuilder();
         puzzleString.append("Name: " + name + "\n");
         puzzleString.append("Description: " + description + "\n");
-        for (PuzzleEntry entry : entries) {
-            puzzleString.append(entry.toString() + "\n");
+        for (Map.Entry<Integer, PuzzleEntry> entry : entries.entrySet()) {
+            int id = entry.getKey();
+            PuzzleEntry puzzleEntry = entry.getValue();        
+            puzzleString.append("(" + id + ", " + puzzleEntry.getWord() + ", " + puzzleEntry.getClue() 
+                        + ", " + puzzleEntry.getOrientation() + ", " + puzzleEntry.getPosition() + ")\n");
         }
         // Remove the string minus the newline at the end
         return puzzleString.substring(0,  puzzleString.length()-1);

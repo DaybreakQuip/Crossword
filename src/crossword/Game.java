@@ -1,8 +1,6 @@
 package crossword;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -103,10 +101,12 @@ public class Game {
     public String getPuzzleForResponse(String name) {
         Puzzle puzzle = puzzles.get(name);
         String puzzleString = "";
-        for (PuzzleEntry entry: puzzle.getEntries()) {
-            puzzleString += entry.getWord().length() + WORD_DELIM + entry.getClue() + WORD_DELIM + 
-                            entry.getOrientation() + WORD_DELIM + entry.getPosition().getRow() 
-                            + WORD_DELIM + entry.getPosition().getCol() + ENTRY_DELIM;
+        for (Map.Entry<Integer, PuzzleEntry> entry: puzzle.getEntries().entrySet()) {
+            Integer id = entry.getKey();
+            PuzzleEntry puzzleEntry = entry.getValue();
+            puzzleString += id + WORD_DELIM + puzzleEntry.getWord().length() + WORD_DELIM + puzzleEntry.getClue() + WORD_DELIM + 
+                    puzzleEntry.getOrientation() + WORD_DELIM + puzzleEntry.getPosition().getRow() 
+                            + WORD_DELIM + puzzleEntry.getPosition().getCol() + ENTRY_DELIM;
         }
         return puzzleString.substring(0,puzzleString.length()-1);
     }
