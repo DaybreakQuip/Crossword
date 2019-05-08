@@ -14,7 +14,10 @@ public class PlayablePuzzle {
     // true
     // Safety From Rep Exposure:
     //  name and description is private and final and immutable
-    //  entries is only accessed through getter methods like getEntries which creates a copy before returning to the client
+    //  playerEntries, confirmedENtries, and correctEntries can only be gotten through getter methods, and returns a copy of the map, which
+    //  only contains immutable objects
+    //  playerEntries and confirmedEntries can only be modified through mutator methods
+    //
     // Thread safety argument:
     //  TODO: Monitor Pattern
     private final String name; 
@@ -67,5 +70,40 @@ public class PlayablePuzzle {
      */
     public boolean deleteConfirmedEntry(int wordID) {
         throw new RuntimeException("Not Implemented");
+    }
+    
+    /**
+     * @return map of playerEntries in the puzzle
+     */
+    public Map<Integer, PuzzleEntry> getPlayerEntries() {
+        return new HashMap<>(playerEntries);
+    }
+    
+    /**
+     * @return map of confirmedEntries in the puzzle
+     */
+    public Map<Integer, PuzzleEntry> getConfirmedEntries() {
+        return new HashMap<>(confirmedEntries);
+    }
+    
+    /**
+     * @return map of correctEntries in the puzzle
+     */
+    public Map<Integer, PuzzleEntry> getCorrectEntries() {
+        return new HashMap<>(correctEntries);
+    }
+    
+    /**
+     * @return name of the puzzle
+     */
+    public String getName() {
+        return name;
+    }
+    
+    /**
+     * @return description of the puzzle
+     */
+    public String getDescription() {
+        return description;
     }
 }
