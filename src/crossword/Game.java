@@ -196,7 +196,7 @@ public class Game {
      * @param playerID player name
      * @return the score of the player
      */
-    public int showScore(String playerID) {
+    public String showScore(String playerID) {
         throw new RuntimeException("Not Implemented");
 
     }
