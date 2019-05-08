@@ -58,6 +58,9 @@ public class Point {
         return this.row + this.col;
     }
     
+    /**
+     * @return point in the form (row,column)
+     */
     @Override
     public String toString() {
         return "(" + row + ", " + col + ")";

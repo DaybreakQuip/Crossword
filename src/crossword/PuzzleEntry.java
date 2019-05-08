@@ -84,6 +84,9 @@ public class PuzzleEntry {
                 && orientation == other.orientation && position.equals(other.position);
     }
     
+    /**
+     * @return puzzle entry in the form (word, clue, orientation, position)
+     */
     @Override
     public String toString() {
         return "(" + word + ", " + clue + ", " + orientation + ", " + position + ")";

@@ -214,6 +214,10 @@ class CrosswordCanvas extends JComponent {
     }
     
     /**
+     * Prints a crossword puzzle with no words filled in and
+     * hints for each word divided into horizontal words and
+     * vertical words. 
+     * 
      * @param g the graphics object to modify
      */
     private void printPuzzle(Graphics g) {
@@ -222,7 +226,7 @@ class CrosswordCanvas extends JComponent {
         List<String> acrossHints = new ArrayList<>();
         List<String> downHints = new ArrayList<>();
                 
-        
+        // sort entries by word id
         String[] unsortedEntries = puzzle.split(ENTRY_DELIM);
         List<String> entries = new ArrayList<>(unsortedEntries.length);
         for (String entry: unsortedEntries) {

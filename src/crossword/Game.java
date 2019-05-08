@@ -225,6 +225,10 @@ public class Game {
         return puzzles.equals(other.puzzles);
     }
     
+    /**
+     * TODO
+     * @return game with puzzle names and their representation separated by newlines
+     */
     @Override
     public String toString() {
         StringBuilder gameString = new StringBuilder();
