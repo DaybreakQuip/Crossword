@@ -173,6 +173,27 @@ public class Game {
     public boolean tryWord(String playerID, String wordID, String word) {
         throw new RuntimeException("Not Implemented");
     }
+    
+    /**
+     * Player tries to challenge another player's word in the puzzle
+     * @param playerID player name
+     * @param wordID the ID of the word to attempt to challenge
+     * @param word the word that the player uses to challenge
+     * @return true if player managed to challenge, false otherwise
+     */
+    public boolean challengeWord(String playerID, String wordID, String word) {
+        throw new RuntimeException("Not Implemented");
+    }
+    
+    /**
+     * Gets a player's score
+     * @param playerID player name
+     * @return the score of the player
+     */
+    public int showScore(String playerID) {
+        throw new RuntimeException("Not Implemented");
+
+    }
     /**
      * @return set of the names of all puzzles in the game
      */
