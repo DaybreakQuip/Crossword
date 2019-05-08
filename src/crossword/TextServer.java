@@ -27,7 +27,8 @@ public class TextServer {
     //  serverSocket is private and final
     //  game is private and final
     // Thread Safety Argument:
-    //  
+    //  game is threadsafe
+    //  TODO: monitor pattern
     
     private final ServerSocket serverSocket;
     private final Game game;

@@ -20,6 +20,8 @@ public class PuzzleEntry {
     //  true
     // Safety from rep exposure:
     //  All fields are private, final, and immutable
+    // Thread safety argument:
+    //  This class is immutable
     
     /**
      * Create a new PuzzleEntry object 

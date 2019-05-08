@@ -13,6 +13,8 @@ public class Point {
     //  true
     // Safety from rep exposure:
     //  all fields are final, private, and immutable
+    // Thread safety argument:
+    //  This class is immutable
       
     /**
      * Create a new point representing location at (row, col)
