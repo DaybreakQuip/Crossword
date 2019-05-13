@@ -16,13 +16,15 @@ import edu.mit.eecs.parserlib.UnableToParseException;
  *
  */
 public class Game {
+    public static final String ENTRY_DELIM = "~";
+    public static final String WORD_DELIM = "`";
+    public static final String RESPONSE_DELIM = ";";
     private final Set<String> players; // set of all playerIDs currently logged in
     private final Map<String, Puzzle> puzzles; // map of puzzleID : Puzzle
     private final Map<String, String> playerToMatch; // map of playerID : match_id
     private final Map<String, Match> matches; //  map of match_id : match
-    public static final String ENTRY_DELIM = "~";
-    public static final String WORD_DELIM = "`";
-    public static final String RESPONSE_DELIM = ";";
+    private Set<WatchListener> listeners = new HashSet<>();
+    
     /**
      * Main method. Makes the Game from Puzzle objects from parsing.
      * 
@@ -33,6 +35,7 @@ public class Game {
     public static void main(final String[] args) throws UnableToParseException, IOException {
         System.out.println(Game.parseGameFromFiles("puzzles/").getPuzzleNames());
     }
+    
     /**
      * @param directory the folder to the puzzles
      * @return a new Game with all puzzles parsed from files inside puzzles/
@@ -68,7 +71,7 @@ public class Game {
     //      puzzles
     //  puzzles's keys and values are immutable types (String and Puzzle respectively)
     //Thread Safety Argument:
-    //TODO: Monitor pattern
+    //  uses monitor pattern
     
     /**
      * Creates a new Game
@@ -82,22 +85,13 @@ public class Game {
     }
     
     /**
-     * Returns a puzzle with specified name
-     * @param name the name of the puzzle
-     * @return puzzle from the game if the name exists
-     */
-    private Puzzle getPuzzle(String name) {
-        return this.puzzles.get(name);
-    }
-    
-    /**
      * Returns a puzzle with a specific format where every entry is separate by new lines and no 
      * words are revealed
      * @param name the name of the puzzle
      * @return string with format: length, clue, orientation, row, col\n
      *         e.g: "4, "twinkle twinkle", ACROSS, 0, 1\n"
      */
-    public String getPuzzleForResponse(String name) {
+    public synchronized String getPuzzleForResponse(String name) {
         Puzzle puzzle = puzzles.get(name);
         String puzzleString = "";
         for (Map.Entry<Integer, PuzzleEntry> entry: puzzle.getEntries().entrySet()) {
@@ -110,7 +104,12 @@ public class Game {
         return puzzleString.substring(0,puzzleString.length()-1);
     }
     
-    public String getPuzzleFromMatchID(String matchID) {
+    /**
+     * Returns puzzle id from match with match id
+     * @param matchID the id of the match
+     * @return puzzle of the given match
+     */
+    public synchronized String getPuzzleFromMatchID(String matchID) {
         return matches.get(matchID).getPuzzleForResponse();
     }
 
@@ -120,7 +119,7 @@ public class Game {
      *      match ::= match_ID WORD_DELIM description;
      *      response ::= match (ENTRY_DELIM match)*;
      */
-    public String getAvailableMatchesForResponse(){
+    public synchronized String getAvailableMatchesForResponse(){
         StringBuilder responseBuilder = new StringBuilder();
         for (Match match : matches.values()) {
             if (responseBuilder.length() > 0) { // Add an entry delim if the entry is no the first one
@@ -136,7 +135,7 @@ public class Game {
      * @param playerID player name
      * @return true if player managed to join the game, false otherwise
      */
-    public boolean login(String playerID) {
+    public synchronized boolean login(String playerID) {
         if (players.contains(playerID)) { // Player already logged in!
             return false;
         }
@@ -145,15 +144,13 @@ public class Game {
         return true;
     }
     /**
-     * Player tries to join a matc
-    
-    h by a///    h's name
+     * Player tries to join a match with match id
      * @param playerID ID of the player who wants to join a game
      * @param matchID ID of the puzzle that the player wants to join
      * @return true if successfully joined, false otherwise
      * @throws IOException 
      */
-    public boolean joinMatch(String playerID, String matchID) throws IOException {
+    public synchronized boolean joinMatch(String playerID, String matchID) throws IOException {
         boolean joined = matches.get(matchID).joinMatch(playerID);
         if (joined) {
             callListeners();
@@ -170,7 +167,7 @@ public class Game {
      * @return true if successfully joined, false otherwise
      * @throws IOException 
      */
-    public boolean createMatch(String playerID, String matchID, String puzzleID, String description) throws IOException {
+    public synchronized boolean createMatch(String playerID, String matchID, String puzzleID, String description) throws IOException {
         if (playerToMatch.containsKey(playerID) || matches.containsKey(matchID)) {
             return false;
         }
@@ -186,7 +183,7 @@ public class Game {
      * @param playerID player name
      * @return true if player managed to quit the game, false otherwise
      */
-    public boolean logout(String playerID) {
+    public synchronized boolean logout(String playerID) {
         throw new RuntimeException("Not Implemented");
     }
     
@@ -197,7 +194,7 @@ public class Game {
      * @param word the word that is guessed
      * @return true if player managed to guess, false otherwise
      */
-    public boolean tryWord(String playerID, String wordID, String word) {
+    public synchronized boolean tryWord(String playerID, String wordID, String word) {
         throw new RuntimeException("Not Implemented");
     }
     
@@ -208,7 +205,7 @@ public class Game {
      * @param word the word that the player uses to challenge
      * @return true if player managed to challenge, false otherwise
      */
-    public boolean challengeWord(String playerID, String wordID, String word) {
+    public synchronized boolean challengeWord(String playerID, String wordID, String word) {
         throw new RuntimeException("Not Implemented");
     }
     
@@ -217,14 +214,15 @@ public class Game {
      * @param playerID player name
      * @return the score of the player
      */
-    public String showScore(String playerID) {
+    public synchronized String showScore(String playerID) {
         throw new RuntimeException("Not Implemented");
 
     }
+    
     /**
      * @return set of the names of all puzzles in the game
      */
-    public Set<String> getPuzzleNames() {
+    public synchronized Set<String> getPuzzleNames() {
         return puzzles.keySet();
     }
     
@@ -235,27 +233,10 @@ public class Game {
      * @return string with format: length, clue, orientation, row, col\n
      *         e.g: "4, "twinkle twinkle", ACROSS, 0, 1\n"
      */
-    public String getMatchPuzzleForResponse(String playerID) {
+    public synchronized String getMatchPuzzleForResponse(String playerID) {
         throw new RuntimeException("Not Implemented");
     }
-    @Override
-    public int hashCode() {
-        return puzzles.hashCode();
-    }
-    
-    @Override
-    public boolean equals(Object other) {
-        return other instanceof Game && sameValue((Game) other);
-    }
 
-    /**
-     * @param other the other game to compare to
-     * @return true if this and other game are equal and false otherwise
-     */
-    public boolean sameValue(Game other) {
-        return puzzles.equals(other.puzzles);
-    }
-    private Set<WatchListener> listeners = new HashSet<>();
     /** A watch listener for the board  */
     public interface WatchListener {
         /** 
@@ -266,13 +247,15 @@ public class Game {
         public String onChange();
     }
     /**
-     * 
+     * Adds a listener for changes to available matches in the game
+     * TODO: Remove?
      * @param listener Adds a new listener
      */
     public synchronized void addWatchListener(WatchListener listener) {
         listeners.add(listener);
     }
-    private void callListeners() throws IOException{
+    
+    private synchronized void callListeners() throws IOException{
         for (WatchListener listener : listeners) {
             listener.onChange();
         }
@@ -282,7 +265,7 @@ public class Game {
      * @return string of puzzle names with format:
      *  response = puzzleName (ENTRY_DELIM puzzleName)*
      */
-    public String getPuzzleNamesForResponse() {
+    public synchronized String getPuzzleNamesForResponse() {
         StringBuilder builder = new StringBuilder();
         for (String puzzleName : puzzles.keySet()) {
             builder.append(puzzleName + Game.ENTRY_DELIM);
@@ -295,7 +278,7 @@ public class Game {
      * @return game with puzzle names and their representation separated by newlines
      */
     @Override
-    public String toString() {
+    public synchronized String toString() {
         StringBuilder gameString = new StringBuilder();
         for (String puzzleName : puzzles.keySet()) {
             Puzzle puzzle = puzzles.get(puzzleName);
