@@ -160,10 +160,10 @@ public class Match {
      * Returns a string of the playable puzzle with a specific format where every entry 
      *  is separated by a delimiter and words are populated based on the playable puzzle's 
      *  confirmed and guessed entries
-     * @param name the name of the puzzle
      * @return a representation of the puzzle with entries separated by delimeters of the same kind
      */
-    public String getPuzzleForResponse(String name) {
+    //TODO TONIGHT
+    public String getPuzzleForResponse() {
         throw new RuntimeException("Not Implemented!");
     }
     

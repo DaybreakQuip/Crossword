@@ -122,11 +122,61 @@ public class TextServer {
      */
     private String handleRequest(String input) throws IOException {
         String[] tokens = input.split(" ");
-        Set<String> puzzleNames = game.getPuzzleNames();
-        if (tokens[0].equals("quit")) {
+        String command = tokens[0]; 
+        String playerID = tokens[1]; 
+        
+        // Check whether the playerID is valid
+        if (!(playerID.matches("[0-9a-zA-Z]*") && playerID.length() > 0)) {
+            throw new RuntimeException("Player ID must be alphanumeric and have a length > 0");
+        }
+        
+        if (command.equals("quit")) {
             return "quit";
         }
-        if (tokens[0].equals("GET")) {
+        //TODO
+        if (command.equals("WATCH")) {
+            game.addWatchListener(new WatchListener() {
+                public String onChange() {
+                    return game.getAvailableMatchesForResponse();
+                }
+            });
+        }
+        if (command.equals("LOGIN")) { // Logs in a player and returns the names of all puzzle templates
+            if (game.login(playerID)) {
+                // Build the string in 3 parts: add puzzle names -> add response delim -> add available matches
+                StringBuilder builder = new StringBuilder();
+                builder.append("V");
+                builder.append(game.getPuzzleNamesForResponse());
+                builder.append(Game.RESPONSE_DELIM);
+                builder.append(game.getAvailableMatchesForResponse());
+                return builder.toString();
+            } else {
+                return "I";
+            }
+        }
+        else if (command.equals("PLAY")) {
+            boolean join = game.joinMatch(playerID, tokens[2]);
+            if (join) {
+                return "V" + game.getPuzzleFromMatchID(tokens[2]);
+            }
+            return "I";
+        }
+        else if (command.equals("LOGOUT")) {
+            throw new RuntimeException("Not Implemented");
+        }
+        else if (command.equals("TRY")) {
+            throw new RuntimeException("Not Implemented");
+        }
+        else if (command.equals("CHALLENGE")) {
+            throw new RuntimeException("Not Implemented");
+        }
+        else if (command.equals("NEW_MATCH")) {
+            throw new RuntimeException("Not Implemented");
+        }
+
+        /* 
+        else if (command.equals("GET")) {
+        Set<String> puzzleNames = game.getPuzzleNames();
             StringBuilder allPuzzles = new StringBuilder();
             allPuzzles.append("Puzzles Available: ");
             for (String puzzle: puzzleNames) {
@@ -135,39 +185,15 @@ public class TextServer {
             allPuzzles.deleteCharAt(allPuzzles.length()-1);
             return allPuzzles.toString();
         }
-        if (puzzleNames.contains(tokens[0])) {
-            return game.getPuzzleForResponse(tokens[0]);
+        else if (puzzleNames.contains(command)) {
+            return game.getPuzzleForResponse(command);
         }
-        if (!puzzleNames.contains(tokens[0])) {
-            return tokens[0];
+        else if (!puzzleNames.contains(command)) {
+            return command;
         }
-        //TODO
-        if (tokens[0].equals("WATCH")) {
-            game.addWatchListener(new WatchListener() {
-                public String onChange() {
-                    return game.getAvailableMatchesForResponse();
-                }
-            });
-        }
-        if (tokens[0].equals("LOGIN")) {
-            throw new RuntimeException("Not Implemented");
-        }
-        if (tokens[0].equals("PLAY")) {
-            throw new RuntimeException("Not Implemented");
-        }
-        if (tokens[0].equals("LOGOUT")) {
-            throw new RuntimeException("Not Implemented");
-        }
-        if (tokens[0].equals("TRY")) {
-            throw new RuntimeException("Not Implemented");
-        }
-        if (tokens[0].equals("CHALLENGE")) {
-            throw new RuntimeException("Not Implemented");
-        }
-        if (tokens[0].equals("NEW_MATCH")) {
-            throw new RuntimeException("Not Implemented");
-        }
+        */
         // if we reach here, the client message did not follow the protocol
         throw new UnsupportedOperationException(input);
+
     }
 }
