@@ -124,8 +124,8 @@ public class TextServer {
      */
     private String handleRequest(String input) throws IOException {
         String[] tokens = input.split(" ");
-        String command = tokens[0]; 
-        String playerID = tokens[1]; 
+        String playerID = tokens[0];
+        String command = tokens[1];  
         
         // Check whether the playerID is valid
         if (!(playerID.matches("[0-9a-zA-Z]*") && playerID.length() > 0)) {
