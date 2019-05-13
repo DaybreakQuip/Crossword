@@ -31,8 +31,10 @@ public class TextServer {
     //  serverSocket is private and final
     //  game is private and final
     // Thread Safety Argument:
-    //  game is threadsafe
-    //  TODO: add thread support
+    //   TextServer creates a new thread for each new connecting client
+    //   game is an object with threadsafe type
+    //   threads for each clients operates on their own and do not interact with each other
+    
     private final ServerSocket serverSocket;
     private final Game game;
     /**
@@ -135,7 +137,7 @@ public class TextServer {
         if (command.equals("quit")) {
             return QUIT;
         }
-        //TODO
+        //TODO: implement each command as needed
         if (command.equals("WATCH")) {
             game.addWatchListener(new WatchListener() {
                 public String onChange() {
@@ -160,6 +162,21 @@ public class TextServer {
             boolean join = game.joinMatch(playerID, tokens[2]);
             if (join) {
                 return "V" + game.getPuzzleFromMatchID(tokens[2]);
+            }
+            return "I";
+        }
+        else if (command.equals("NEW")) {
+            String matchID = tokens[2];
+            String puzzleID = tokens[3];
+            String description = tokens[4];
+            if (description.matches("[0-9a-zA-Z ]*")) {
+                description = description.substring(1, description.length()-1);
+            } else {
+                return "I";
+            }
+            boolean create = game.createMatch(playerID, matchID, puzzleID, description);
+            if (create) {
+                return "V";
             }
             return "I";
         }
