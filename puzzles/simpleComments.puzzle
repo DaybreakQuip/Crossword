@@ -1,7 +1,7 @@
 >> "SimpleComments" "An easy puzzle to get started"
 
 // Comment in its own line
-(star, "twinkle twinkle", ACROSS, 1, 0) // Comment next to entry
+(star, "twinkle twinkle // Here's a comment", ACROSS, 1, 0) // Comment next to entry
 (market, "Farmers ______", DOWN, 0, 2)
 (kettle, "It's tea time!", ACROSS, 3, 2)
 (extra, "more", DOWN, 1, 5)

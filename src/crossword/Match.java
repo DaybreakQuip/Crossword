@@ -8,9 +8,10 @@ import java.util.Map;
  */
 public class Match {
     // Abstraction Function:
-    // AF(matchId, puzzle, playerOne, playerTwo, state) = A match that has a match ID (matchID), a playable puzzle, and two players that
-    //                                                      are playing in the match (playerOne and playerTwo). The state of the match can
-    //                                                      be waiting (for a second player), ongoing (when the match has two players), and
+    // AF(matchId, description, puzzle, playerOne, playerTwo, state) = A match that has a match ID (matchID), a description,
+    //                                                      a playable puzzle, and two players that are playing in the match 
+    //                                                      (playerOne and playerTwo). The state of the match can be waiting 
+    //                                                      (for a second player), ongoing (when the match has two players), and
     //                                                      done (if all words in the puzzle are confirmed).
     // Rep Invariant:
     //      true
@@ -23,6 +24,7 @@ public class Match {
     // Thread safety argument:
     //  TODO: Monitor Pattern
     private final String matchId;
+    private final String description;
     private final PlayablePuzzle puzzle;
     private Player playerOne;
     private Player playerTwo;
@@ -32,15 +34,31 @@ public class Match {
      * Creates a match with a match_id and a template puzzle
      *  A match requires at least one player to be created
      * @param matchId the id of the match
+     * @param description the description of the match
      * @param templatePuzzle the template puzzle to create the playable puzzle from
      * @param playerOneId the first player's id for the game
      */
-    public Match(String matchId, Puzzle templatePuzzle, String playerOneId) {
+    public Match(String matchId, String description, Puzzle templatePuzzle, String playerOneId) {
         this.state = MatchState.WAITING;
+        this.description = description;
         this.matchId = matchId;
         playerOne = new Player(playerOneId);
         playerTwo = new Player(Player.EMPTY_PLAYER_ID);
         puzzle = new PlayablePuzzle(templatePuzzle);
+    }
+    
+    /**
+     * @return id of the match
+     */
+    public String getMatchId() {
+        return this.matchId;
+    }
+    
+    /**
+     * @return description of the match
+     */
+    public String getDescription() {
+        return this.description;
     }
     
     /**
