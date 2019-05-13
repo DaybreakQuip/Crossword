@@ -114,7 +114,7 @@ public class Game {
     public synchronized String getAvailableMatchesForResponse(){
         return "MatchID" + WORD_DELIM + "Description";
     }
-    
+        
     /**
      * Allows a new player into the game
      * @param playerID player name
