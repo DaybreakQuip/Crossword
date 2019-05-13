@@ -169,7 +169,7 @@ public class TextServer {
             String matchID = tokens[2];
             String puzzleID = tokens[3];
             String description = tokens[4];
-            if (description.matches("[0-9a-zA-Z ]*")) {
+            if (description.matches("\"[0-9a-zA-Z ]*\"")) {
                 description = description.substring(1, description.length()-1);
             } else {
                 return "I";
