@@ -16,11 +16,13 @@ import edu.mit.eecs.parserlib.UnableToParseException;
  *
  */
 public class Game {
-    private final Map<String, Puzzle> puzzles; // map of name : puzzle
-    // private final Map<String, String> playerToMatch; // map of player_id : match_id
-    // private final Map<String, Match> matches; //  map of match_id : match
-    private static final String ENTRY_DELIM = "~";
-    private static final String WORD_DELIM = "`";
+    private final Set<String> players; // set of all playerIDs currently logged in
+    private final Map<String, Puzzle> puzzles; // map of puzzleID : Puzzle
+    private final Map<String, String> playerToMatch; // map of playerID : match_id
+    private final Map<String, Match> matches; //  map of match_id : match
+    public static final String ENTRY_DELIM = "~";
+    public static final String WORD_DELIM = "`";
+    public static final String RESPONSE_DELIM = ";";
     /**
      * Main method. Makes the Game from Puzzle objects from parsing.
      * 
@@ -74,6 +76,9 @@ public class Game {
      */
     public Game(Map<String, Puzzle> puzzles) {
         this.puzzles = Collections.unmodifiableMap(new HashMap<>(puzzles));
+        this.matches = new HashMap<String, Match>();
+        this.playerToMatch = new HashMap<String, String>();
+        this.players = new HashSet<String>();
     }
     
     /**
@@ -81,7 +86,7 @@ public class Game {
      * @param name the name of the puzzle
      * @return puzzle from the game if the name exists
      */
-    public Puzzle getPuzzle(String name) {
+    private Puzzle getPuzzle(String name) {
         return this.puzzles.get(name);
     }
     
@@ -104,6 +109,10 @@ public class Game {
         }
         return puzzleString.substring(0,puzzleString.length()-1);
     }
+    
+    public String getPuzzleFromMatchID(String matchID) {
+        return matches.get(matchID).getPuzzleForResponse();
+    }
 
     /**
      * Gets names of all puzzles and descriptions that are awaiting another player
@@ -111,8 +120,15 @@ public class Game {
      *      match ::= match_ID WORD_DELIM description;
      *      response ::= match (ENTRY_DELIM match)*;
      */
-    public synchronized String getAvailableMatchesForResponse(){
-        return "MatchID" + WORD_DELIM + "Description";
+    public String getAvailableMatchesForResponse(){
+        StringBuilder responseBuilder = new StringBuilder();
+        for (Match match : matches.values()) {
+            if (responseBuilder.length() > 0) { // Add an entry delim if the entry is no the first one
+                responseBuilder.append(ENTRY_DELIM);
+            }
+            responseBuilder.append(match.getMatchId() + WORD_DELIM + match.getDescription());
+        }
+        return responseBuilder.toString();
     }
         
     /**
@@ -121,7 +137,12 @@ public class Game {
      * @return true if player managed to join the game, false otherwise
      */
     public boolean login(String playerID) {
-        throw new RuntimeException("Not Implemented");
+        if (players.contains(playerID)) { // Player already logged in!
+            return false;
+        }
+        // player successfully logged in
+        players.add(playerID);
+        return true;
     }
     /**
      * Player tries to join a matc
@@ -130,19 +151,34 @@ public class Game {
      * @param playerID ID of the player who wants to join a game
      * @param matchID ID of the puzzle that the player wants to join
      * @return true if successfully joined, false otherwise
+     * @throws IOException 
      */
-    public boolean joinMatch(String playerID, String matchID) {
-        throw new RuntimeException("Not Implemented");
+    public boolean joinMatch(String playerID, String matchID) throws IOException {
+        boolean joined = matches.get(matchID).joinMatch(playerID);
+        if (joined) {
+            callListeners();
+        }
+        return joined;
     }
     
     /**
      * Player tries to create a match with matchID as the name
      * @param playerID ID of the player who wants to join a game
      * @param matchID ID of the puzzle that the player wants to join
+     * @param puzzleID puzzle name
+     * @param description description of the match
      * @return true if successfully joined, false otherwise
+     * @throws IOException 
      */
-    public boolean createMatch(String playerID, String matchID) {
-        throw new RuntimeException("Not Implemented");
+    public boolean createMatch(String playerID, String matchID, String puzzleID, String description) throws IOException {
+        if (playerToMatch.containsKey(playerID) || matches.containsKey(matchID)) {
+            return false;
+        }
+        playerToMatch.put(playerID, matchID);
+        matches.put(matchID, new Match(matchID, description, puzzles.get(puzzleID), playerID));
+        callListeners();
+        return true;
+        
     }
     
     /**
@@ -191,6 +227,7 @@ public class Game {
     public Set<String> getPuzzleNames() {
         return puzzles.keySet();
     }
+    
     /**
      * Returns a PlayablePuzzle with a specific format where every entry is separate by new lines and no 
      * words are revealed
@@ -242,7 +279,19 @@ public class Game {
     }
     
     /**
-     * TODO
+     * @return string of puzzle names with format:
+     *  response = puzzleName (ENTRY_DELIM puzzleName)*
+     */
+    public String getPuzzleNamesForResponse() {
+        StringBuilder builder = new StringBuilder();
+        for (String puzzleName : puzzles.keySet()) {
+            builder.append(puzzleName + Game.ENTRY_DELIM);
+        }
+        builder.deleteCharAt(builder.length()-1);
+        return builder.toString();
+    }
+    
+    /**
      * @return game with puzzle names and their representation separated by newlines
      */
     @Override
