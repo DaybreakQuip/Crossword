@@ -156,6 +156,7 @@ public class Game {
     public synchronized boolean joinMatch(String playerID, String matchID) throws IOException {
         boolean joined = matches.get(matchID).joinMatch(playerID);
         if (joined) {
+            playerToMatch.put(playerID, matchID);
             callWatchListeners();
             Match match = matches.get(matchID);
             callWaitListener(match.getPlayerOne());
