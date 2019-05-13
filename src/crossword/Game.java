@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,8 +17,8 @@ import edu.mit.eecs.parserlib.UnableToParseException;
  */
 public class Game {
     private final Map<String, Puzzle> puzzles; // map of name : puzzle
-    //private final Map<String, String> playerToMatch;
-    //private final Map<String, Match> matches;
+    private final Map<String, String> playerToMatch; // map of player_id : match_id
+    private final Map<String, Match> matches; //  map of match_id : match
     private static final String ENTRY_DELIM = "~";
     private static final String WORD_DELIM = "`";
     /**
@@ -68,19 +69,6 @@ public class Game {
     //TODO: Monitor pattern
     
     /**
-     * Returns a game meant for testing purposes
-     * @return a new dummy game with puzzle entries from simple.puzzle
-     */
-    public static Game createDummyGame() {
-        Puzzle dummyPuzzle = Puzzle.makeDummyPuzzle();
-        // then put the puzzle in a map
-        Map<String, Puzzle> puzzles = new HashMap<>();
-        puzzles.put(dummyPuzzle.getName(), dummyPuzzle);
-        // lastly, initialize and a return a game with that map 
-        return new Game(puzzles);
-    }
-    
-    /**
      * Creates a new Game
      * @param puzzles map of name : puzzles that are valid (consistent)
      */
@@ -117,23 +105,15 @@ public class Game {
         return puzzleString.substring(0,puzzleString.length()-1);
     }
     /**
-     * Gets names of all puzzles that are awaiting another player
-     * @return set of names of puzzles that need another player
+     * Gets names of all puzzles and descriptions that are awaiting another player
+     * @return String with format: 
+     *      match ::= match_ID WORD_DELIM description;
+     *      response ::= match (ENTRY_DELIM match)*;
      */
-    public Set<String> getMatchedPuzzleNames(){
-        throw new RuntimeException("Not Implemented");
-    }
-    
-    /**
-     * Gets names of all puzzles available
-     * @return set of names of puzzles that are available
-     */
-    public Set<String> getAllPuzzleNames(){
-        throw new RuntimeException("Not Implemented");
-
+    public String getAvailableMatchesForResponse(){
+        
     }
     /**
-     * Allows a new player into the game
      * @param playerID player name
      * @return true if player managed to join the game, false otherwise
      */
@@ -232,6 +212,28 @@ public class Game {
      */
     public boolean sameValue(Game other) {
         return puzzles.equals(other.puzzles);
+    }
+    private Set<WatchListener> listeners = new HashSet<>();
+    /** A watch listener for the board  */
+    public interface WatchListener {
+        /** 
+         * Called when the available matches in the game changes.
+         * A change is defined as when a new match becomes available or an available match becomes full
+         * @return String of the available matches since last change
+         */
+        public String onChange();
+    }
+    /**
+     * 
+     * @param listener Adds a new listener
+     */
+    public synchronized void addWatchListener(WatchListener listener) {
+        listeners.add(listener);
+    }
+    private void callListeners() throws IOException{
+        for (WatchListener listener : listeners) {
+            listener.onChange();
+        }
     }
     
     /**
