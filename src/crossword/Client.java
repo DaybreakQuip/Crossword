@@ -35,6 +35,16 @@ public class Client {
     private static final int CANVAS_WIDTH = 1200;
     private static final int CANVAS_HEIGHT = 900;
     private static final String RESPONSE_DELIM = ";";
+    
+    private String playerID;
+    
+    /**
+     * creates a new client
+     */
+    public Client() {
+        
+    }
+    
 
     /**
      * Start a Crossword Extravaganza client.
@@ -67,7 +77,8 @@ public class Client {
                 PrintWriter socketOut = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), UTF_8), true);
                 BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in));
         ) {
-            launchGameWindow(socketIn, socketOut, host, port);
+            Client client = new Client();
+            client.launchGameWindow(socketIn, socketOut, host, port);
             boolean showRaw = false;
             while (!socket.isClosed()) {
                 System.out.print("? ");
@@ -92,14 +103,15 @@ public class Client {
     /**
      * Transition crossword canvas from start state to choose state
      * @param canvas crossword canvas to modify
-     * @param playerId id of the player/client
+     * @param id id of the player/client
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
      */
-    private static void transitionStartState(CrosswordCanvas canvas, String playerId, BufferedReader socketIn, PrintWriter socketOut) {
-        socketOut.println("LOGIN " + playerId);
+    private void transitionStartState(CrosswordCanvas canvas, String id, BufferedReader socketIn, PrintWriter socketOut) {
+        socketOut.println(id + " " + "LOGIN");
         try {
             String response = socketIn.readLine();
+            System.out.println("r: " + response);
             if (response.charAt(0) == 'I') {
                 return;
             }
@@ -113,6 +125,7 @@ public class Client {
             }
             canvas.setState(State.CHOOSE);
             canvas.repaint();
+            playerID = id;
         } catch (IOException ioe) {}
     }
     
@@ -129,11 +142,17 @@ public class Client {
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
      */
-    private static void transitionChooseState(CrosswordCanvas canvas, String command, BufferedReader socketIn, PrintWriter socketOut) {
-        canvas.setState(State.PLAY);
-        socketOut.println(command);
+    private void transitionChooseState(CrosswordCanvas canvas, String command, BufferedReader socketIn, PrintWriter socketOut) {
+        
+        socketOut.println(playerID + " " + command);
         try {
-            canvas.setPuzzle(socketIn.readLine());
+            String response = socketIn.readLine();
+            if (response.charAt(0) == 'I') {
+                return;
+            }
+            canvas.setPuzzle(response.substring(1));
+            canvas.setState(State.PLAY);
+            canvas.repaint();
         } catch (IOException ioe) {}
     }
     
@@ -141,13 +160,13 @@ public class Client {
      * Starter code to display a window with a CrosswordCanvas,
      * a text box to enter commands and an Enter button.
      */
-    private static void launchGameWindow(BufferedReader socketIn, PrintWriter socketOut, String host, int port) {
+    private void launchGameWindow(BufferedReader socketIn, PrintWriter socketOut, String host, int port) {
         CrosswordCanvas canvas = new CrosswordCanvas("");
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
         JTextField textbox = new JTextField(30);
         textbox.setFont(new Font("Arial", Font.BOLD, 20));
-        
+                
         JButton enterButton = new JButton("Enter");
         enterButton.addActionListener((event) -> {
             // This code executes every time the user presses the Enter
