@@ -12,6 +12,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Set;
 
+import crossword.Game.WatchListener;
+
 
 /**
  * Text-protocol game server.
@@ -140,6 +142,13 @@ public class TextServer {
             return tokens[0];
         }
         //TODO
+        if (tokens[0].equals("WATCH")) {
+            game.addWatchListener(new WatchListener() {
+                public String onChange() {
+                    return game.getAvailableMatchesForResponse();
+                }
+            });
+        }
         if (tokens[0].equals("LOGIN")) {
             throw new RuntimeException("Not Implemented");
         }
