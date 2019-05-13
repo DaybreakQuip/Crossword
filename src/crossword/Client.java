@@ -13,16 +13,20 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+
+import crossword.Game.WatchListener;
 /**
  * Text-protocol game client.
  */
@@ -57,13 +61,13 @@ public class Client {
             throw new IllegalArgumentException("missing or invalid PORT", e);
         }
         
-        try (
+        try (                
                 Socket socket = new Socket(host, port);
                 BufferedReader socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), UTF_8));
                 PrintWriter socketOut = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), UTF_8), true);
                 BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in));
         ) {
-            launchGameWindow(socketIn, socketOut);
+            launchGameWindow(socketIn, socketOut, host, port);
             boolean showRaw = false;
             while (!socket.isClosed()) {
                 System.out.print("? ");
@@ -93,14 +97,22 @@ public class Client {
      * @param socketOut print writer to write to the server
      */
     private static void transitionStartState(CrosswordCanvas canvas, String playerId, BufferedReader socketIn, PrintWriter socketOut) {
-        canvas.setState(State.CHOOSE);
         socketOut.println("LOGIN " + playerId);
         try {
             String response = socketIn.readLine();
-            // list of matches RESPONSE_DELIM list of puzzles
-            String[] matchesAndPuzzles = response.split(RESPONSE_DELIM);
+            if (response.charAt(0) == 'I') {
+                return;
+            }
+            // list of puzzles RESPONSE_DELIM list of matches
+            String[] matchesAndPuzzles = response.substring(1).split(RESPONSE_DELIM);
             canvas.setPuzzleList(matchesAndPuzzles[0]);
-            canvas.setMatchList(matchesAndPuzzles[1]);
+            if (matchesAndPuzzles.length == 1) {
+                canvas.setMatchList("");
+            } else {
+                canvas.setMatchList(matchesAndPuzzles[1]);
+            }
+            canvas.setState(State.CHOOSE);
+            canvas.repaint();
         } catch (IOException ioe) {}
     }
     
@@ -129,7 +141,7 @@ public class Client {
      * Starter code to display a window with a CrosswordCanvas,
      * a text box to enter commands and an Enter button.
      */
-    private static void launchGameWindow(BufferedReader socketIn, PrintWriter socketOut) {
+    private static void launchGameWindow(BufferedReader socketIn, PrintWriter socketOut, String host, int port) {
         CrosswordCanvas canvas = new CrosswordCanvas("");
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -145,6 +157,11 @@ public class Client {
             String text = textbox.getText();
             textbox.setText("");
             canvas.repaint();
+            
+            if (text.length() == 0) {
+                return;
+            }
+            
             switch (canvas.getState()) {
             case START:
                 {
@@ -153,6 +170,25 @@ public class Client {
                 }
             case CHOOSE:
                 {
+                    new Thread(new Runnable() {
+                       public void run() {
+                           try (
+                               Socket watchSocket = new Socket(host, port);
+                               BufferedReader watchSocketIn = new BufferedReader(new InputStreamReader(watchSocket.getInputStream(), UTF_8));
+                               PrintWriter watchSocketOut = new PrintWriter(new OutputStreamWriter(watchSocket.getOutputStream(), UTF_8), true);
+                               BufferedReader watchSystemIn = new BufferedReader(new InputStreamReader(System.in));
+                           ) {
+                               while (true) {
+                                   watchSocketOut.println("WATCH");
+                                   String response = watchSocketIn.readLine();
+                                   canvas.setMatchList(response);
+                               }
+                           } catch (IOException ioe) {
+                               System.out.println("Something went wrong in watching for changes in matches");
+                           } 
+                       }
+                    });
+                    
                     transitionChooseState(canvas, text, socketIn, socketOut);
                     break;
                 }
@@ -193,5 +229,6 @@ public class Client {
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
     }
+    
     
 }
