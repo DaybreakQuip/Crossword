@@ -61,7 +61,7 @@ public class Client {
             throw new IllegalArgumentException("missing or invalid PORT", e);
         }
         
-        try (
+        try (                
                 Socket socket = new Socket(host, port);
                 BufferedReader socketIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), UTF_8));
                 PrintWriter socketOut = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), UTF_8), true);
@@ -97,14 +97,22 @@ public class Client {
      * @param socketOut print writer to write to the server
      */
     private static void transitionStartState(CrosswordCanvas canvas, String playerId, BufferedReader socketIn, PrintWriter socketOut) {
-        canvas.setState(State.CHOOSE);
         socketOut.println("LOGIN " + playerId);
         try {
             String response = socketIn.readLine();
+            if (response.charAt(0) == 'I') {
+                return;
+            }
             // list of puzzles RESPONSE_DELIM list of matches
-            String[] matchesAndPuzzles = response.split(RESPONSE_DELIM);
+            String[] matchesAndPuzzles = response.substring(1).split(RESPONSE_DELIM);
             canvas.setPuzzleList(matchesAndPuzzles[0]);
-            canvas.setMatchList(matchesAndPuzzles[1]);
+            if (matchesAndPuzzles.length == 1) {
+                canvas.setMatchList("");
+            } else {
+                canvas.setMatchList(matchesAndPuzzles[1]);
+            }
+            canvas.setState(State.CHOOSE);
+            canvas.repaint();
         } catch (IOException ioe) {}
     }
     
@@ -149,6 +157,11 @@ public class Client {
             String text = textbox.getText();
             textbox.setText("");
             canvas.repaint();
+            
+            if (text.length() == 0) {
+                return;
+            }
+            
             switch (canvas.getState()) {
             case START:
                 {
@@ -159,7 +172,6 @@ public class Client {
                 {
                     new Thread(new Runnable() {
                        public void run() {
-                           // ????
                            try (
                                Socket watchSocket = new Socket(host, port);
                                BufferedReader watchSocketIn = new BufferedReader(new InputStreamReader(watchSocket.getInputStream(), UTF_8));
