@@ -19,7 +19,7 @@ public class PlayablePuzzle {
     //  playerEntries and confirmedEntries can only be modified through mutator methods
     //
     // Thread safety argument:
-    //  TODO: Monitor Pattern
+    //  Uses monitor Pattern
     private final String name; 
     private final String description;
     private final Map<Integer, PuzzleEntry> playerEntries = new HashMap<>();
@@ -44,7 +44,7 @@ public class PlayablePuzzle {
      * @param word word to add as a puzzle entry 
      * @return true if word is added, false otherwise
      */
-    public boolean addPlayerEntry(int wordID, PuzzleEntry word) {
+    public synchronized boolean addPlayerEntry(int wordID, PuzzleEntry word) {
         throw new RuntimeException("Not Implemented");
     }
     /**
@@ -52,7 +52,7 @@ public class PlayablePuzzle {
      * @param wordID the id of the word on the crossword puzzle
      * @return true if entry is deleted, false otherwise
      */
-    public boolean deletePlayerEntry(int wordID) {
+    public synchronized boolean deletePlayerEntry(int wordID) {
         throw new RuntimeException("Not Implemented");
     }
     
@@ -62,7 +62,7 @@ public class PlayablePuzzle {
      * @param word word to add as a puzzle entry 
      * @return true if word is added, false otherwise
      */
-    public boolean addConfirmedEntry(int wordID, PuzzleEntry word) {
+    public synchronized boolean addConfirmedEntry(int wordID, PuzzleEntry word) {
         throw new RuntimeException("Not Implemented");
     }
     /**
@@ -71,28 +71,28 @@ public class PlayablePuzzle {
      * @return true if entry is deleted, false otherwise
 
      */
-    public boolean deleteConfirmedEntry(int wordID) {
+    public synchronized boolean deleteConfirmedEntry(int wordID) {
         throw new RuntimeException("Not Implemented");
     }
     
     /**
      * @return map of playerEntries in the puzzle
      */
-    public Map<Integer, PuzzleEntry> getPlayerEntries() {
+    public synchronized Map<Integer, PuzzleEntry> getPlayerEntries() {
         return new HashMap<>(playerEntries);
     }
     
     /**
      * @return map of confirmedEntries in the puzzle
      */
-    public Map<Integer, PuzzleEntry> getConfirmedEntries() {
+    public synchronized Map<Integer, PuzzleEntry> getConfirmedEntries() {
         return new HashMap<>(confirmedEntries);
     }
     
     /**
      * @return map of correctEntries in the puzzle
      */
-    public Map<Integer, PuzzleEntry> getCorrectEntries() {
+    public synchronized Map<Integer, PuzzleEntry> getCorrectEntries() {
         return new HashMap<>(correctEntries);
     }
     
@@ -100,7 +100,7 @@ public class PlayablePuzzle {
      * @return puzzle formatted for responses
      * TODO: Modify this later (or delete it)
      */
-    public String getPuzzleForResponse() {
+    public synchronized String getPuzzleForResponse() {
         String puzzleString = "";
         for (Map.Entry<Integer, PuzzleEntry> entry: puzzle.getEntries().entrySet()) {
             Integer id = entry.getKey();
@@ -115,14 +115,14 @@ public class PlayablePuzzle {
     /**
      * @return name of the puzzle
      */
-    public String getName() {
+    public synchronized String getName() {
         return name;
     }
     
     /**
      * @return description of the puzzle
      */
-    public String getDescription() {
+    public synchronized String getDescription() {
         return description;
     }
 }
