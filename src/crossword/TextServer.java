@@ -149,6 +149,7 @@ public class TextServer {
         else if (command.equals("WAIT")) {
             game.addWaitListener(playerID, new WaitListener() {
                 public String onChange() {
+                    System.out.println("id: "+playerID);
                     return game.getMatchPuzzleForResponse(playerID);
                 }
             }

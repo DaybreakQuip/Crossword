@@ -159,7 +159,7 @@ public class Game {
             playerToMatch.put(playerID, matchID);
             callWatchListeners();
             Match match = matches.get(matchID);
-            callWaitListener(match.getPlayerOne());
+            //callWaitListener(match.getPlayerOne());
         }
         return joined;
     }
@@ -179,6 +179,7 @@ public class Game {
         }
         playerToMatch.put(playerID, matchID);
         matches.put(matchID, new Match(matchID, description, puzzles.get(puzzleID), playerID));
+        // TODO add waitListener
         callWatchListeners();
         return true;
         
@@ -297,6 +298,7 @@ public class Game {
      * @throws IOException calling wait listener does not work out
      */
     private synchronized void callWaitListener(String playerID) throws IOException{
+        System.out.println("id: "+playerID);
         if (!waitListeners.containsKey(playerID)) {
             throw new RuntimeException("PlayerID must be waiting to call their listener");
         }

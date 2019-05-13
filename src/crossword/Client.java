@@ -143,15 +143,39 @@ public class Client {
      * @param socketOut print writer to write to the server
      */
     private void transitionChooseState(CrosswordCanvas canvas, String command, BufferedReader socketIn, PrintWriter socketOut) {
-        
+        String[] commandParts = command.split(" ");
         socketOut.println(playerID + " " + command);
         try {
             String response = socketIn.readLine();
             if (response.charAt(0) == 'I') {
                 return;
             }
+            
+            if (commandParts[0].equals("PLAY")) {
+                canvas.setState(State.PLAY);
+            } else {
+                canvas.setState(State.WAIT);
+            }
             canvas.setPuzzle(response.substring(1));
+            canvas.repaint();
+        } catch (IOException ioe) {}
+    }
+    
+    /**
+     * Transition crossword canvas from wait state to play state
+     * @param canvas crossword canvas to modify
+     * @param socketIn buffered reader to read input from server
+     * @param socketOut print writer to write to the server
+     */
+    private void transitionWaitState(CrosswordCanvas canvas, BufferedReader socketIn, PrintWriter socketOut) {
+        socketOut.println(playerID + " " + "WAIT");
+        try {
+            String response = socketIn.readLine();
+            if (response.charAt(0) == 'I') {
+                return;
+            }
             canvas.setState(State.PLAY);
+            canvas.setPuzzle(response.substring(1));
             canvas.repaint();
         } catch (IOException ioe) {}
     }
@@ -198,7 +222,7 @@ public class Client {
                                BufferedReader watchSystemIn = new BufferedReader(new InputStreamReader(System.in));
                            ) {
                                while (true) {
-                                   watchSocketOut.println("WATCH");
+                                   watchSocketOut.println(playerID + " " + "WATCH");
                                    String response = watchSocketIn.readLine();
                                    canvas.setMatchList(response);
                                }
@@ -213,6 +237,27 @@ public class Client {
                 }
             case WAIT:
                 {
+                    /**
+                    new Thread(new Runnable() {
+                        public void run() {
+                            try (
+                                Socket waitSocket = new Socket(host, port);
+                                BufferedReader waitSocketIn = new BufferedReader(new InputStreamReader(waitSocket.getInputStream(), UTF_8));
+                                PrintWriter waitSocketOut = new PrintWriter(new OutputStreamWriter(waitSocket.getOutputStream(), UTF_8), true);
+                                BufferedReader waitSystemIn = new BufferedReader(new InputStreamReader(System.in));
+                            ) {
+                                while (true) {
+                                    waitSocketOut.println(playerID + " " + "WAIT");
+                                    // ???
+                                }
+                            } catch (IOException ioe) {
+                                System.out.println("Something went wrong in waiting for another player");
+                            } 
+                        }
+                     });
+                    
+                    transitionWaitState(canvas, socketIn, socketOut);
+                    */
                     break;
                 }
             case PLAY:

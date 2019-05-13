@@ -241,6 +241,7 @@ class CrosswordCanvas extends JComponent {
         String[] unsortedEntries = puzzle.split(ENTRY_DELIM);
         List<String> entries = new ArrayList<>(unsortedEntries.length);
         for (String entry: unsortedEntries) {
+            System.out.println("entry: " + entry);
             entries.add(Integer.parseInt(entry.substring(0, entry.indexOf(WORD_DELIM))), entry);
         }
                 
