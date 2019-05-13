@@ -23,7 +23,8 @@ public class Game {
     private final Map<String, Puzzle> puzzles; // map of puzzleID : Puzzle
     private final Map<String, String> playerToMatch; // map of playerID : match_id
     private final Map<String, Match> matches; //  map of match_id : match
-    private Set<WatchListener> listeners = new HashSet<>();
+    private Set<WatchListener> listeners;
+    private final Map<String, WaitListener> waitListeners;
     
     /**
      * Main method. Makes the Game from Puzzle objects from parsing.
@@ -82,6 +83,8 @@ public class Game {
         this.matches = new HashMap<String, Match>();
         this.playerToMatch = new HashMap<String, String>();
         this.players = new HashSet<String>();
+        this.listeners = new HashSet<>();
+        this.waitListeners = new HashMap<>();
     }
     
     /**
@@ -153,7 +156,9 @@ public class Game {
     public synchronized boolean joinMatch(String playerID, String matchID) throws IOException {
         boolean joined = matches.get(matchID).joinMatch(playerID);
         if (joined) {
-            callListeners();
+            callWatchListeners();
+            Match match = matches.get(matchID);
+            callWaitListener(match.getPlayerOne());
         }
         return joined;
     }
@@ -173,7 +178,7 @@ public class Game {
         }
         playerToMatch.put(playerID, matchID);
         matches.put(matchID, new Match(matchID, description, puzzles.get(puzzleID), playerID));
-        callListeners();
+        callWatchListeners();
         return true;
         
     }
@@ -234,7 +239,12 @@ public class Game {
      *         e.g: "4, "twinkle twinkle", ACROSS, 0, 1\n"
      */
     public synchronized String getMatchPuzzleForResponse(String playerID) {
-        throw new RuntimeException("Not Implemented");
+        if (!playerToMatch.containsKey(playerID)) {
+            throw new RuntimeException("PlayerID is not currently in a match");
+        }
+        String matchID = playerToMatch.get(playerID);
+        Match match = matches.get(matchID);
+        return match.getPuzzleForResponse();
     }
 
     /** A watch listener for the board  */
@@ -255,10 +265,42 @@ public class Game {
         listeners.add(listener);
     }
     
-    private synchronized void callListeners() throws IOException{
+    private synchronized void callWatchListeners() throws IOException{
         for (WatchListener listener : listeners) {
             listener.onChange();
         }
+    }
+    
+    /** A watch listener for the board  */
+    public interface WaitListener {
+        /** 
+         * Called when the available matches in the game changes.
+         * A change is defined as when a new match becomes available or an available match becomes full
+         * @return String of the available matches since last change
+         */
+        public String onChange();
+    }
+    /**
+     * Adds a listener for a player to wait for another player to join their match
+     * TODO: Remove?
+     * @param playerID id of the player
+     * @param listener Adds a new listener
+     */
+    public synchronized void addWaitListener(String playerID, WaitListener listener) {
+        waitListeners.put(playerID, listener);
+    }
+    
+    /**
+     * Calls the wait listener corresponding to the player ID
+     * @param playerID the ID of the player
+     * @throws IOException calling wait listener does not work out
+     */
+    private synchronized void callWaitListener(String playerID) throws IOException{
+        if (!waitListeners.containsKey(playerID)) {
+            throw new RuntimeException("PlayerID must be waiting to call their listener");
+        }
+        WaitListener listener = waitListeners.get(playerID);
+        listener.onChange();
     }
     
     /**
