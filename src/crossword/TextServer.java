@@ -19,6 +19,8 @@ import crossword.Game.WatchListener;
  * Text-protocol game server.
  */
 public class TextServer {
+    private static String QUIT = "quit";
+    
     // Abstraction function:
     //    AF(serverSocket, game) --> TextServer Object having the ability to connect one player to a Crossword Puzzle game. 
     //                                        One serverSocket (a rep) is able to run multiple connections, game is the game class for
@@ -101,7 +103,7 @@ public class TextServer {
         try {
             for (String input = in.readLine(); input != null; input = in.readLine()) {
                 String output = handleRequest(input);
-                if (output.equals("quit")) {
+                if (output.equals(QUIT)) {
                     break;
                 }
                 out.println(output);
@@ -131,7 +133,7 @@ public class TextServer {
         }
         
         if (command.equals("quit")) {
-            return "quit";
+            return QUIT;
         }
         //TODO
         if (command.equals("WATCH")) {
