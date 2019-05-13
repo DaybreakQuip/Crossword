@@ -51,10 +51,12 @@ class CrosswordCanvas extends JComponent {
     private final Font textFont = new Font("Arial", Font.PLAIN, 16);
 
     // Abstraction function:
-    //  AF(originX, originY, delta, mainFont, indexFont, textFont, puzzle, state, puzzleList) = canvas representing the crossword puzzle starting at originX, originY 
-    //                                                                      with puzzle cells of size delta and text using mainFont, indexFont, and textFont.
-    //                                                                      puzzle represents puzzle entries separated by ENTRY_DELIM and
-    //                                                                      puzzle parts of each entry separated by WORD_DELIM.
+    //  AF(originX, originY, delta, mainFont, indexFont, textFont, puzzle, state, puzzleList, matchList) = 
+    //              canvas representing the crossword puzzle starting at originX, originY 
+    //              with puzzle cells of size delta and text using mainFont, indexFont, and textFont.
+    //              puzzle represents puzzle entries separated by ENTRY_DELIM and
+    //              puzzle parts of each entry separated by WORD_DELIM.
+    //              TODO include state, puzzleList, and matchList in the AF
     // Representation invariant:
     //  true
     // Safety from rep exposure:
@@ -67,6 +69,7 @@ class CrosswordCanvas extends JComponent {
     private static final String WORD_DELIM = "`";
     private State state;
     private String puzzleList;
+    private String matchList;
     
     /**
      * @param puzzle string representation of the crossword puzzle
@@ -103,6 +106,13 @@ class CrosswordCanvas extends JComponent {
      */
     public void setPuzzleList(String puzzleList) {
         this.puzzleList = puzzleList;
+    }
+    
+    /**
+     * @param matchList the list of valid match ids
+     */
+    public void setMatchList(String matchList) {
+        this.matchList = matchList;
     }
     
     /**
@@ -307,7 +317,8 @@ class CrosswordCanvas extends JComponent {
         case CHOOSE:
             {
                 println("Choose state:", g);
-                println(puzzleList, g);
+                println("Available matches:" + matchList,g);
+                println("Available puzzles:" + puzzleList, g);
                 break;
             }
         case WAIT:
