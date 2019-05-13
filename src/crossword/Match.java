@@ -22,7 +22,7 @@ public class Match {
     //  puzzle is never returned directly to clients so it cannot be modified by clients
     //  clients only pass in player ids and never get access to the player objects so they cannot modify the players
     // Thread safety argument:
-    //  TODO: Monitor Pattern
+    //  uses monitor pattern
     private final String matchId;
     private final String description;
     private final PlayablePuzzle puzzle;
@@ -50,14 +50,14 @@ public class Match {
     /**
      * @return id of the match
      */
-    public String getMatchId() {
+    public synchronized String getMatchId() {
         return this.matchId;
     }
     
     /**
      * @return description of the match
      */
-    public String getDescription() {
+    public synchronized String getDescription() {
         return this.description;
     }
     
@@ -67,7 +67,7 @@ public class Match {
      *          as the player that is already in match
      * @return true of the player was added to the match and false otherwise
      */
-    public boolean joinMatch(String playerId) {
+    public synchronized boolean joinMatch(String playerId) {
         if (isWaiting()) {
             playerTwo = new Player(playerId);
             return true;
@@ -78,21 +78,21 @@ public class Match {
     /**
      * @return true if the match is ongoing and false otherwise
      */
-    public boolean isOngoing() {
+    public synchronized boolean isOngoing() {
         return state == MatchState.ONGOING;
     }
     
     /**
      * @return true if the match is waiting and false otherwise
      */
-    public boolean isWaiting() {
+    public synchronized boolean isWaiting() {
         return state == MatchState.WAITING;
     }
     
     /**
      * @return true if the match is done and false otherwise
      */
-    public boolean isDone() {
+    public synchronized boolean isDone() {
         return state == MatchState.DONE;
     }
     
@@ -101,7 +101,7 @@ public class Match {
      * @param playerId the id of the player, the player id must exist in the match
      * @return the Player with the corresponding player id in the match
      */
-    private Player getPlayer(String id) {
+    private synchronized Player getPlayer(String id) {
         throw new RuntimeException("Not Implemented!");
     }
     
@@ -114,7 +114,7 @@ public class Match {
      * @param guess the guess of the player
      * @return true if the guess is valid and false otherwise
      */
-    public boolean tryWord(String playerId, Guess guess) {
+    public synchronized boolean tryWord(String playerId, Guess guess) {
         throw new RuntimeException("Not Implemented!");
     }
     
@@ -144,7 +144,7 @@ public class Match {
      * @param guess the guess of the player
      * @return true if the challenge is valid and false otherwise
      */
-    public boolean challengeWord(String playerId, Guess guess) {
+    public synchronized boolean challengeWord(String playerId, Guess guess) {
         throw new RuntimeException("Not Implemented!");
     }
 
@@ -152,7 +152,7 @@ public class Match {
      * Forfeits a player from the match and ends the match
      * @param playerId the player id of the player that is forfeiting
      */
-    public void forfeit(String playerId) {
+    public synchronized void forfeit(String playerId) {
         throw new RuntimeException("Not Implemented!");
     }
     
@@ -162,15 +162,14 @@ public class Match {
      *  confirmed and guessed entries
      * @return a representation of the puzzle with entries separated by delimeters of the same kind
      */
-    //TODO TONIGHT
-    public String getPuzzleForResponse() {
-        throw new RuntimeException("Not Implemented!");
+    public synchronized String getPuzzleForResponse() {
+        return puzzle.getPuzzleForResponse();
     }
     
     /**
      * @return string representing the score of each player
      */
-    public String showScore() {
+    public synchronized String showScore() {
         throw new RuntimeException("Not Implemented!");
     }
 }

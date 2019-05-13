@@ -25,6 +25,8 @@ public class PlayablePuzzle {
     private final Map<Integer, PuzzleEntry> playerEntries = new HashMap<>();
     private final Map<Integer, PuzzleEntry> confirmedEntries  = new HashMap<>();
     private final Map<Integer, PuzzleEntry> correctEntries;
+    // TODO: DELETE this in the future
+    private final Puzzle puzzle;
     /**
      * Constructs a puzzle that can be played by different players
      * @param puzzle an unmodifiable puzzle with the correct answers
@@ -33,6 +35,7 @@ public class PlayablePuzzle {
         name = puzzle.getName();
         description = puzzle.getDescription();
         correctEntries = puzzle.getEntries();
+        this.puzzle = puzzle;
     }
     
     /**
@@ -91,6 +94,22 @@ public class PlayablePuzzle {
      */
     public Map<Integer, PuzzleEntry> getCorrectEntries() {
         return new HashMap<>(correctEntries);
+    }
+    
+    /**
+     * @return puzzle formatted for responses
+     * TODO: Modify this later (or delete it)
+     */
+    public String getPuzzleForResponse() {
+        String puzzleString = "";
+        for (Map.Entry<Integer, PuzzleEntry> entry: puzzle.getEntries().entrySet()) {
+            Integer id = entry.getKey();
+            PuzzleEntry puzzleEntry = entry.getValue();
+            puzzleString += id + Game.WORD_DELIM + puzzleEntry.getWord().length() + Game.WORD_DELIM + puzzleEntry.getClue() + Game.WORD_DELIM + 
+                    puzzleEntry.getOrientation() + Game.WORD_DELIM + puzzleEntry.getPosition().getRow() 
+                            + Game.WORD_DELIM + puzzleEntry.getPosition().getCol() + Game.ENTRY_DELIM;
+        }
+        return puzzleString.substring(0,puzzleString.length()-1);
     }
     
     /**
