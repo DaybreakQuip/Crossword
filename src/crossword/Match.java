@@ -97,6 +97,22 @@ public class Match {
     }
     
     /**
+     * 
+     * @return name of first player
+     */
+    public String getPlayerOne() {
+        return playerOne.getId();
+    }
+    
+    /**
+     * 
+     * @return name of second player
+     */
+    public String getPlayerTwo() {
+        return playerTwo.getId();
+    }
+    
+    /**
      * Returns the player with the corresponding id in the match
      * @param playerId the id of the player, the player id must exist in the match
      * @return the Player with the corresponding player id in the match
