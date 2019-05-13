@@ -30,6 +30,7 @@ public class Client {
     
     private static final int CANVAS_WIDTH = 1200;
     private static final int CANVAS_HEIGHT = 900;
+    private static final String RESPONSE_DELIM = ";";
 
     /**
      * Start a Crossword Extravaganza client.
@@ -87,25 +88,38 @@ public class Client {
     /**
      * Transition crossword canvas from start state to choose state
      * @param canvas crossword canvas to modify
+     * @param playerId id of the player/client
+     * @param socketIn buffered reader to read input from server
+     * @param socketOut print writer to write to the server
      */
-    private static void transitionStartState(CrosswordCanvas canvas, BufferedReader socketIn, PrintWriter socketOut) {
+    private static void transitionStartState(CrosswordCanvas canvas, String playerId, BufferedReader socketIn, PrintWriter socketOut) {
         canvas.setState(State.CHOOSE);
-        socketOut.println("GET");
+        socketOut.println("LOGIN " + playerId);
         try {
-            canvas.setPuzzleList(socketIn.readLine());
+            String response = socketIn.readLine();
+            // list of matches RESPONSE_DELIM list of puzzles
+            String[] matchesAndPuzzles = response.split(RESPONSE_DELIM);
+            canvas.setPuzzleList(matchesAndPuzzles[0]);
+            canvas.setMatchList(matchesAndPuzzles[1]);
         } catch (IOException ioe) {}
     }
     
     /**
      * Transition crossword canvas from choose state to play state
+     * 
+     * Commands:
+     *  PLAY Match_ID
+     *  NEW Match_ID Puzzle_ID "Description"
+     *  EXIT
+     * 
      * @param canvas crossword canvas to modify
-     * @param puzzle name of the puzzle to play
+     * @param command command that the player can call in the choose state
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
      */
-    private static void transitionChooseState(CrosswordCanvas canvas, String puzzle, BufferedReader socketIn, PrintWriter socketOut) {
+    private static void transitionChooseState(CrosswordCanvas canvas, String command, BufferedReader socketIn, PrintWriter socketOut) {
         canvas.setState(State.PLAY);
-        socketOut.println(puzzle);
+        socketOut.println(command);
         try {
             canvas.setPuzzle(socketIn.readLine());
         } catch (IOException ioe) {}
@@ -134,7 +148,7 @@ public class Client {
             switch (canvas.getState()) {
             case START:
                 {
-                    transitionStartState(canvas, socketIn, socketOut);
+                    transitionStartState(canvas, text, socketIn, socketOut);
                     break;
                 }
             case CHOOSE:
@@ -179,4 +193,5 @@ public class Client {
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
     }
+    
 }

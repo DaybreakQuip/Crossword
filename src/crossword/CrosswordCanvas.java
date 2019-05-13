@@ -67,6 +67,7 @@ class CrosswordCanvas extends JComponent {
     private String puzzle;
     private static final String ENTRY_DELIM = "~";
     private static final String WORD_DELIM = "`";
+    private static final String RESPONSE_DELIM = ";";
     private State state;
     private String puzzleList;
     private String matchList;
