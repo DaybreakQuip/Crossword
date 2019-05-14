@@ -37,6 +37,11 @@ public class Client {
     private static final String RESPONSE_DELIM = ";";
     
     private String playerID;
+    private CrosswordCanvas canvas;
+    
+    // TODO: Potentially delete this field later, it's for debugging purposes and will remember the previous response sent by the server
+    //       It can be used to directly print errors returned by the server (i.e. invalid playerID format or something)
+    private String previousResponse = "No previous response";
     
     /**
      * creates a new client
@@ -101,32 +106,54 @@ public class Client {
     }
     
     /**
+     * Returns the response from server given a request
+     * @param request the request for the server 
+     * @param socketIn the socket for accepting responses
+     * @param socketOut the socket for sending requests
+     * @return response from the server given the request
+     */
+    private String getResponse(String request, BufferedReader socketIn, PrintWriter socketOut) {
+        try {
+            // TODO: Delete this line later, it's for debugging purposes
+            System.out.println("Request: " + request);
+            
+            socketOut.println(request);
+            String response = socketIn.readLine();
+            // TODO: Delete previous responses if they're not needed in the future
+            this.previousResponse = response;
+            canvas.setPreviousResponse(response);
+            return response;
+        } catch (IOException ioe) {
+            throw new RuntimeException("Error occured when processing request: " + request);
+        }
+    }
+    
+    /**
      * Transition crossword canvas from start state to choose state
      * @param canvas crossword canvas to modify
      * @param id id of the player/client
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
      */
-    private void transitionStartState(CrosswordCanvas canvas, String id, BufferedReader socketIn, PrintWriter socketOut) {
-        socketOut.println(id + " " + "LOGIN");
-        try {
-            String response = socketIn.readLine();
-            System.out.println("r: " + response);
-            if (response.charAt(0) == 'I') {
-                return;
-            }
-            // list of puzzles RESPONSE_DELIM list of matches
-            String[] matchesAndPuzzles = response.substring(1).split(RESPONSE_DELIM);
-            canvas.setPuzzleList(matchesAndPuzzles[0]);
-            if (matchesAndPuzzles.length == 1) {
-                canvas.setMatchList("");
-            } else {
-                canvas.setMatchList(matchesAndPuzzles[1]);
-            }
-            canvas.setState(State.CHOOSE);
-            canvas.repaint();
-            playerID = id;
-        } catch (IOException ioe) {}
+    private void transitionStartState(String id, BufferedReader socketIn, PrintWriter socketOut) {
+        String request = id + " " + "LOGIN";
+        String response = getResponse(request, socketIn, socketOut);
+        
+        System.out.println("r: " + response);
+        if (response.charAt(0) == 'I') {
+            return;
+        }
+        // list of puzzles RESPONSE_DELIM list of matches
+        String[] matchesAndPuzzles = response.substring(1).split(RESPONSE_DELIM);
+        canvas.setPuzzleList(matchesAndPuzzles[0]);
+        if (matchesAndPuzzles.length == 1) {
+            canvas.setMatchList("");
+        } else {
+            canvas.setMatchList(matchesAndPuzzles[1]);
+        }
+        canvas.setState(State.CHOOSE);
+        canvas.repaint();
+        playerID = id;
     }
     
     /**
@@ -142,23 +169,22 @@ public class Client {
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
      */
-    private void transitionChooseState(CrosswordCanvas canvas, String command, BufferedReader socketIn, PrintWriter socketOut) {
+    private void transitionChooseState(String command, BufferedReader socketIn, PrintWriter socketOut) {
+        String request = playerID + " " + command;
+        String response = getResponse(request, socketIn, socketOut);
+        
         String[] commandParts = command.split(" ");
-        socketOut.println(playerID + " " + command);
-        try {
-            String response = socketIn.readLine();
-            if (response.charAt(0) == 'I') {
-                return;
-            }
-            
-            if (commandParts[0].equals("PLAY")) {
-                canvas.setState(State.PLAY);
-            } else {
-                canvas.setState(State.WAIT);
-            }
-            canvas.setPuzzle(response.substring(1));
-            canvas.repaint();
-        } catch (IOException ioe) {}
+        if (response.charAt(0) == 'I') {
+            return;
+        }
+        
+        if (commandParts[0].equals("PLAY")) {
+            canvas.setState(State.PLAY);
+        } else {
+            canvas.setState(State.WAIT);
+        }
+        canvas.setPuzzle(response.substring(1));
+        canvas.repaint();
     }
     
     /**
@@ -167,17 +193,16 @@ public class Client {
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
      */
-    private void transitionWaitState(CrosswordCanvas canvas, BufferedReader socketIn, PrintWriter socketOut) {
-        socketOut.println(playerID + " " + "WAIT");
-        try {
-            String response = socketIn.readLine();
-            if (response.charAt(0) == 'I') {
-                return;
-            }
-            canvas.setState(State.PLAY);
-            canvas.setPuzzle(response.substring(1));
-            canvas.repaint();
-        } catch (IOException ioe) {}
+    private void transitionWaitState(BufferedReader socketIn, PrintWriter socketOut) {
+        String request = playerID + " " + "WAIT";
+        String response = getResponse(request, socketIn, socketOut);
+        
+        if (response.charAt(0) == 'I') {
+            return;
+        }
+        canvas.setState(State.PLAY);
+        canvas.setPuzzle(response.substring(1));
+        canvas.repaint();
     }
     
     /**
@@ -185,7 +210,7 @@ public class Client {
      * a text box to enter commands and an Enter button.
      */
     private void launchGameWindow(BufferedReader socketIn, PrintWriter socketOut, String host, int port) {
-        CrosswordCanvas canvas = new CrosswordCanvas("");
+        canvas = new CrosswordCanvas("");
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
         JTextField textbox = new JTextField(30);
@@ -208,7 +233,7 @@ public class Client {
             switch (canvas.getState()) {
             case START:
                 {
-                    transitionStartState(canvas, text, socketIn, socketOut);
+                    transitionStartState(text, socketIn, socketOut);
                     break;
                 }
             case CHOOSE:
@@ -232,7 +257,7 @@ public class Client {
                        }
                     });
                     
-                    transitionChooseState(canvas, text, socketIn, socketOut);
+                    transitionChooseState(text, socketIn, socketOut);
                     break;
                 }
             case WAIT:
@@ -256,7 +281,7 @@ public class Client {
                         }
                      });
                     
-                    transitionWaitState(canvas, socketIn, socketOut);
+                    transitionWaitState(socketIn, socketOut);
                     */
                     break;
                 }

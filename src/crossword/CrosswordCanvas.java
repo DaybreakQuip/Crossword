@@ -69,6 +69,7 @@ class CrosswordCanvas extends JComponent {
     private static final String WORD_DELIM = "`";
     private static final String RESPONSE_DELIM = ";";
     private State state;
+    private String previousResponse = "No previous response";
     private String puzzleList;
     private String matchList;
     
@@ -114,6 +115,13 @@ class CrosswordCanvas extends JComponent {
      */
     public void setMatchList(String matchList) {
         this.matchList = matchList;
+    }
+    
+    /**
+     * @param previousResponse the previous response from the server
+     */
+    public void setPreviousResponse(String previousResponse) {
+        this.previousResponse = previousResponse;
     }
     
     /**
@@ -236,7 +244,7 @@ class CrosswordCanvas extends JComponent {
         int down = 0;
         List<String> acrossHints = new ArrayList<>();
         List<String> downHints = new ArrayList<>();
-                
+        
         // sort entries by word id
         String[] unsortedEntries = puzzle.split(ENTRY_DELIM);
         List<String> entries = new ArrayList<>(unsortedEntries.length);
@@ -279,6 +287,10 @@ class CrosswordCanvas extends JComponent {
         
         // print hints for across and down words
         resetLine();
+
+        // TODO: Remove this when we remove previousResponse
+        println("", g);
+        
         if (across > 0) {
             println("Across\n", g);
             for (String hint: acrossHints) {
@@ -308,6 +320,7 @@ class CrosswordCanvas extends JComponent {
     @Override
     public void paint(Graphics g) {
         resetLine();
+        println("Previous response: " + previousResponse, g);
         switch (state) {
         case START:
             {

@@ -165,7 +165,7 @@ public class TextServer {
                 builder.append(game.getAvailableMatchesForResponse());
                 return builder.toString();
             } else {
-                return "I";
+                return "I" + "Player failed to log in";
             }
         }
         else if (command.equals("PLAY")) {
@@ -173,7 +173,7 @@ public class TextServer {
             if (join) {
                 return "V" + game.getPuzzleFromMatchID(tokens[2]);
             }
-            return "I";
+            return "I" + "Player was unable to join the match";
         }
         else if (command.equals("NEW")) {
             String matchID = tokens[2];
@@ -188,7 +188,7 @@ public class TextServer {
             if (create) {
                 return "V";
             }
-            return "I";
+            return "I" + "Match was unable to be created";
         }
         else if (command.equals("LOGOUT")) {
             throw new RuntimeException("Not Implemented");
