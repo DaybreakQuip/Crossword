@@ -256,7 +256,7 @@ public class Game {
          * A change is defined as when a new match becomes available or an available match becomes full
          * @return String of the available matches since last change
          */
-        public String onChange();
+        public void onChange();
     }
     /**
      * Adds a listener for changes to available matches in the game
@@ -280,7 +280,7 @@ public class Game {
          * A change is defined as when a new match becomes available or an available match becomes full
          * @return String of the available matches since last change
          */
-        public String onChange();
+        public void onChange();
     }
     /**
      * Adds a listener for a player to wait for another player to join their match

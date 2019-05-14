@@ -351,12 +351,8 @@ class CrosswordCanvas extends JComponent {
                 if (matchList.length() > 0) {
                     String[] matches = matchList.split(ENTRY_DELIM);
                     
-                    System.out.println("matchList: " + matchList.split(ENTRY_DELIM));
                     for (String match : matches) {
                         String[] matchEntry = match.split(WORD_DELIM);
-                        // TODO Delete this
-                        System.out.println("DISASTER: " + Arrays.toString(matchEntry));
-                        System.out.println("Previous response:" + previousResponse);
                         println("    " + matchEntry[0] + ": " + matchEntry[1], g);
                     }
                     

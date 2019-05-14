@@ -131,7 +131,7 @@ public class TextServer {
         String command = tokens[1];  
         
         // Check whether the playerID is valid
-        if (!(playerID.matches("[0-9a-zA-Z]*") && playerID.length() > 0)) {
+        if (!(playerID.matches("[A-Za-z0-9]*") && playerID.length() > 0)) {
             throw new RuntimeException("Player ID must be alphanumeric and have a length > 0");
         }
         
@@ -140,22 +140,41 @@ public class TextServer {
         }
         //TODO: implement each command as needed
         if (command.equals("WATCH")) {
+            Object lock = new Object();
+            StringBuilder builder = new StringBuilder();
             game.addWatchListener(new WatchListener() {
-                public String onChange() {
-                    return game.getAvailableMatchesForResponse();
+                public void onChange() {
+                    synchronized (lock) {
+                        builder.append(game.getAvailableMatchesForResponse());
+                        lock.notify();
+                    }
                 }
             });
+            
+            synchronized(lock) {
+                try {
+                    lock.wait();
+                } catch (Exception e) {
+                    
+                }
+                return builder.toString();
+            }
+            
         }
         else if (command.equals("WAIT")) {
+            /*
             game.addWaitListener(playerID, new WaitListener() {
-                public String onChange() {
+                public void onChange() {
                     System.out.println("id: "+playerID);
                     return game.getMatchPuzzleForResponse(playerID);
                 }
             }
             );
+            */
+            // TODO: Implement this
+            return "You are waiting";
         }
-        if (command.equals("LOGIN")) { // Logs in a player and returns the names of all puzzle templates
+        else if (command.equals("LOGIN")) { // Logs in a player and returns the names of all puzzle templates
             if (game.login(playerID)) {
                 // Build the string in 3 parts: add puzzle names -> add response delim -> add available matches
                 StringBuilder builder = new StringBuilder();
@@ -223,7 +242,7 @@ public class TextServer {
         */
         // if we reach here, the client message did not follow the protocol
         // Instead of throwing an except, return a response indicating  failure
-        return "I" + "Sorry, that is not a valid command";
+        return "I" + "Sorry, that is not a valid input: " + input;
         // throw new UnsupportedOperationException(input);
 
     }

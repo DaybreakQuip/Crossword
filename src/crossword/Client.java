@@ -36,8 +36,19 @@ public class Client {
     private static final int CANVAS_HEIGHT = 900;
     private static final String RESPONSE_DELIM = ";";
     
+    private final String host;
+    private final int port;
     private String playerID;
     private CrosswordCanvas canvas;
+    
+    // Abstraction function:
+    //  AF(): TODO fill this in
+    // Representation invariant:
+    //  true
+    // Safety from rep exposure:
+    //  All fields are private
+    // Thread safety argument:
+    //  This uses the monitor pattern
     
     // TODO: Potentially delete this field later, it's for debugging purposes and will remember the previous response sent by the server
     //       It can be used to directly print errors returned by the server (i.e. invalid playerID format or something)
@@ -46,8 +57,9 @@ public class Client {
     /**
      * creates a new client
      */
-    public Client() {
-        
+    public Client(String host, int port) {
+        this.host = host;
+        this.port = port;
     }
     
 
@@ -82,7 +94,7 @@ public class Client {
                 PrintWriter socketOut = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), UTF_8), true);
                 BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in));
         ) {
-            Client client = new Client();
+            Client client = new Client(host, port);
             client.launchGameWindow(socketIn, socketOut, host, port);
             boolean showRaw = false;
             while (!socket.isClosed()) {
@@ -101,7 +113,6 @@ public class Client {
                 }
             }
             System.out.println("connection closed");
-            
         }
     }
     
@@ -112,7 +123,7 @@ public class Client {
      * @param socketOut the socket for sending requests
      * @return response from the server given the request
      */
-    private String getResponse(String request, BufferedReader socketIn, PrintWriter socketOut) {
+    private synchronized String getResponse(String request, BufferedReader socketIn, PrintWriter socketOut) {
         try {
             // TODO: Delete this line later, it's for debugging purposes
             System.out.println("Request: " + request);
@@ -137,7 +148,7 @@ public class Client {
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
      */
-    private void transitionStartState(String id, BufferedReader socketIn, PrintWriter socketOut) {
+    private synchronized void transitionStartState(String id, BufferedReader socketIn, PrintWriter socketOut) {
         String request = id + " " + "LOGIN";
         String response = getResponse(request, socketIn, socketOut);
         
@@ -155,6 +166,30 @@ public class Client {
         canvas.setState(State.CHOOSE);
         canvas.repaint();
         playerID = id;
+        
+        // Create a new thread to watch for changes
+        new Thread(new Runnable() {
+            public void run() {
+                try (
+                    Socket watchSocket = new Socket(host, port);
+                    BufferedReader watchSocketIn = new BufferedReader(new InputStreamReader(watchSocket.getInputStream(), UTF_8));
+                    PrintWriter watchSocketOut = new PrintWriter(new OutputStreamWriter(watchSocket.getOutputStream(), UTF_8), true);
+                    BufferedReader watchSystemIn = new BufferedReader(new InputStreamReader(System.in));
+                ) {
+                    while (true) {
+                        watchSocketOut.println(playerID + " " + "WATCH");
+                        System.out.println("Waiting for watch response");
+                        String watchResponse = watchSocketIn.readLine();
+                        System.out.println("The watch response was: " + watchResponse);
+                        canvas.setMatchList(watchResponse);
+                        canvas.repaint();
+                    }
+                } catch (IOException ioe) {
+                    System.out.println("Something went wrong in watching for changes in matches");
+                } 
+            }
+         }).start();
+         
     }
     
     /**
@@ -170,7 +205,7 @@ public class Client {
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
      */
-    private void transitionChooseState(String command, BufferedReader socketIn, PrintWriter socketOut) {
+    private synchronized void transitionChooseState(String command, BufferedReader socketIn, PrintWriter socketOut) {
         String request = playerID + " " + command;
         String response = getResponse(request, socketIn, socketOut);
         
@@ -194,7 +229,7 @@ public class Client {
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
      */
-    private void transitionWaitState(BufferedReader socketIn, PrintWriter socketOut) {
+    private synchronized void transitionWaitState(BufferedReader socketIn, PrintWriter socketOut) {
         String request = playerID + " " + "WAIT";
         String response = getResponse(request, socketIn, socketOut);
         
@@ -210,7 +245,7 @@ public class Client {
      * Starter code to display a window with a CrosswordCanvas,
      * a text box to enter commands and an Enter button.
      */
-    private void launchGameWindow(BufferedReader socketIn, PrintWriter socketOut, String host, int port) {
+    private synchronized void launchGameWindow(BufferedReader socketIn, PrintWriter socketOut, String host, int port) {
         canvas = new CrosswordCanvas("");
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -239,25 +274,6 @@ public class Client {
                 }
             case CHOOSE:
                 {
-                    new Thread(new Runnable() {
-                       public void run() {
-                           try (
-                               Socket watchSocket = new Socket(host, port);
-                               BufferedReader watchSocketIn = new BufferedReader(new InputStreamReader(watchSocket.getInputStream(), UTF_8));
-                               PrintWriter watchSocketOut = new PrintWriter(new OutputStreamWriter(watchSocket.getOutputStream(), UTF_8), true);
-                               BufferedReader watchSystemIn = new BufferedReader(new InputStreamReader(System.in));
-                           ) {
-                               while (true) {
-                                   watchSocketOut.println(playerID + " " + "WATCH");
-                                   String response = watchSocketIn.readLine();
-                                   canvas.setMatchList(response);
-                               }
-                           } catch (IOException ioe) {
-                               System.out.println("Something went wrong in watching for changes in matches");
-                           } 
-                       }
-                    });
-                    
                     transitionChooseState(text, socketIn, socketOut);
                     break;
                 }
@@ -280,7 +296,7 @@ public class Client {
                                 System.out.println("Something went wrong in waiting for another player");
                             } 
                         }
-                     });
+                     }).start();
                     
                     transitionWaitState(socketIn, socketOut);
                     */
