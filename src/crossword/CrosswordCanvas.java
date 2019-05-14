@@ -9,6 +9,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JComponent;
 
@@ -70,9 +71,9 @@ class CrosswordCanvas extends JComponent {
     private static final String RESPONSE_DELIM = ";";
     private State state;
     private String previousResponse = "No previous response";
-    private String puzzleList;
-    private String matchList;
-    private String currentPuzzle;
+    private String puzzleList = "";
+    private String matchList = "";
+    private String currentPuzzle = "";
     
     /**
      * @param puzzle string representation of the crossword puzzle
@@ -85,14 +86,14 @@ class CrosswordCanvas extends JComponent {
     /**
      * @return the state of the crossword puzzle
      */
-    public State getState() {
+    public synchronized State getState() {
         return state;
     }
     
     /**
      * @param state the new state of the crossword puzzle
      */
-    public void setState(State state) {
+    public synchronized void setState(State state) {
         this.state = state;
     }
     
@@ -100,28 +101,28 @@ class CrosswordCanvas extends JComponent {
     /**
      * @param puzzle the new string representation of the crossword puzzle
      */
-    public void setPuzzle(String puzzle) {
+    public synchronized void setPuzzle(String puzzle) {
         this.puzzle = puzzle;
     }
     
     /**
      * @param puzzleList the list of valid puzzle names
      */
-    public void setPuzzleList(String puzzleList) {
+    public synchronized void setPuzzleList(String puzzleList) {
         this.puzzleList = puzzleList;
     }
     
     /**
      * @param matchList the list of valid match ids
      */
-    public void setMatchList(String matchList) {
+    public synchronized void setMatchList(String matchList) {
         this.matchList = matchList;
     }
     
     /**
      * @param previousResponse the previous response from the server
      */
-    public void setPreviousResponse(String previousResponse) {
+    public synchronized void setPreviousResponse(String previousResponse) {
         this.previousResponse = previousResponse;
     }
     
@@ -131,7 +132,7 @@ class CrosswordCanvas extends JComponent {
      * @param col Column where the cell is to be placed.
      * @param g Graphics environment used to draw the cell.
      */
-    private void drawCell(int row, int col, Graphics g) {
+    private synchronized void drawCell(int row, int col, Graphics g) {
         // Before changing the color it is a good idea to record what the old color
         // was.
         Color oldColor = g.getColor();
@@ -152,7 +153,7 @@ class CrosswordCanvas extends JComponent {
      * @param col Column position of the cell.
      * @param g Graphics environment to use.
      */
-    private void letterInCell(String letter, int row, int col, Graphics g) {
+    private synchronized void letterInCell(String letter, int row, int col, Graphics g) {
         g.setFont(mainFont);
         FontMetrics fm = g.getFontMetrics();
         g.drawString(letter, originX + col * delta + delta / 6,
@@ -166,7 +167,7 @@ class CrosswordCanvas extends JComponent {
      * @param col Column position of the cell.
      * @param g Graphics environment to use.
      */
-    private void verticalId(String id, int row, int col, Graphics g) {
+    private synchronized void verticalId(String id, int row, int col, Graphics g) {
         g.setFont(indexFont);
         g.drawString(id, originX + col * delta + delta / 8,
                          originY + row * delta - delta / 15);
@@ -179,7 +180,7 @@ class CrosswordCanvas extends JComponent {
      * @param col Column position of the cell.
      * @param g Graphics environment to use.
      */
-    private void horizontalId(String id, int row, int col, Graphics g) {
+    private synchronized void horizontalId(String id, int row, int col, Graphics g) {
         g.setFont(indexFont);
         FontMetrics fm = g.getFontMetrics();
         int maxwidth = fm.charWidth('0') * id.length();
@@ -200,13 +201,13 @@ class CrosswordCanvas extends JComponent {
     // We use a line counter to compute the position where the next line of code is
     // written, but the line needs to be reset every time you paint, otherwise the
     // text will keep moving down.
-    private void resetLine() {
+    private synchronized void resetLine() {
         line = 0;
     }
 
     // This code illustrates how to write a single line of text with a particular
     // color.
-    private void println(String s, Graphics g) {
+    private synchronized void println(String s, Graphics g) {
         g.setFont(textFont);
         FontMetrics fm = g.getFontMetrics();
         // Before changing the color it is a good idea to record what the old color
@@ -221,7 +222,7 @@ class CrosswordCanvas extends JComponent {
 
     // This code shows one approach for fancier formatting by changing the
     // background color of the line of text.
-    private void printlnFancy(String s, Graphics g) {
+    private synchronized void printlnFancy(String s, Graphics g) {
 
         g.setFont(textFont);
         FontMetrics fm = g.getFontMetrics();
@@ -249,7 +250,7 @@ class CrosswordCanvas extends JComponent {
      * 
      * @param g the graphics object to modify
      */
-    private void printPuzzle(Graphics g) {
+    private synchronized void printPuzzle(Graphics g) {
         int across = 0;
         int down = 0;
         List<String> acrossHints = new ArrayList<>();
@@ -328,7 +329,7 @@ class CrosswordCanvas extends JComponent {
      * method.
      */
     @Override
-    public void paint(Graphics g) {
+    public synchronized void paint(Graphics g) {
         resetLine();
         println("Previous response: " + previousResponse, g);
         switch (state) {
@@ -347,19 +348,25 @@ class CrosswordCanvas extends JComponent {
                 
                 println("", g);
                 println("Available matches (Match_ID: Description):", g);
-                String[] matches = matchList.split(ENTRY_DELIM);
-                for (String match : matches) {
-                    String[] matchEntry = match.split(WORD_DELIM);
-                    println("    " + matchEntry[0] + ": " + matchEntry[1], g);
+                if (matchList.length() > 0) {
+                    String[] matches = matchList.split(ENTRY_DELIM);
+                    
+                    System.out.println("matchList: " + matchList.split(ENTRY_DELIM));
+                    for (String match : matches) {
+                        String[] matchEntry = match.split(WORD_DELIM);
+                        // TODO Delete this
+                        System.out.println("DISASTER: " + Arrays.toString(matchEntry));
+                        System.out.println("Previous response:" + previousResponse);
+                        println("    " + matchEntry[0] + ": " + matchEntry[1], g);
+                    }
+                    
+                    println("", g);
+                    println("Available puzzles:", g);
+                    String[] entries = puzzleList.split(ENTRY_DELIM);
+                    for (String entry : entries) {
+                        println("    " + entry, g);
+                    }
                 }
-                
-                println("", g);
-                println("Available puzzles:", g);
-                String[] entries = puzzleList.split(ENTRY_DELIM);
-                for (String entry : entries) {
-                    println("    " + entry, g);
-                }
-                
                 break;
             }
         case WAIT:

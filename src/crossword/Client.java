@@ -121,6 +121,9 @@ public class Client {
             String response = socketIn.readLine();
             this.previousResponse = response;
             canvas.setPreviousResponse(response);
+            
+            // TODO: Delete this later after we're done with the project
+            System.out.println("Response: " + response);
             return response;
         } catch (IOException ioe) {
             throw new RuntimeException("Error occured when processing request: " + request);
@@ -138,7 +141,6 @@ public class Client {
         String request = id + " " + "LOGIN";
         String response = getResponse(request, socketIn, socketOut);
         
-        System.out.println("r: " + response);
         if (response.charAt(0) == 'I') {
             return;
         }
