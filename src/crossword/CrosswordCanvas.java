@@ -72,6 +72,7 @@ class CrosswordCanvas extends JComponent {
     private String previousResponse = "No previous response";
     private String puzzleList;
     private String matchList;
+    private String currentPuzzle;
     
     /**
      * @param puzzle string representation of the crossword puzzle
@@ -131,8 +132,6 @@ class CrosswordCanvas extends JComponent {
      * @param g Graphics environment used to draw the cell.
      */
     private void drawCell(int row, int col, Graphics g) {
-        g.drawRect(originX + col * delta,
-                   originY + row * delta, delta, delta);
         // Before changing the color it is a good idea to record what the old color
         // was.
         Color oldColor = g.getColor();
@@ -141,6 +140,9 @@ class CrosswordCanvas extends JComponent {
                 originY + row * delta, delta, delta);
         // After drawing the cell you can return to the previous color.
         g.setColor(oldColor);
+        
+        g.drawRect(originX + col * delta,
+                originY + row * delta, delta, delta);
     }
 
     /**
@@ -332,29 +334,32 @@ class CrosswordCanvas extends JComponent {
         switch (state) {
         case START:
             {
-                println("Start state:", g);
                 println("Please type in a valid ID into the text box and hit the Enter button.", g);
                 println("Valid ID requirements: alphanumeric, at least one character long", g);
                 break;
             }
         case CHOOSE:
             {
-                println("Choose state:", g);
-                /*
-                println("Available matches:", g);
-                String[] matches = matchList.split(WORD_DELIM);
+                println("Here are the commands that you can enter in the box:", g);
+                println("    PLAY Match_ID", g);
+                println("    NEW Match_ID Puzzle_ID \"Description\"", g);
+                println("    EXIT", g);
+                
+                println("", g);
+                println("Available matches (Match_ID: Description):", g);
+                String[] matches = matchList.split(ENTRY_DELIM);
                 for (String match : matches) {
-                    println(match, g);
+                    String[] matchEntry = match.split(WORD_DELIM);
+                    println("    " + matchEntry[0] + ": " + matchEntry[1], g);
                 }
                 
+                println("", g);
                 println("Available puzzles:", g);
                 String[] entries = puzzleList.split(ENTRY_DELIM);
                 for (String entry : entries) {
-                    println(entry, g);
+                    println("    " + entry, g);
                 }
-                */
-                println("Available matches:" + matchList,g);
-                println("Available puzzles:" + puzzleList, g);
+                
                 break;
             }
         case WAIT:
