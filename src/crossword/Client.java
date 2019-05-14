@@ -155,6 +155,8 @@ public class Client {
         if (response.charAt(0) == 'I') {
             return;
         }
+        
+        canvas.setPlayerID(id);
         // list of puzzles RESPONSE_DELIM list of matches
         String[] matchesAndPuzzles = response.substring(1).split(RESPONSE_DELIM);
         canvas.setPuzzleList(matchesAndPuzzles[0]);
