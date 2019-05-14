@@ -133,6 +133,14 @@ class CrosswordCanvas extends JComponent {
     private void drawCell(int row, int col, Graphics g) {
         g.drawRect(originX + col * delta,
                    originY + row * delta, delta, delta);
+        // Before changing the color it is a good idea to record what the old color
+        // was.
+        Color oldColor = g.getColor();
+        g.setColor(Color.YELLOW);
+        g.fillRect(originX + col * delta,
+                originY + row * delta, delta, delta);
+        // After drawing the cell you can return to the previous color.
+        g.setColor(oldColor);
     }
 
     /**
@@ -332,6 +340,19 @@ class CrosswordCanvas extends JComponent {
         case CHOOSE:
             {
                 println("Choose state:", g);
+                /*
+                println("Available matches:", g);
+                String[] matches = matchList.split(WORD_DELIM);
+                for (String match : matches) {
+                    println(match, g);
+                }
+                
+                println("Available puzzles:", g);
+                String[] entries = puzzleList.split(ENTRY_DELIM);
+                for (String entry : entries) {
+                    println(entry, g);
+                }
+                */
                 println("Available matches:" + matchList,g);
                 println("Available puzzles:" + puzzleList, g);
                 break;
