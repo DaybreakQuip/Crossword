@@ -139,7 +139,7 @@ public class TextServer {
             return QUIT;
         }
         //TODO: implement each command as needed
-        if (command.equals("WATCH")) {
+        if (command.equals("WATCH")) { // blocks and returns only when there is a change in available matches
             Object lock = new Object();
             StringBuilder builder = new StringBuilder();
             game.addWatchListener(new WatchListener() {
@@ -159,9 +159,8 @@ public class TextServer {
                 }
                 return builder.toString();
             }
-            
         }
-        else if (command.equals("WAIT")) {
+        else if (command.equals("WAIT")) { // blocks and returns only when a match has two players
             /*
             game.addWaitListener(playerID, new WaitListener() {
                 public void onChange() {

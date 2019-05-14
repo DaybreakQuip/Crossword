@@ -167,7 +167,7 @@ public class Client {
         canvas.repaint();
         playerID = id;
         
-        // Create a new thread to watch for changes
+        // Create a new thread to watch for changes for available matches
         new Thread(new Runnable() {
             public void run() {
                 try (
@@ -176,7 +176,7 @@ public class Client {
                     PrintWriter watchSocketOut = new PrintWriter(new OutputStreamWriter(watchSocket.getOutputStream(), UTF_8), true);
                     BufferedReader watchSystemIn = new BufferedReader(new InputStreamReader(System.in));
                 ) {
-                    while (true) {
+                    while (canvas.getState() == State.CHOOSE) {
                         watchSocketOut.println(playerID + " " + "WATCH");
                         System.out.println("Waiting for watch response");
                         String watchResponse = watchSocketIn.readLine();
@@ -221,6 +221,28 @@ public class Client {
         }
         canvas.setPuzzle(response.substring(1));
         canvas.repaint();
+        
+        /**
+        new Thread(new Runnable() {
+            public void run() {
+                try (
+                    Socket waitSocket = new Socket(host, port);
+                    BufferedReader waitSocketIn = new BufferedReader(new InputStreamReader(waitSocket.getInputStream(), UTF_8));
+                    PrintWriter waitSocketOut = new PrintWriter(new OutputStreamWriter(waitSocket.getOutputStream(), UTF_8), true);
+                    BufferedReader waitSystemIn = new BufferedReader(new InputStreamReader(System.in));
+                ) {
+                    while (true) {
+                        waitSocketOut.println(playerID + " " + "WAIT");
+                        // ???
+                    }
+                } catch (IOException ioe) {
+                    System.out.println("Something went wrong in waiting for another player");
+                } 
+            }
+         }).start();
+        
+        transitionWaitState(socketIn, socketOut);
+        */
     }
     
     /**
@@ -279,27 +301,7 @@ public class Client {
                 }
             case WAIT:
                 {
-                    /**
-                    new Thread(new Runnable() {
-                        public void run() {
-                            try (
-                                Socket waitSocket = new Socket(host, port);
-                                BufferedReader waitSocketIn = new BufferedReader(new InputStreamReader(waitSocket.getInputStream(), UTF_8));
-                                PrintWriter waitSocketOut = new PrintWriter(new OutputStreamWriter(waitSocket.getOutputStream(), UTF_8), true);
-                                BufferedReader waitSystemIn = new BufferedReader(new InputStreamReader(System.in));
-                            ) {
-                                while (true) {
-                                    waitSocketOut.println(playerID + " " + "WAIT");
-                                    // ???
-                                }
-                            } catch (IOException ioe) {
-                                System.out.println("Something went wrong in waiting for another player");
-                            } 
-                        }
-                     }).start();
                     
-                    transitionWaitState(socketIn, socketOut);
-                    */
                     break;
                 }
             case PLAY:

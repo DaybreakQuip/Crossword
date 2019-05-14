@@ -117,7 +117,7 @@ public class Game {
     }
 
     /**
-     * Gets names of all puzzles and descriptions that are awaiting another player
+     * Gets names of all puzzles and descriptions that are waiting for another player
      * @return String with format: 
      *      match ::= match_ID WORD_DELIM description;
      *      response ::= match (ENTRY_DELIM match)*;
@@ -125,10 +125,15 @@ public class Game {
     public synchronized String getAvailableMatchesForResponse(){
         StringBuilder responseBuilder = new StringBuilder();
         for (Match match : matches.values()) {
-            if (responseBuilder.length() > 0) { // Add an entry delim if the entry is no the first one
+            if (responseBuilder.length() > 0) { // Add an entry delim if the entry is not the first one
                 responseBuilder.append(ENTRY_DELIM);
             }
-            responseBuilder.append(match.getMatchId() + WORD_DELIM + match.getDescription());
+            // Only add matches that are waiting for another player
+            if (match.isWaiting()) {
+                responseBuilder.append(match.getMatchId() + WORD_DELIM + match.getDescription());
+            } else {
+                System.out.println("match is full: " + match.getMatchId()); 
+            }
         }
         return responseBuilder.toString();
     }
@@ -159,6 +164,8 @@ public class Game {
             playerToMatch.put(playerID, matchID);
             callWatchListeners();
             Match match = matches.get(matchID);
+            // Available matches just changed;
+            callWatchListeners();
             //callWaitListener(match.getPlayerOne());
         }
         return joined;

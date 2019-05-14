@@ -69,6 +69,7 @@ public class Match {
      */
     public synchronized boolean joinMatch(String playerId) {
         if (isWaiting()) {
+            state = MatchState.ONGOING;
             playerTwo = new Player(playerId);
             return true;
         }
