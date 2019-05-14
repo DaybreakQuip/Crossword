@@ -2,6 +2,7 @@ package crossword;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -131,8 +132,6 @@ public class Game {
             // Only add matches that are waiting for another player
             if (match.isWaiting()) {
                 responseBuilder.append(match.getMatchId() + WORD_DELIM + match.getDescription());
-            } else {
-                System.out.println("match is full: " + match.getMatchId()); 
             }
         }
         return responseBuilder.toString();
@@ -164,9 +163,9 @@ public class Game {
             playerToMatch.put(playerID, matchID);
             callWatchListeners();
             Match match = matches.get(matchID);
-            // Available matches just changed;
+            // Available matches just changed
             callWatchListeners();
-            //callWaitListener(match.getPlayerOne());
+            callWaitListener(match.getPlayerOne());
         }
         return joined;
     }
@@ -186,7 +185,6 @@ public class Game {
         }
         playerToMatch.put(playerID, matchID);
         matches.put(matchID, new Match(matchID, description, puzzles.get(puzzleID), playerID));
-        // TODO add waitListener
         callWatchListeners();
         return true;
         
@@ -275,8 +273,9 @@ public class Game {
     }
     
     private synchronized void callWatchListeners() throws IOException{
-        for (WatchListener listener : listeners) {
+        for (WatchListener listener : new ArrayList<>(listeners)) {
             listener.onChange();
+            listeners.remove(listener);
         }
     }
     
@@ -311,6 +310,7 @@ public class Game {
         }
         WaitListener listener = waitListeners.get(playerID);
         listener.onChange();
+        waitListeners.remove(playerID);
     }
     
     /**

@@ -22,10 +22,12 @@ public class PlayablePuzzle {
     //  Uses monitor Pattern
     private final String name; 
     private final String description;
-    private final Map<Integer, PuzzleEntry> playerEntries = new HashMap<>();
+    // TODO: Add player information (i.e. player 1 id and player 2 id or something)
+    // New map of puzzle id : player OR player id : (list or set) puzzle id
+    private final Map<Integer, PuzzleEntry> playerEntries = new HashMap<>(); // unconfirmed puzzle id : puzzle entry
     private final Map<Integer, PuzzleEntry> confirmedEntries  = new HashMap<>();
     private final Map<Integer, PuzzleEntry> correctEntries;
-    // TODO: DELETE this in the future
+    // TODO: DELETE this in the future (it's the template puzzle)
     private final Puzzle puzzle;
     /**
      * Constructs a puzzle that can be played by different players
@@ -98,7 +100,7 @@ public class PlayablePuzzle {
     
     /**
      * @return puzzle formatted for responses
-     * TODO: Modify this later (or delete it)
+     * TODO: Modify this later 
      */
     public synchronized String getPuzzleForResponse() {
         String puzzleString = "";

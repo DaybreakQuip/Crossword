@@ -21,6 +21,7 @@ import crossword.Game.WatchListener;
  */
 public class TextServer {
     private static String QUIT = "quit";
+    private static String LISTENER = "listener"; // Returned by listener commands 
     
     // Abstraction function:
     //    AF(serverSocket, game) --> TextServer Object having the ability to connect one player to a Crossword Puzzle game. 
@@ -105,9 +106,11 @@ public class TextServer {
         
         try {
             for (String input = in.readLine(); input != null; input = in.readLine()) {
-                String output = handleRequest(input);
+                String output = handleRequest(input, out);
                 if (output.equals(QUIT)) {
                     break;
+                } else if (output.equals(LISTENER)) {
+                    continue;
                 }
                 out.println(output);
 
@@ -125,7 +128,7 @@ public class TextServer {
      * @return output message to client
      * @throws IOException 
      */
-    private String handleRequest(String input) throws IOException {
+    private String handleRequest(String input, PrintWriter out) throws IOException {
         String[] tokens = input.split(" ");
         String playerID = tokens[0];
         String command = tokens[1];  
@@ -140,38 +143,22 @@ public class TextServer {
         }
         //TODO: implement each command as needed
         if (command.equals("WATCH")) { // blocks and returns only when there is a change in available matches
-            Object lock = new Object();
-            StringBuilder builder = new StringBuilder();
             game.addWatchListener(new WatchListener() {
                 public void onChange() {
-                    synchronized (lock) {
-                        builder.append(game.getAvailableMatchesForResponse());
-                        lock.notify();
-                    }
+                    out.println("V" + game.getAvailableMatchesForResponse());
                 }
             });
             
-            synchronized(lock) {
-                try {
-                    lock.wait();
-                } catch (Exception e) {
-                    
-                }
-                return builder.toString();
-            }
+            return LISTENER;
         }
         else if (command.equals("WAIT")) { // blocks and returns only when a match has two players
-            /*
             game.addWaitListener(playerID, new WaitListener() {
                 public void onChange() {
-                    System.out.println("id: "+playerID);
-                    return game.getMatchPuzzleForResponse(playerID);
+                    out.println("V" + game.getMatchPuzzleForResponse(playerID));
                 }
-            }
-            );
-            */
-            // TODO: Implement this
-            return "You are waiting";
+            });
+            
+            return LISTENER;
         }
         else if (command.equals("LOGIN")) { // Logs in a player and returns the names of all puzzle templates
             if (game.login(playerID)) {
