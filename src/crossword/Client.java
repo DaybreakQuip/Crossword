@@ -119,7 +119,6 @@ public class Client {
             
             socketOut.println(request);
             String response = socketIn.readLine();
-            // TODO: Delete previous responses if they're not needed in the future
             this.previousResponse = response;
             canvas.setPreviousResponse(response);
             return response;
