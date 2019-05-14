@@ -222,7 +222,9 @@ public class TextServer {
         }
         */
         // if we reach here, the client message did not follow the protocol
-        throw new UnsupportedOperationException(input);
+        // Instead of throwing an except, return a response indicating  failure
+        return "I" + "Sorry, that is not a valid command";
+        // throw new UnsupportedOperationException(input);
 
     }
 }
