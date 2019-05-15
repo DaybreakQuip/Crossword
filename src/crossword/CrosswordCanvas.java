@@ -94,6 +94,24 @@ class CrosswordCanvas extends JComponent {
     }
     
     /**
+     * Resets the player's ID
+     */
+    public synchronized void clearPlayerInfo() {
+        playerID = "";
+    }
+    
+    /**
+     * Clears the current puzzle info from the canvas
+     */
+    public synchronized void clearPuzzleInfo() {
+        puzzle = "";
+        previousResponse = "No previous response";
+        puzzleList = "";
+        matchList = "";
+        currentPuzzle = "";
+    }
+    
+    /**
      * @param state the new state of the crossword puzzle
      */
     public synchronized void setState(State state) {
@@ -186,8 +204,17 @@ class CrosswordCanvas extends JComponent {
     }
     
     /**
-     * Place error message from entering a command at the top-left corner of the canvas, 
-     *  below the player id
+     * Place print colors at the top-left corner of the canvas, 
+     *  underneath the player id
+     * @param g
+     */
+    private synchronized void drawPlayerColors(Graphics g) {
+        g.drawString("Colors: (Red) Me, (Green) Opponent", 0, 60);
+    }
+    
+    /**
+     * Place error message from entering a command in the middle, underneath 
+     * the text box
      * @param g Graphics environment to use
      */
     private synchronized void drawErrorMessage(Graphics g) {
@@ -379,6 +406,7 @@ class CrosswordCanvas extends JComponent {
         resetLine();
         println("Previous response: " + previousResponse, g);
         drawPlayerID(g);
+        drawPlayerColors(g);
         // Draws the error message (i.e. invalid ID) if there is one
         drawErrorMessage(g);
         switch (state) {

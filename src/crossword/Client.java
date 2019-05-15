@@ -464,8 +464,11 @@ public class Client {
                     if (text.equals(NEW_MATCH)) {
                         startNewWatchThread();
                         setCanvasState(State.CHOOSE);
+                        canvas.clearPuzzleInfo();
                     } else if (text.equals(EXIT)) {
                         logoutFromServer(socketIn, socketOut);
+                        canvas.clearPuzzleInfo();
+                        canvas.clearPlayerInfo();
                         resetToStart();
                     }
                     break;
