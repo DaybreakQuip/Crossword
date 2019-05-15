@@ -142,7 +142,6 @@ public class Client {
     
     /**
      * Transition crossword canvas from start state to choose state
-     * @param canvas crossword canvas to modify
      * @param id id of the player/client
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
@@ -201,7 +200,6 @@ public class Client {
      *  NEW Match_ID Puzzle_ID "Description"
      *  EXIT
      * 
-     * @param canvas crossword canvas to modify
      * @param command command that the player can call in the choose state
      * @param socketIn buffered reader to read input from server
      * @param socketOut print writer to write to the server
@@ -246,6 +244,31 @@ public class Client {
         
         listenerThreads.add(waitThread);
         waitThread.start();
+    }
+    
+    /**
+     * Updates the canvas as client plays the crossword puzzle.
+     * 
+     * Commands:
+     *  TRY id word
+     *  CHALLENGE id word
+     *  EXIT
+     * 
+     * @param command command that the player can call in the choose state
+     * @param socketIn buffered reader to read input from server
+     * @param socketOut print writer to write to the server
+     */
+    private synchronized void playPuzzle(String command, BufferedReader socketIn, PrintWriter socketOut) {
+        String request = playerID + " " + command;
+        String response = getResponse(request, socketIn, socketOut);
+        
+        String[] commandParts = command.split(" ");
+        if (response.charAt(0) == 'I') {
+            return;
+        }
+        
+        canvas.setCurrentPuzzle(response.substring(1));
+        canvas.repaint();
     }
     
     /**
@@ -371,7 +394,9 @@ public class Client {
                     // TODO: DOES NOT WORK, IMPLEMENT after implementing game logic
                     if (text.equals(EXIT)) {
                         exitPlayFromServer(socketIn, socketOut);
-                        setCanvasState(State.CHOOSE);
+                        setCanvasState(State.SHOW_SCORE);
+                    } else {
+                        playPuzzle(text, socketIn, socketOut);
                     }
                     break;
                 }

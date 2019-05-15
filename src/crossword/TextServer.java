@@ -145,6 +145,9 @@ public class TextServer {
         String playerID = tokens[0];
         String command = tokens[1];  
         
+        System.out.println("This is the input: " + input);
+        System.out.println("This is the command: " + command);
+        
         // Check whether the playerID is valid
         if (!(playerID.matches("[A-Za-z0-9]*") && playerID.length() > 0)) {
             return "I" + "Player ID must be alphanumeric and have a length > 0";
@@ -247,17 +250,20 @@ public class TextServer {
             throw new RuntimeException("Not Implemented");
         }
         else if (command.equals("TRY")) {
+            System.out.println("Just entered the try state");
             int wordID = Integer.parseInt(tokens[2]);
-            String word = tokens[3];
-            if(game.tryWord(playerID, wordID, word)) {
+            String word = tokens[3].toLowerCase();
+            if (game.tryWord(playerID, wordID, word)) {
+                System.out.println("In the try state: " + game.getGuessesForResponse(playerID));
                 return "V" + game.getGuessesForResponse(playerID);
             }
             return "I" + "Failed to guess word.";
         }
         else if (command.equals("CHALLENGE")) {
             int wordID = Integer.parseInt(tokens[2]);
-            String word = tokens[3];
-            if(game.challengeWord(playerID, wordID, word)) {
+            String word = tokens[3].toLowerCase();
+            if (game.challengeWord(playerID, wordID, word)) {
+                System.out.println("In the challenge state: " + game.getGuessesForResponse(playerID));
                 return "V" + game.getGuessesForResponse(playerID);
             }
             return "I" + "Failed to challenge word.";        
