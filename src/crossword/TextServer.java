@@ -246,7 +246,10 @@ public class TextServer {
             return "I" + "Failed to log out the player";
         }
         else if (command.equals("EXIT_PLAY")) {
-            throw new RuntimeException("Not Implemented");
+            if (game.exitPlay(playerID)) {
+                return "V" + game.showScore(playerID);
+            }
+            return "I" + "Failed to exit game";
         }
         else if (command.equals("TRY")) {
             int wordID = Integer.parseInt(tokens[2]);
@@ -263,9 +266,6 @@ public class TextServer {
                 return "V" + game.getGuessesForResponse(playerID);
             }
             return "I" + "Failed to challenge word.";        
-        }
-        else if (command.equals("NEW_MATCH")) {
-            throw new RuntimeException("Not Implemented");
         }
 
         // if we reach here, the client message did not follow the protocol
