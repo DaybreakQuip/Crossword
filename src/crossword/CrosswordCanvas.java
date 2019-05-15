@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -57,16 +58,33 @@ class CrosswordCanvas extends JComponent {
     public static final String RESPONSE_DELIM = ";";
     
     // Abstraction function:
-    //  AF(originX, originY, delta, mainFont, indexFont, textFont, puzzle, state, puzzleList, matchList) = 
-    //              canvas representing the crossword puzzle starting at originX, originY 
-    //              with puzzle cells of size delta and text using mainFont, indexFont, and textFont.
-    //              puzzle represents puzzle entries separated by ENTRY_DELIM and
-    //              puzzle parts of each entry separated by WORD_DELIM.
-    //              TODO include state, puzzleList, and matchList in the AF
+    //  AF(originX, originY, delta, mainFont, indexFont, textFont, 
+    //     playerID, puzzle, state, puzzleList, matchList, currentPuzzle) = 
+    //          canvas representing the crossword puzzle with with puzzle cells of size delta
+    //          starting at originX, originY and text using mainFont, indexFont, and textFont.
+    //          playerID represents the unique identifier for the client drawing on the canvas.
+    //          puzzle represents the blank crossword puzzle, where puzzle entries are separated 
+    //          by ENTRY_DELIM and puzzle parts of each entry are separated by WORD_DELIM.
+    //          The canvas can be in one of five states representing the state of the puzzle:
+    //          START, CHOOSE, WAIT, PLAY, and SHOW_SCORE. The state of the canvas influences
+    //          what is drawn on the canvas. puzzleList represents the list of available consistent
+    //          puzzles that the player can create a match from, whereas matchList is the list of
+    //          matches that are waiting for another player to join. currentPuzzle represents
+    //          all guesses, confirmed words, and scores of all players in a match, with different 
+    //          background colors highlighting each player's guesses on the crossword puzzle.
+    //          currentPuzzle contains entries for each player and their score, separated by
+    //          WORD_DELIM. Each player-score entry is separated by ENTRY_DELIM. The scores and
+    //          the list of guessed/confirmed words are separated by RESPONSE_DELIM, and the entry
+    //          for each guessed/confirmed word is separated by ENTRY_DELIM. Each word entry has
+    //          information about the word separated by WORD_DELIM.
     // Representation invariant:
-    //  true
+    //  originX >= 0, 
+    //  originY >= 0, 
+    //  delta >= 0,
+    //  Set.of(State.START, State.CHOOSE, State.WAIT, State.PLAY, State.SHOW_SCORE).contains(state)
     // Safety from rep exposure:
-    //  All fields are private, final, and immutable
+    //  All fields are private and immutable
+    //  The client can only modify the rep through mutator methods.
     // Thread safety argument:
     //  This uses the monitor pattern
     
@@ -84,6 +102,13 @@ class CrosswordCanvas extends JComponent {
     public CrosswordCanvas(String puzzle) {
         this.puzzle = puzzle;
         this.state = State.START;
+    }
+    
+    private void checkRep() {
+        assert originX >= 0;
+        assert originY >= 0;
+        assert delta >= 0;
+        assert Set.of(State.START, State.CHOOSE, State.WAIT, State.PLAY, State.SHOW_SCORE).contains(state);
     }
     
     /**

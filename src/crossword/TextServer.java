@@ -24,9 +24,10 @@ public class TextServer {
     private static final String LISTENER = "listener"; // Returned by listener commands 
     
     // Abstraction function:
-    //    AF(serverSocket, game) --> TextServer Object having the ability to connect one player to a Crossword Puzzle game. 
-    //                                        One serverSocket (a rep) is able to run multiple connections, game is the game class for
-    //                                        the Crossword game
+    //    AF(serverSocket, game): TextServer Object having the ability to connect one player to 
+    //                            a Crossword Puzzle game. One serverSocket (a rep) is able to 
+    //                            run multiple connections, game is the game class for
+    //                            the Crossword game
     // Representation invariant:
     //  true
     // Safety from rep exposure:

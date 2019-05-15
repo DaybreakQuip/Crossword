@@ -12,8 +12,7 @@ import java.util.Set;
 import edu.mit.eecs.parserlib.UnableToParseException;
 
 /**
- * TODO: Make this class mutable for future milestones (?)
- * An immutable Game class representing a single Crossword Game
+ * A mutable Game class representing a single Crossword Game
  *
  */
 public class Game {
@@ -62,10 +61,17 @@ public class Game {
     }
     
     // Abstraction function:
-    //    AF(puzzles, playerToMatch, matches) = a crossword game with multiple crossword puzzles, where each entry in puzzles 
-    //                  represents a mapping of puzzle name to the crossword puzzle it represents, and each entry in playerToMatch represents
-    //                  a mapping of a current player to the match it represents, and matches represents a mapping of a match name to an object
-    //                  representation of a match 
+    //    AF(players, puzzles, playerToMatch, matches, 
+    //       watchListeners, waitListeners, playListeners):
+    //          a crossword game with multiple crossword puzzles, where players represents the
+    //          set of players logged in to the game and where each entry in puzzles 
+    //          represents a mapping of puzzle name to the crossword puzzle it represents, 
+    //          each entry in playerToMatch represents a mapping of a current player to the match 
+    //          it represents, and matches represents a mapping of a match name to an object
+    //          representation of a match. watchListeners represents the set of WatchListeners
+    //          that notifies all players when a change occurs to the list of available matches.
+    //          waitListeners and playListeners represent a mapping of players in matches to 
+    //          the respective listeners when a change occurs in their match.
     // Representation invariant:
     //  true
     // Safety from rep exposure:
@@ -73,7 +79,9 @@ public class Game {
     //  puzzles map is mutable, but defensive copies are made in getPuzzles() to not return the original
     //      puzzles
     //  puzzles's keys and values are immutable types (String and Puzzle respectively)
-    //Thread Safety Argument:
+    //  all getter methods return an immutable String object and does not access the reps directly
+    //  only way to modify reps is through mutator methods
+    // Thread Safety Argument:
     //  uses monitor pattern
     
     /**

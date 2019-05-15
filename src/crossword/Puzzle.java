@@ -15,16 +15,18 @@ import edu.mit.eecs.parserlib.UnableToParseException;
  */
 public class Puzzle {
     // Abstraction Function:
-    // AF(name, description, entries) --> A Puzzle representing a crossword puzzle with a name and a description for the crossword. 
-    //                                   There is a map of ID to PuzzleEntries that represents each word in the puzzle.
+    // AF(name, description, entries): a Puzzle representing a crossword puzzle with a name 
+    //                                 and a description for the crossword. There is a map of ID 
+    //                                 to PuzzleEntries that represents each word in the puzzle.
     //                                    
     // Rep Invariant:
     // true
     // Safety From Rep Exposure:
     //  name and description is private and final and immutable
-    //  entries is only accessed through getter methods like getEntries which creates a copy before returning to the client
+    //  entries is only accessed through getter methods like getEntries which creates a copy 
+    //      before returning to the client
     // Thread safety argument:
-    //  This class is immutable
+    //  This class is immutable and therefore threadsafe
     private final String name; 
     private final String description;
     private final Map<Integer, PuzzleEntry> entries;

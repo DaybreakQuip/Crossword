@@ -14,6 +14,18 @@ public class Player {
     private final String id;
     private int score;
     
+    // Abstraction Function:
+    // AF(id, score): id maps to a unique identifier for the player and score represents
+    //                the player's score in the crossword game.                                 
+    // Rep Invariant:
+    //  true
+    // Safety From Rep Exposure:
+    //  All fields are private
+    //  id is final and immutable
+    //  score is immutable and only modified through changeScore()
+    // Thread safety argument:
+    //  Player is only referenced through threadsafe maps
+    
     /**
      * Creates a new player for the game
      * @param id the id of the player

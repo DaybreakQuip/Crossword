@@ -6,31 +6,32 @@ import java.util.Map;
 
 public class PlayablePuzzle {
     // Abstraction Function:
-    // AF(name, description, playerEntries, confirmedEntries, correctEntries) --> A Puzzle representing a crossword puzzle with a name and a description for the crossword. 
-    //                                   There is a map of word ID to PuzzleEntries that represents each word in the puzzle for player entries.
-    //                                   There is a map of word ID to PuzzleEntries that represents each word in the puzzle for confirmed entries.
-    //                                   There is a map of word ID to PuzzleEntries that represents each word in the puzzle for correct entries.
+    // AF(name, description, playerEntries, confirmedEntries, correctEntries, puzzle): 
+    //     A Puzzle representing a specific crossword puzzle with a name and a description.
+    //     playerEntries represents the mapping of wordID of a particular word mapped to 
+    //     a Player and a PuzzleEntry, to indicate the player who currently has the guess to the
+    //     particular entry. confirmedEntries represents the mapping of wordID to PuzzleEntry,
+    //     to represent the entries that have been confirmed as correct and can no longer be
+    //     guessed. correctEntries is a mapping of wordID to a PuzzleEntry that encompasses
+    //     all the correct entries in the puzzle. puzzle represents the immutable correct 
+    //     puzzle that the player can check the mutalbe playable puzzle against.
     //                                    
     // Rep Invariant:
-    // true
+    //  true
     // Safety From Rep Exposure:
-    //  name and description is private and final and immutable
+    //  name, description, and puzzle are private, final and immutable
     //  playerEntries, confirmedENtries, and correctEntries can only be gotten through getter methods, and returns a copy of the map, which
-    //  only contains immutable objects
     //  playerEntries and confirmedEntries can only be modified through mutator methods
-    //
+    //  correctEntries is never returned neither directly or as a copy
     // Thread safety argument:
     //  Uses monitor Pattern
     private final String name; 
     private final String description;
-    // TODO: Add player information (i.e. player 1 id and player 2 id or something)
     // New map of puzzle id : player OR player id : (list or set) puzzle id
     private final Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = new HashMap<>(); // unconfirmed word id : puzzle entry
     private final Map<Integer, PuzzleEntry> confirmedEntries  = new HashMap<>();
     private final Map<Integer, PuzzleEntry> correctEntries;
-    
-    // TODO: DELETE this in the future (it's the template puzzle)
-    private final Puzzle puzzle;
+    private final Puzzle puzzle; // immutable correct puzzle
     /**
      * Constructs a puzzle that can be played by different players
      * @param puzzle an unmodifiable puzzle with the correct answers

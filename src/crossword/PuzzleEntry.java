@@ -11,17 +11,17 @@ public class PuzzleEntry {
     private final Point position;
     
     // Abstraction function:
-    //  AF(word, clue, orientation, position) = word entry in the crossword puzzle oriented horizontally 
-    //                                          if orientation == Orientation.ACROSS and vertically if
-    //                                          orientation == Orientation.DOWN, starting at row position.getRow()
-    //                                          and column position.getCol() in the crossword puzzle. 
-    //                                          Clue is a hint with respect to word.
+    //  AF(word, clue, orientation, position): word entry in the crossword puzzle oriented horizontally 
+    //                                         if orientation == Orientation.ACROSS and vertically if
+    //                                         orientation == Orientation.DOWN, starting at row position.getRow()
+    //                                         and column position.getCol() in the crossword puzzle. 
+    //                                         Clue is a hint with respect to word.
     // Representation invariant:
     //  true
     // Safety from rep exposure:
     //  All fields are private, final, and immutable
     // Thread safety argument:
-    //  This class is immutable
+    //  This class is immutable and therefore threadsafe
     
     /**
      * Create a new PuzzleEntry object 

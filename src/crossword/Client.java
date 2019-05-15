@@ -37,22 +37,25 @@ public class Client {
     
     private final String host;
     private final int port;
-    private String playerID;
+    private String playerID = "";
     private CrosswordCanvas canvas;
     private final List<Thread> listenerThreads; // keeps track of currently running threads
     
     // Abstraction function:
-    //  AF(): TODO fill this in
+    //  AF(host, port, playerID, canvas, listenerThreads):
+    //      client connecting with hostname host to port port, where the client starts with an
+    //      empty string for playerID and updates playerID after logging in. The client draws on
+    //      the canvas to play the crossword puzzle. The listenerThreads stores the list of 
+    //      running threads that check for updates in the match as the client is connected. 
     // Representation invariant:
-    //  true
+    //      host.length() > 0,
+    //      port >= 0,
+    //      playerID.length() >= 0,
     // Safety from rep exposure:
     //  All fields are private
+    //  None of the methods return any references to the fields
     // Thread safety argument:
     //  This uses the monitor pattern
-    
-    // TODO: Potentially delete this field later, it's for debugging purposes and will remember the previous response sent by the server
-    //       It can be used to directly print errors returned by the server (i.e. invalid playerID format or something)
-    private String previousResponse = "No previous response";
     
     /**
      * creates a new client
@@ -61,9 +64,15 @@ public class Client {
         this.host = host;
         this.port = port;
         listenerThreads = new ArrayList<>();
+        checkRep();
     }
     
-
+    private void checkRep() {
+        assert host.length() > 0;
+        assert port >= 0;
+        assert playerID.length() >= 0;
+    }
+    
     /**
      * Start a Crossword Extravaganza client.
      * 
@@ -131,11 +140,10 @@ public class Client {
             
             socketOut.println(request);
             String response = socketIn.readLine();
-            this.previousResponse = response;
-            canvas.setPreviousResponse(response);
             
             // TODO: Delete this later after we're done with the project
             System.out.println("Response: " + response);
+            checkRep();
             return response;
         } catch (IOException ioe) {
             throw new RuntimeException("Error occured when processing request: " + request);
@@ -192,6 +200,7 @@ public class Client {
         
         listenerThreads.add(watchThread);
         watchThread.start();
+        checkRep();
     }
     
     /**
@@ -247,6 +256,7 @@ public class Client {
         
         listenerThreads.add(waitThread);
         waitThread.start();
+        checkRep();
     }
     
     private synchronized void transitionToPlayState(BufferedReader socketIn, PrintWriter socketOut) {
@@ -276,6 +286,7 @@ public class Client {
         
         listenerThreads.add(playThread);
         playThread.start();
+        checkRep();
     }
     
     /**
@@ -297,6 +308,7 @@ public class Client {
         
         canvas.setCurrentPuzzle(currentPuzzle.substring(0, currentPuzzle.length() - 1));
         canvas.repaint();
+        checkRep();
     }
     
     /**
@@ -320,6 +332,7 @@ public class Client {
         }
         
         processResponseForPlay(response);
+        checkRep();
     }
     
     /**
@@ -327,8 +340,8 @@ public class Client {
      */
     private void logoutFromServer(BufferedReader socketIn, PrintWriter socketOut) {
         String response = getResponse(playerID + " " + "LOGOUT", socketIn, socketOut);
+        checkRep();
         if (response.charAt(0) == 'I') {
-            // TODO: Change this to throw exception when EXIT is implemented on server
             throw new RuntimeException("Failed to log out from the server");
         }
     }
@@ -340,6 +353,7 @@ public class Client {
      */
     private void exitWaitFromServer(BufferedReader socketIn, PrintWriter socketOut) {
         String response = getResponse(playerID + " " + "EXIT_WAIT", socketIn, socketOut);
+        checkRep();
         if (response.charAt(0) == 'I') {
             throw new RuntimeException("Unable to exit from waiting on the server");
         }
@@ -352,8 +366,9 @@ public class Client {
      */
     private void exitPlayFromServer(BufferedReader socketIn, PrintWriter socketOut) {
         String response = getResponse(playerID + " " + "EXIT_PLAY", socketIn, socketOut);
+        checkRep();
         if (response.charAt(0) == 'I') {
-            System.out.println("Unable to exit from waiting on the server");
+            throw new RuntimeException("Unable to exit from waiting on the server");
         }
     }
     
@@ -365,6 +380,7 @@ public class Client {
         playerID = "";
         canvas.setPlayerID(playerID);
         setCanvasState(State.START);
+        checkRep();
     }
     
     /**
@@ -375,6 +391,7 @@ public class Client {
         // TODO: Try stopping the threads if something goes wrong :) 
         // stopThreads();
         canvas.setState(state);
+        checkRep();
     }
     
     /**
@@ -386,6 +403,7 @@ public class Client {
             thread.interrupt();
             listenerThreads.remove(thread);
         }
+        checkRep();
     }
     
     /**
@@ -485,6 +503,7 @@ public class Client {
 
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setVisible(true);
+        checkRep();
     }
     
     
