@@ -140,6 +140,10 @@ public class PlayablePuzzle {
      * @return player entries for responses
      */
     public synchronized String getGuessesForResponse() {
+        if (playerEntries.size() == 0) {
+            return "";
+        }
+        
         String puzzleString = "";
         for (Map.Entry<Integer, SimpleImmutableEntry<Player,PuzzleEntry>> entry: playerEntries.entrySet()) {
             Integer wordID = entry.getKey();

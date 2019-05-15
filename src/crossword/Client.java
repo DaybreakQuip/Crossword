@@ -284,6 +284,7 @@ public class Client {
      * @param response the response in PLAY state
      */
     private synchronized void processResponseForPlay(String response) {
+        System.out.println("We're getting here");
         String[] responseParts = response.split(CrosswordCanvas.RESPONSE_DELIM);
         
         if (responseParts[1].equals("DONE")) {
@@ -455,13 +456,10 @@ public class Client {
             case SHOW_SCORE:
                 {
                     if (text.equals(NEW_MATCH)) {
-                        String oldPlayerID = playerID; // in case logging out resets playerID
-                        logoutFromServer(socketIn, socketOut);
-                        transitionStartState(oldPlayerID, socketIn, socketOut);
+                        exitWaitFromServer(socketIn, socketOut);
                         setCanvasState(State.CHOOSE);
                     } else if (text.equals(EXIT)) {
-                        logoutFromServer(socketIn, socketOut);
-                        setCanvasState(State.START);
+                        resetToStart();
                     }
                     break;
                 }
