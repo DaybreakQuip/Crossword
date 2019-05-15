@@ -196,6 +196,9 @@ public class TextServer {
             }
         }
         else if (command.equals("PLAY")) {
+            if (tokens.length < 3) {
+                return "I" + "PLAY command must include matchID";
+            }
             boolean join = game.joinMatch(playerID, tokens[2]);
             if (join) {
                 return "V" + game.getPuzzleFromMatchID(tokens[2]);

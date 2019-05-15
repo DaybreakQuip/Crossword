@@ -189,6 +189,10 @@ public class Match {
         Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = puzzle.getPlayerEntries();
         Map<Integer, PuzzleEntry> confirmedEntries = puzzle.getConfirmedEntries();    
         PuzzleEntry correctEntry = puzzle.getCorrectEntries().get(wordID);
+        // Make sure the entry exists, or else cannot challenge it
+        if (!playerEntries.containsKey(wordID)) {
+            return false;
+        }
         PuzzleEntry originalEntry = playerEntries.get(wordID).getValue();
         Player player = getPlayer(playerId);
         Player opponent = (player.getId().equals(playerOne.getId())) ? playerTwo : playerOne;

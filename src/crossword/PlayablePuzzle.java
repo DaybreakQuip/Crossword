@@ -1,6 +1,7 @@
 package crossword;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +29,8 @@ public class PlayablePuzzle {
     private final String name; 
     private final String description;
     // New map of puzzle id : player OR player id : (list or set) puzzle id
-    private final Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = new HashMap<>(); // unconfirmed word id : puzzle entry
-    private final Map<Integer, PuzzleEntry> confirmedEntries  = new HashMap<>();
+    private final Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = Collections.synchronizedMap(new HashMap<>()); // unconfirmed word id : puzzle entry
+    private final Map<Integer, PuzzleEntry> confirmedEntries  = Collections.synchronizedMap(new HashMap<>());
     private final Map<Integer, PuzzleEntry> correctEntries;
     private final Puzzle puzzle; // immutable correct puzzle
     /**
@@ -39,7 +40,7 @@ public class PlayablePuzzle {
     public PlayablePuzzle(Puzzle puzzle) {
         name = puzzle.getName();
         description = puzzle.getDescription();
-        correctEntries = puzzle.getEntries();
+        correctEntries = Collections.unmodifiableMap(puzzle.getEntries());
         this.puzzle = puzzle;
     }
     

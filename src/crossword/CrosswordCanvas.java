@@ -56,6 +56,7 @@ class CrosswordCanvas extends JComponent {
     public static final String ENTRY_DELIM = "~";
     public static final String WORD_DELIM = "`";
     public static final String RESPONSE_DELIM = ";";
+    private static final String CONFIRMED_WORD = "CONFIRMED_WORD";
     
     // Abstraction function:
     //  AF(originX, originY, delta, mainFont, indexFont, textFont, 
@@ -116,6 +117,24 @@ class CrosswordCanvas extends JComponent {
      */
     public synchronized State getState() {
         return state;
+    }
+    
+    /**
+     * Resets the player's ID
+     */
+    public synchronized void clearPlayerInfo() {
+        playerID = "";
+    }
+    
+    /**
+     * Clears the current puzzle info from the canvas
+     */
+    public synchronized void clearPuzzleInfo() {
+        puzzle = "";
+        previousResponse = "No previous response";
+        puzzleList = "";
+        matchList = "";
+        currentPuzzle = "";
     }
     
     /**
@@ -188,6 +207,8 @@ class CrosswordCanvas extends JComponent {
         
         if (id.length() == 0) {
             g.setColor(Color.YELLOW);
+        } else if (id.equals(CONFIRMED_WORD)) {
+            g.setColor(Color.ORANGE);
         } else if (id.equals(playerID)) {
             g.setColor(Color.RED);
         } else {
@@ -211,8 +232,17 @@ class CrosswordCanvas extends JComponent {
     }
     
     /**
-     * Place error message from entering a command at the top-left corner of the canvas, 
-     *  below the player id
+     * Place print colors at the top-left corner of the canvas, 
+     *  underneath the player id
+     * @param g
+     */
+    private synchronized void drawPlayerColors(Graphics g) {
+        g.drawString("Red:Me|Green:Other|Orange:Confirmed", 0, 60);
+    }
+    
+    /**
+     * Place error message from entering a command in the middle, underneath 
+     * the text box
      * @param g Graphics environment to use
      */
     private synchronized void drawErrorMessage(Graphics g) {
@@ -335,7 +365,6 @@ class CrosswordCanvas extends JComponent {
         String[] unsortedEntries = puzzle.split(ENTRY_DELIM);
         List<String> entries = new ArrayList<>(unsortedEntries.length);
         for (String entry: unsortedEntries) {
-            System.out.println("entry: " + entry);
             entries.add(Integer.parseInt(entry.substring(0, entry.indexOf(WORD_DELIM))), entry);
         }
                 
@@ -370,7 +399,6 @@ class CrosswordCanvas extends JComponent {
         }
         
         // print hints for across and down words
-        // TODO: Remove this when we remove previousResponse
         println("", g);
         
         if (across > 0) {
@@ -404,6 +432,7 @@ class CrosswordCanvas extends JComponent {
         resetLine();
         println("Previous response: " + previousResponse, g);
         drawPlayerID(g);
+        drawPlayerColors(g);
         // Draws the error message (i.e. invalid ID) if there is one
         drawErrorMessage(g);
         switch (state) {
@@ -454,14 +483,11 @@ class CrosswordCanvas extends JComponent {
                 
                 printPuzzle(g);
                 println("", g);
-
-                System.out.println("Current puzzle: " + currentPuzzle);
                 
                 if (currentPuzzle.length() > 0) {
                     String[] currentPuzzleState = currentPuzzle.split(RESPONSE_DELIM);
                     for (String currentPlayerState : currentPuzzleState[0].split(ENTRY_DELIM)) {
                         String[] playerPoints = currentPlayerState.split(WORD_DELIM);
-                        System.out.println("Player points: " + Arrays.toString(playerPoints));
                         println(playerPoints[0] + "'s Challenge Points: " + playerPoints[1], g);
                     }
                     
@@ -473,16 +499,18 @@ class CrosswordCanvas extends JComponent {
                             String[] wordEntered = wordEntry.split(WORD_DELIM);
                             int row = Integer.parseInt(wordEntered[5]);
                             int col = Integer.parseInt(wordEntered[6]);
+                            boolean confirmed = wordEntered[1].equals("T");
+                            String player = (!confirmed) ? wordEntered[0] : CONFIRMED_WORD;  
 
                             // draw words entered
                             if (wordEntered[4].equals("ACROSS")) {
                                 for (int i = 0; i < wordEntered[3].length(); i++) {
-                                    drawCell(row, col + i, g, wordEntered[0]);
+                                    drawCell(row, col + i, g, player);
                                     letterInCell(wordEntered[3].substring(i, i+1).toUpperCase(), row, col + i, g);
                                 }
                             } else {
                                 for (int i = 0; i < wordEntered[3].length(); i++) {
-                                    drawCell(row + i, col, g, wordEntered[0]);
+                                    drawCell(row + i, col, g, player);
                                     letterInCell(wordEntered[3].substring(i, i+1).toUpperCase(), row + i, col, g);
                                 }
                             }

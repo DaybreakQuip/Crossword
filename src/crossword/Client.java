@@ -135,19 +135,42 @@ public class Client {
      */
     private synchronized String getResponse(String request, BufferedReader socketIn, PrintWriter socketOut) {
         try {
-            // TODO: Delete this line later, it's for debugging purposes
-            System.out.println("Request: " + request);
-            
             socketOut.println(request);
-            String response = socketIn.readLine();
-            
-            // TODO: Delete this later after we're done with the project
-            System.out.println("Response: " + response);
+            String response = socketIn.readLine();            
             checkRep();
             return response;
         } catch (IOException ioe) {
             throw new RuntimeException("Error occured when processing request: " + request);
         }
+    }
+    
+    /**
+     * Starts a new thread for watching changes to available matches
+     */
+    private synchronized void startNewWatchThread() {
+        // Create a new thread to watch for changes for available matches
+        Thread watchThread = new Thread(new Runnable() {
+            public void run() {
+                try (
+                    Socket watchSocket = new Socket(host, port);
+                    BufferedReader watchSocketIn = new BufferedReader(new InputStreamReader(watchSocket.getInputStream(), UTF_8));
+                    PrintWriter watchSocketOut = new PrintWriter(new OutputStreamWriter(watchSocket.getOutputStream(), UTF_8), true);
+                    BufferedReader watchSystemIn = new BufferedReader(new InputStreamReader(System.in));
+                ) {
+                    while (canvas.getState() == State.CHOOSE) {
+                        watchSocketOut.println(playerID + " " + "WATCH");
+                        String watchResponse = watchSocketIn.readLine();
+                        canvas.setMatchList(watchResponse.substring(1));
+                        canvas.repaint();
+                    }
+                } catch (IOException ioe) {
+                    System.out.println("Something went wrong in watching for changes in matches");
+                } 
+            }
+         });
+        
+        listenerThreads.add(watchThread);
+        watchThread.start();
     }
     
     /**
@@ -177,29 +200,7 @@ public class Client {
         canvas.repaint();
         playerID = id;
         
-        // Create a new thread to watch for changes for available matches
-        Thread watchThread = new Thread(new Runnable() {
-            public void run() {
-                try (
-                    Socket watchSocket = new Socket(host, port);
-                    BufferedReader watchSocketIn = new BufferedReader(new InputStreamReader(watchSocket.getInputStream(), UTF_8));
-                    PrintWriter watchSocketOut = new PrintWriter(new OutputStreamWriter(watchSocket.getOutputStream(), UTF_8), true);
-                    BufferedReader watchSystemIn = new BufferedReader(new InputStreamReader(System.in));
-                ) {
-                    while (canvas.getState() == State.CHOOSE) {
-                        watchSocketOut.println(playerID + " " + "WATCH");
-                        String watchResponse = watchSocketIn.readLine();
-                        canvas.setMatchList(watchResponse.substring(1));
-                        canvas.repaint();
-                    }
-                } catch (IOException ioe) {
-                    System.out.println("Something went wrong in watching for changes in matches");
-                } 
-            }
-         });
-        
-        listenerThreads.add(watchThread);
-        watchThread.start();
+        startNewWatchThread();
         checkRep();
     }
     
@@ -249,7 +250,7 @@ public class Client {
                     // It's time to play!
                     transitionToPlayState(socketIn, socketOut);
                 } catch (IOException ioe) {
-                    System.out.println("Something went wrong in waiting for another player");
+                    
                 } 
             }
          });
@@ -274,12 +275,11 @@ public class Client {
                     while (canvas.getState() == State.PLAY) {
                         playSocketOut.println(playerID + " " + "WAIT_PLAY");
                         String playResponse = playSocketIn.readLine();
-                        System.out.println("Play response: " + playResponse);
                         
                         processResponseForPlay(playResponse);
                     }
                 } catch (IOException ioe) {
-                    System.out.println("Something went wrong in listening for changes in the puzzle");
+                    
                 } 
             }
          });
@@ -388,7 +388,7 @@ public class Client {
      * @param state
      */
     private void setCanvasState(State state) {
-        // TODO: Try stopping the threads if something goes wrong :) 
+        // The threads should stop themselves, but use this if necessary
         // stopThreads();
         canvas.setState(state);
         checkRep();
@@ -431,10 +431,6 @@ public class Client {
                 return;
             }
             
-            // TODO: Delete these prints, debugging only
-            System.out.println("Text: " + text);
-            System.out.println("state: " + canvas.getState());
-            
             switch (canvas.getState()) {
             case START:
                 {
@@ -455,6 +451,7 @@ public class Client {
                 {
                     if (text.equals(EXIT)) {
                         exitWaitFromServer(socketIn, socketOut);
+                        startNewWatchThread();
                         setCanvasState(State.CHOOSE);
                     }
                     break;
@@ -472,9 +469,13 @@ public class Client {
             case SHOW_SCORE:
                 {
                     if (text.equals(NEW_MATCH)) {
+                        startNewWatchThread();
                         setCanvasState(State.CHOOSE);
+                        canvas.clearPuzzleInfo();
                     } else if (text.equals(EXIT)) {
                         logoutFromServer(socketIn, socketOut);
+                        canvas.clearPuzzleInfo();
+                        canvas.clearPlayerInfo();
                         resetToStart();
                     }
                     break;

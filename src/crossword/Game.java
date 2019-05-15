@@ -90,12 +90,12 @@ public class Game {
      */
     public Game(Map<String, Puzzle> puzzles) {
         this.puzzles = Collections.unmodifiableMap(new HashMap<>(puzzles));
-        this.matches = new HashMap<String, Match>();
-        this.playerToMatch = new HashMap<String, String>();
-        this.players = new HashSet<String>();
-        this.watchListeners = new HashSet<>();
-        this.waitListeners = new HashMap<>();
-        this.playListeners = new HashMap<>();
+        this.matches = Collections.synchronizedMap(new HashMap<String, Match>());
+        this.playerToMatch = Collections.synchronizedMap(new HashMap<String, String>());
+        this.players = Collections.synchronizedSet(new HashSet<String>());
+        this.watchListeners = Collections.synchronizedSet(new HashSet<>());
+        this.waitListeners = Collections.synchronizedMap(new HashMap<>());
+        this.playListeners = Collections.synchronizedMap(new HashMap<>());
     }
     
     /**
@@ -184,6 +184,10 @@ public class Game {
      * @throws IOException 
      */
     public synchronized boolean joinMatch(String playerID, String matchID) throws IOException {
+        if (!matches.containsKey(matchID)) {
+            // Match ID does not exist
+            return false;
+        }
         boolean joined = matches.get(matchID).joinMatch(playerID);
         if (joined) {
             playerToMatch.put(playerID, matchID);
@@ -346,7 +350,6 @@ public class Game {
         String playerOne = match.getPlayerOne();
         String playerTwo = match.getPlayerTwo();
         if (match.forfeit()) {
-            System.out.println("Forfeiting");
             callPlayListener(playerOne);
             callPlayListener(playerTwo);
             return true;
@@ -489,7 +492,7 @@ public class Game {
         return builder.toString();
     }
     /**
-     * TODO
+     * Returns response of the puzzle
      * @param playerID player
      * @return puzzle
      */
