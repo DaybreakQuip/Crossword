@@ -443,7 +443,6 @@ public class Client {
                 }
             case PLAY:
                 {
-                    // TODO: DOES NOT WORK, IMPLEMENT after implementing game logic
                     if (text.equals(EXIT)) {
                         exitPlayFromServer(socketIn, socketOut);
                         setCanvasState(State.SHOW_SCORE);
@@ -455,9 +454,9 @@ public class Client {
             case SHOW_SCORE:
                 {
                     if (text.equals(NEW_MATCH)) {
-                        exitWaitFromServer(socketIn, socketOut);
                         setCanvasState(State.CHOOSE);
                     } else if (text.equals(EXIT)) {
+                        logoutFromServer(socketIn, socketOut);
                         resetToStart();
                     }
                     break;
