@@ -53,7 +53,20 @@ public class Game {
             if (file.isFile()) {
                 Puzzle newPuzzle = Puzzle.parseFromFile(directory + file.getName()); 
                 if (newPuzzle.isConsistent()) {
-                    puzzles.put(newPuzzle.getName(), newPuzzle);
+                    String puzzleID = newPuzzle.getName();
+                    // If the puzzle name is already in puzzles, try 
+                    //  using puzzleName1, puzzleName2, etc. until one of them hasn't been taken yet
+                    if (puzzles.containsKey(puzzleID)) {
+                        int i = 1;
+                        puzzleID += Integer.toString(i);
+                        while (puzzles.containsKey(puzzleID)) {
+                            i += 1;
+                            // Remove the number at the end and replace it with a new number
+                            puzzleID = puzzleID.substring(0, puzzleID.length()-1);
+                            puzzleID += Integer.toString(i);
+                        }
+                    }
+                    puzzles.put(puzzleID, newPuzzle);
                 }
             }
         }
