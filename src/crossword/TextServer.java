@@ -9,8 +9,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Set;
 
 import crossword.Game.WaitListener;
 import crossword.Game.WatchListener;
@@ -20,8 +18,8 @@ import crossword.Game.WatchListener;
  * Text-protocol game server.
  */
 public class TextServer {
-    private static String QUIT = "quit";
-    private static String LISTENER = "listener"; // Returned by listener commands 
+    private static final String QUIT = "quit";
+    private static final String LISTENER = "listener"; // Returned by listener commands 
     
     // Abstraction function:
     //    AF(serverSocket, game) --> TextServer Object having the ability to connect one player to a Crossword Puzzle game. 
@@ -124,7 +122,7 @@ public class TextServer {
                 }
                 out.println(output);
                 
-                // TODO: Debugging only: remove this
+                // For debugging only: 
                 // printGameStats();
             }
         } finally {
