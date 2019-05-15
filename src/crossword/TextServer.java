@@ -246,7 +246,9 @@ public class TextServer {
         }
         else if (command.equals("EXIT_PLAY")) {
             if (game.exitPlay(playerID)) {
-                return "V" + game.showScore(playerID);
+                String score = game.showScore(playerID);
+                game.removePlayerAndMatch(playerID);
+                return "V" + score;
             }
             return "I" + "Failed to exit game";
         }
