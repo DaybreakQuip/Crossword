@@ -255,7 +255,7 @@ public class Client {
         String response = getResponse(playerID + " " + "LOGOUT", socketIn, socketOut);
         if (response.charAt(0) == 'I') {
             // TODO: Change this to throw exception when EXIT is implemented on server
-            System.out.println("Unable to log out from the server");
+            throw new RuntimeException("Failed to log out from the server");
         }
     }
     
@@ -267,7 +267,7 @@ public class Client {
     private void exitWaitFromServer(BufferedReader socketIn, PrintWriter socketOut) {
         String response = getResponse(playerID + " " + "EXIT_WAIT", socketIn, socketOut);
         if (response.charAt(0) == 'I') {
-            System.out.println("Unable to exit from waiting on the server");
+            throw new RuntimeException("Unable to exit from waiting on the server");
         }
     }
     
@@ -368,7 +368,7 @@ public class Client {
                 }
             case PLAY:
                 {
-                    // TODO: Possibly may not work, revisit after implementing PLAY
+                    // TODO: DOES NOT WORK, IMPLEMENT after implementing game logic
                     if (text.equals(EXIT)) {
                         exitPlayFromServer(socketIn, socketOut);
                         setCanvasState(State.CHOOSE);

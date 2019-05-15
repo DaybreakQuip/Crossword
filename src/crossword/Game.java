@@ -192,11 +192,44 @@ public class Game {
     
     /**
      * Disconnects a player from the game
-     * @param playerID player name
-     * @return true if player managed to quit the game, false otherwise
+     * @param playerID player id
+     * @return true if player managed to log out of the game, false otherwise
      */
     public synchronized boolean logout(String playerID) {
-        throw new RuntimeException("Not Implemented");
+        if (playerToMatch.containsKey(playerID)) {
+            // Player already in a match cannot log out, they must exit the match first!
+            return false;
+        }
+        if (players.contains(playerID)) {
+            players.remove(playerID);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Exits a player from a match that is waiting
+     * @param playerID player id
+     * @return true if the player managed to exit the match, false otherwise
+     * @throws IOException
+     */
+    public synchronized boolean exitWait(String playerID) throws IOException {
+        if (!playerToMatch.containsKey(playerID)) {
+            // Player is not in a match to exit from
+            return false;
+        }
+        String matchID = playerToMatch.get(playerID);
+        Match match = matches.get(matchID);
+        if (!match.isWaiting()) {
+            // Match is not waiting
+            return false;
+        }
+        matches.remove(matchID);
+        playerToMatch.remove(playerID);
+        
+        callWatchListeners();
+        return true;
     }
     
     /**

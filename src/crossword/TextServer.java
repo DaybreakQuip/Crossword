@@ -213,10 +213,16 @@ public class TextServer {
             return "I" + "Match was unable to be created";
         }
         else if (command.equals("LOGOUT")) {
-            throw new RuntimeException("Not Implemented");
+            if (game.logout(playerID)) {
+                return "V";
+            }
+            return "I" + "Failed to log out the player";
         }
         else if (command.equals("EXIT_WAIT")) {
-            throw new RuntimeException("Not Implemented");
+            if (game.exitWait(playerID)) {
+                return "V";
+            }
+            return "I" + "Failed to log out the player";
         }
         else if (command.equals("EXIT_PLAY")) {
             throw new RuntimeException("Not Implemented");
