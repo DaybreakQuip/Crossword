@@ -261,9 +261,16 @@ public class Game {
             return false;
         }
         boolean success = match.tryWord(playerID, wordID, word);
+        String playerOne = match.getPlayerOne();
+        String playerTwo = match.getPlayerTwo();
         if (success) {
-            callPlayListener(match.getPlayerOne());
-            callPlayListener(match.getPlayerTwo());
+            callPlayListener(playerOne);
+            callPlayListener(playerTwo);
+            players.remove(playerOne);
+            players.remove(playerTwo);
+            playerToMatch.remove(playerOne);
+            playerToMatch.remove(playerTwo);
+            matches.remove(matchID);
         }
         return success;
     }
@@ -290,10 +297,17 @@ public class Game {
         if (!match.isOngoing()) {
             return false;
         }
+        String playerOne = match.getPlayerOne();
+        String playerTwo = match.getPlayerTwo();
         boolean success = match.challengeWord(playerID, wordID, word);
         if (success) {
             callPlayListener(match.getPlayerOne());
             callPlayListener(match.getPlayerTwo());
+            players.remove(playerOne);
+            players.remove(playerTwo);
+            playerToMatch.remove(playerOne);
+            playerToMatch.remove(playerTwo);
+            matches.remove(matchID);
         }   
         return success;
      }
@@ -315,10 +329,17 @@ public class Game {
             return false;
         }
         Match match = matches.get(matchID);
+        String playerOne = match.getPlayerOne();
+        String playerTwo = match.getPlayerTwo();
         if (match.forfeit()) {
             System.out.println("Forfeiting");
-            callPlayListener(match.getPlayerOne());
-            callPlayListener(match.getPlayerTwo());
+            callPlayListener(playerOne);
+            callPlayListener(playerTwo);
+            players.remove(playerOne);
+            players.remove(playerTwo);
+            playerToMatch.remove(playerOne);
+            playerToMatch.remove(playerTwo);
+            matches.remove(matchID);
             return true;
         }
         return false;
