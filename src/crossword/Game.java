@@ -246,7 +246,20 @@ public class Game {
      * @return true if player managed to guess, false otherwise
      */
     public synchronized boolean tryWord(String playerID, int wordID, String word) {
-        return matches.get(playerToMatch.get(playerID)).tryWord(playerID, wordID, word);
+        if (!playerToMatch.containsKey(playerID)) {
+            // The player id cannot be found
+            return false;
+        }
+        String matchID = playerToMatch.get(playerID);
+        if (!matches.containsKey(matchID)) {
+            // The match id cannot be found
+            return false;
+        }
+        Match match = matches.get(matchID);
+        if (!match.isOngoing()) {
+            return false;
+        }
+        return matches.get(matchID).tryWord(playerID, wordID, word);
     }
     
     /**
@@ -257,9 +270,35 @@ public class Game {
      * @return true if player managed to challenge, false otherwise
      */
     public synchronized boolean challengeWord(String playerID, int wordID, String word) {
+        if (!playerToMatch.containsKey(playerID)) {
+            // The player id cannot be found
+            return false;
+        }
+        String matchID = playerToMatch.get(playerID);
+        if (!matches.containsKey(matchID)) {
+            // The match id cannot be found
+            return false;
+        }
+        Match match = matches.get(matchID);
+        if (!match.isOngoing()) {
+            return false;
+        }
         return matches.get(playerToMatch.get(playerID)).challengeWord(playerID, wordID, word);
     }
     
+    public synchronized boolean exitPlay(String playerID) {
+        if (!playerToMatch.containsKey(playerID)) {
+            // The player id cannot be found
+            return false;
+        }
+        String matchID = playerToMatch.get(playerID);
+        if (!matches.containsKey(matchID)) {
+            // The match id cannot be found
+            return false;
+        }
+        Match match = matches.get(matchID);
+        return match.forfeit();
+    }
     /**
      * Gets a player's score
      * @param playerID player name

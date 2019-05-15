@@ -265,10 +265,14 @@ public class Match {
 
     /**
      * Forfeits a player from the match and ends the match
-     * @param playerId the player id of the player that is forfeiting
+     * @return true if forfeited 
      */
-    public synchronized void forfeit(String playerId) {
-        throw new RuntimeException("Not Implemented!");
+    public synchronized boolean forfeit() {
+        if (state == MatchState.DONE) {
+            return false;
+        }
+        state = MatchState.DONE;
+        return true;
     }
     
     /**
@@ -297,7 +301,7 @@ public class Match {
      * @return string representing the score of each player
      */
     public synchronized String showScore() {
-        return MatchState.DONE + Game.RESPONSE_DELIM + playerOne.getId() + Game.WORD_DELIM + playerOne.getScore() + Game.ENTRY_DELIM + 
+        return state + Game.RESPONSE_DELIM + playerOne.getId() + Game.WORD_DELIM + playerOne.getScore() + Game.ENTRY_DELIM + 
                 playerTwo.getId() + Game.WORD_DELIM + playerTwo.getScore();
     }
 }
