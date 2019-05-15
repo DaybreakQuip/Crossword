@@ -254,7 +254,9 @@ public class TextServer {
             int wordID = Integer.parseInt(tokens[2]);
             String word = tokens[3].toLowerCase();
             if (game.tryWord(playerID, wordID, word)) {
-                return "V" + game.getGuessesForResponse(playerID);
+                String response = game.getGuessesForResponse(playerID);
+                game.removePlayerAndMatch(playerID);
+                return "V" + response;
             }
             return "I" + "Failed to guess word.";
         }
@@ -262,7 +264,9 @@ public class TextServer {
             int wordID = Integer.parseInt(tokens[2]);
             String word = tokens[3].toLowerCase();
             if (game.challengeWord(playerID, wordID, word)) {
-                return "V" + game.getGuessesForResponse(playerID);
+                String response = game.getGuessesForResponse(playerID);
+                game.removePlayerAndMatch(playerID);
+                return "V" + response;
             }
             return "I" + "Failed to challenge word.";        
         }

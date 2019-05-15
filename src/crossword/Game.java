@@ -120,6 +120,24 @@ public class Game {
     }
 
     /**
+     * 
+     * @param playerID player
+     */
+    public synchronized void removePlayerAndMatch(String playerID) {
+        String matchID = playerToMatch.get(playerID);
+        Match match = matches.get(matchID);
+        String playerOne = match.getPlayerOne();
+        String playerTwo = match.getPlayerTwo();
+        if (match.isDone()) {
+            players.remove(playerOne);
+            players.remove(playerTwo);
+            playerToMatch.remove(playerOne);
+            playerToMatch.remove(playerTwo);
+            matches.remove(matchID);
+        }
+    }
+    
+    /**
      * Gets names of all puzzles and descriptions that are waiting for another player
      * @return String with format: 
      *      match ::= match_ID WORD_DELIM description;
@@ -266,11 +284,6 @@ public class Game {
         if (success) {
             callPlayListener(playerOne);
             callPlayListener(playerTwo);
-            players.remove(playerOne);
-            players.remove(playerTwo);
-            playerToMatch.remove(playerOne);
-            playerToMatch.remove(playerTwo);
-            matches.remove(matchID);
         }
         return success;
     }
@@ -301,14 +314,9 @@ public class Game {
         String playerTwo = match.getPlayerTwo();
         boolean success = match.challengeWord(playerID, wordID, word);
         if (success) {
-            callPlayListener(match.getPlayerOne());
-            callPlayListener(match.getPlayerTwo());
-            players.remove(playerOne);
-            players.remove(playerTwo);
-            playerToMatch.remove(playerOne);
-            playerToMatch.remove(playerTwo);
-            matches.remove(matchID);
-        }   
+            callPlayListener(playerOne);
+            callPlayListener(playerTwo);
+        }
         return success;
      }
     
