@@ -239,8 +239,8 @@ public class Game {
      * @param word the word that is guessed
      * @return true if player managed to guess, false otherwise
      */
-    public synchronized boolean tryWord(String playerID, String wordID, String word) {
-        throw new RuntimeException("Not Implemented");
+    public synchronized boolean tryWord(String playerID, int wordID, String word) {
+        return matches.get(playerToMatch.get(playerID)).tryWord(playerID, wordID, word);
     }
     
     /**
@@ -250,8 +250,8 @@ public class Game {
      * @param word the word that the player uses to challenge
      * @return true if player managed to challenge, false otherwise
      */
-    public synchronized boolean challengeWord(String playerID, String wordID, String word) {
-        throw new RuntimeException("Not Implemented");
+    public synchronized boolean challengeWord(String playerID, int wordID, String word) {
+        return matches.get(playerToMatch.get(playerID)).challengeWord(playerID, wordID, word);
     }
     
     /**
@@ -260,8 +260,7 @@ public class Game {
      * @return the score of the player
      */
     public synchronized String showScore(String playerID) {
-        throw new RuntimeException("Not Implemented");
-
+        return matches.get(playerToMatch.get(playerID)).showScore();
     }
     
     /**
@@ -354,7 +353,14 @@ public class Game {
         builder.deleteCharAt(builder.length()-1);
         return builder.toString();
     }
-    
+    /**
+     * TODO
+     * @param playerID player
+     * @return puzzle
+     */
+    public synchronized String getGuessesForResponse(String playerID) {
+        return matches.get(playerToMatch.get(playerID)).getGuessesForResponse();
+    }
     /**
      * Prints number of each listener currently in-game
      */

@@ -28,6 +28,7 @@ public class PlayablePuzzle {
     private final Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = new HashMap<>(); // unconfirmed word id : puzzle entry
     private final Map<Integer, PuzzleEntry> confirmedEntries  = new HashMap<>();
     private final Map<Integer, PuzzleEntry> correctEntries;
+    
     // TODO: DELETE this in the future (it's the template puzzle)
     private final Puzzle puzzle;
     /**
