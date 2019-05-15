@@ -342,7 +342,6 @@ public class Game {
         String playerOne = match.getPlayerOne();
         String playerTwo = match.getPlayerTwo();
         if (match.forfeit()) {
-            System.out.println("Forfeiting");
             callPlayListener(playerOne);
             callPlayListener(playerTwo);
             return true;
@@ -485,7 +484,7 @@ public class Game {
         return builder.toString();
     }
     /**
-     * TODO
+     * Returns response of the puzzle
      * @param playerID player
      * @return puzzle
      */

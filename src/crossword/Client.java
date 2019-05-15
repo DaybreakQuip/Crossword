@@ -126,16 +126,11 @@ public class Client {
      */
     private synchronized String getResponse(String request, BufferedReader socketIn, PrintWriter socketOut) {
         try {
-            // TODO: Delete this line later, it's for debugging purposes
-            System.out.println("Request: " + request);
-            
             socketOut.println(request);
             String response = socketIn.readLine();
             this.previousResponse = response;
             canvas.setPreviousResponse(response);
             
-            // TODO: Delete this later after we're done with the project
-            System.out.println("Response: " + response);
             return response;
         } catch (IOException ioe) {
             throw new RuntimeException("Error occured when processing request: " + request);
@@ -247,7 +242,7 @@ public class Client {
                     // It's time to play!
                     transitionToPlayState(socketIn, socketOut);
                 } catch (IOException ioe) {
-                    System.out.println("Something went wrong in waiting for another player");
+                    
                 } 
             }
          });
@@ -271,12 +266,11 @@ public class Client {
                     while (canvas.getState() == State.PLAY) {
                         playSocketOut.println(playerID + " " + "WAIT_PLAY");
                         String playResponse = playSocketIn.readLine();
-                        System.out.println("Play response: " + playResponse);
                         
                         processResponseForPlay(playResponse);
                     }
                 } catch (IOException ioe) {
-                    System.out.println("Something went wrong in listening for changes in the puzzle");
+                    
                 } 
             }
          });
@@ -379,7 +373,7 @@ public class Client {
      * @param state
      */
     private void setCanvasState(State state) {
-        // TODO: Try stopping the threads if something goes wrong :) 
+        // The threads should stop themselves, but use this if necessary
         // stopThreads();
         canvas.setState(state);
     }
@@ -419,10 +413,6 @@ public class Client {
             if (text.length() == 0) {
                 return;
             }
-            
-            // TODO: Delete these prints, debugging only
-            System.out.println("Text: " + text);
-            System.out.println("state: " + canvas.getState());
             
             switch (canvas.getState()) {
             case START:
