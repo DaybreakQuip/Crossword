@@ -77,7 +77,7 @@ class CrosswordCanvas extends JComponent {
     private String puzzleList = "";
     private String matchList = "";
     // TODO change currentPuzzle to ""
-    private String currentPuzzle = "ze`0~jy`0;ze`F`star`ACROSS`1`0~jy`F`extra`DOWN`1`5~jy`T`loss`DOWN`3`6";
+    private String currentPuzzle = "ze`0~jy`0;ze`F`0`star`ACROSS`1`0~jy`F`3`extra`DOWN`1`5~jy`T`7`loss`DOWN`3`6";
     
     /**
      * @param puzzle string representation of the crossword puzzle
@@ -421,30 +421,31 @@ class CrosswordCanvas extends JComponent {
                     List<String> otherWords = new ArrayList<>();
                     
                     // ze`F`star`ACROSS`1`0
+                    // ze`F`0`star`ACROSS`1`0
                     if (currentPuzzleState.length > 1) {
                         for (String wordEntry : currentPuzzleState[1].split(ENTRY_DELIM)) {
                             String[] wordEntered = wordEntry.split(WORD_DELIM);
-                            int row = Integer.parseInt(wordEntered[4]);
-                            int col = Integer.parseInt(wordEntered[5]);
+                            int row = Integer.parseInt(wordEntered[5]);
+                            int col = Integer.parseInt(wordEntered[6]);
 
                             // draw words entered
-                            if (wordEntered[3].equals("ACROSS")) {
-                                for (int i = 0; i < wordEntered[2].length(); i++) {
+                            if (wordEntered[4].equals("ACROSS")) {
+                                for (int i = 0; i < wordEntered[3].length(); i++) {
                                     drawCell(row, col + i, g, wordEntered[0]);
-                                    letterInCell(wordEntered[2].substring(i, i+1).toUpperCase(), row, col + i, g);
+                                    letterInCell(wordEntered[3].substring(i, i+1).toUpperCase(), row, col + i, g);
                                 }
                             } else {
-                                for (int i = 0; i < wordEntered[2].length(); i++) {
+                                for (int i = 0; i < wordEntered[3].length(); i++) {
                                     drawCell(row + i, col, g, wordEntered[0]);
-                                    letterInCell(wordEntered[2].substring(i, i+1).toUpperCase(), row + i, col, g);
+                                    letterInCell(wordEntered[3].substring(i, i+1).toUpperCase(), row + i, col, g);
                                 }
                             }
 
                             // separating each player's confirmed words
                             if (wordEntered[1].equals("T") && wordEntered[0].equals(playerID)) {
-                                myWords.add(wordEntered[2]);
+                                myWords.add(wordEntered[3]);
                             } else if (wordEntered[1].equals("T")) {
-                                otherWords.add(wordEntered[2]);
+                                otherWords.add(wordEntered[3]);
                             }
                         }
                         
