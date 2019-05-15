@@ -24,7 +24,7 @@ public class Game {
     private final Map<String, Puzzle> puzzles; // map of puzzleID : Puzzle
     private final Map<String, String> playerToMatch; // map of playerID : match_id
     private final Map<String, Match> matches; //  map of match_id : match
-    private Set<WatchListener> listeners;
+    private Set<WatchListener> watchListeners;
     private final Map<String, WaitListener> waitListeners;
     
     /**
@@ -84,7 +84,7 @@ public class Game {
         this.matches = new HashMap<String, Match>();
         this.playerToMatch = new HashMap<String, String>();
         this.players = new HashSet<String>();
-        this.listeners = new HashSet<>();
+        this.watchListeners = new HashSet<>();
         this.waitListeners = new HashMap<>();
     }
     
@@ -192,11 +192,44 @@ public class Game {
     
     /**
      * Disconnects a player from the game
-     * @param playerID player name
-     * @return true if player managed to quit the game, false otherwise
+     * @param playerID player id
+     * @return true if player managed to log out of the game, false otherwise
      */
     public synchronized boolean logout(String playerID) {
-        throw new RuntimeException("Not Implemented");
+        if (playerToMatch.containsKey(playerID)) {
+            // Player already in a match cannot log out, they must exit the match first!
+            return false;
+        }
+        if (players.contains(playerID)) {
+            players.remove(playerID);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Exits a player from a match that is waiting
+     * @param playerID player id
+     * @return true if the player managed to exit the match, false otherwise
+     * @throws IOException
+     */
+    public synchronized boolean exitWait(String playerID) throws IOException {
+        if (!playerToMatch.containsKey(playerID)) {
+            // Player is not in a match to exit from
+            return false;
+        }
+        String matchID = playerToMatch.get(playerID);
+        Match match = matches.get(matchID);
+        if (!match.isWaiting()) {
+            // Match is not waiting
+            return false;
+        }
+        matches.remove(matchID);
+        playerToMatch.remove(playerID);
+        
+        callWatchListeners();
+        return true;
     }
     
     /**
@@ -259,23 +292,21 @@ public class Game {
         /** 
          * Called when the available matches in the game changes.
          * A change is defined as when a new match becomes available or an available match becomes full
-         * @return String of the available matches since last change
          */
         public void onChange();
     }
     /**
      * Adds a listener for changes to available matches in the game
-     * TODO: Remove?
      * @param listener Adds a new listener
      */
     public synchronized void addWatchListener(WatchListener listener) {
-        listeners.add(listener);
+        watchListeners.add(listener);
     }
     
     private synchronized void callWatchListeners() throws IOException{
-        for (WatchListener listener : new ArrayList<>(listeners)) {
+        for (WatchListener listener : new ArrayList<>(watchListeners)) {
             listener.onChange();
-            listeners.remove(listener);
+            watchListeners.remove(listener);
         }
     }
     
@@ -284,13 +315,11 @@ public class Game {
         /** 
          * Called when the available matches in the game changes.
          * A change is defined as when a new match becomes available or an available match becomes full
-         * @return String of the available matches since last change
          */
         public void onChange();
     }
     /**
      * Adds a listener for a player to wait for another player to join their match
-     * TODO: Remove?
      * @param playerID id of the player
      * @param listener Adds a new listener
      */
@@ -324,6 +353,15 @@ public class Game {
         }
         builder.deleteCharAt(builder.length()-1);
         return builder.toString();
+    }
+    
+    /**
+     * Prints number of each listener currently in-game
+     */
+    public synchronized void printListenerStats() {
+        System.out.println("Game listener stats:");
+        System.out.println("\tWatch listeners: " + this.watchListeners.size());
+        System.out.println("\tWait listeners: " + this.waitListeners.size());
     }
     
     /**

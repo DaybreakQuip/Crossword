@@ -9,8 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Set;
+import java.util.Arrays;
 
 import crossword.Game.WaitListener;
 import crossword.Game.WatchListener;
@@ -20,8 +19,8 @@ import crossword.Game.WatchListener;
  * Text-protocol game server.
  */
 public class TextServer {
-    private static String QUIT = "quit";
-    private static String LISTENER = "listener"; // Returned by listener commands 
+    private static final String QUIT = "quit";
+    private static final String LISTENER = "listener"; // Returned by listener commands 
     
     // Abstraction function:
     //    AF(serverSocket, game) --> TextServer Object having the ability to connect one player to a Crossword Puzzle game. 
@@ -94,6 +93,16 @@ public class TextServer {
     }
     
     /**
+     * Prints game stats for debugging including info such as:
+     *  - Number of watch listeners (for CHOOSE state)
+     *  - Number of wait listeners (for WAIT state)
+     *  - Number of play listeners (for PLAY state)
+     */
+    private void printGameStats() {
+        game.printListenerStats();
+    }
+    
+    /**
      * Handle a single client connection.
      * Returns when the client disconnects.
      * 
@@ -113,7 +122,9 @@ public class TextServer {
                     continue;
                 }
                 out.println(output);
-
+                
+                // For debugging only: 
+                // printGameStats();
             }
         } finally {
             out.close();
@@ -135,7 +146,7 @@ public class TextServer {
         
         // Check whether the playerID is valid
         if (!(playerID.matches("[A-Za-z0-9]*") && playerID.length() > 0)) {
-            throw new RuntimeException("Player ID must be alphanumeric and have a length > 0");
+            return "I" + "Player ID must be alphanumeric and have a length > 0";
         }
         
         if (command.equals("quit")) {
@@ -181,14 +192,30 @@ public class TextServer {
             return "I" + "Player was unable to join the match";
         }
         else if (command.equals("NEW")) {
+            if (tokens.length < 4) {
+                return "I" + "NEW command must contain matchID, puzzleID, and description";
+            }
+            
             String matchID = tokens[2];
             String puzzleID = tokens[3];
-            String description = tokens[4];
-            if (description.matches("\"[0-9a-zA-Z ]*\"")) {
+            String description = "";
+            // The rest of the string is the description
+            for (String token : Arrays.copyOfRange(tokens, 4, tokens.length)) {
+                description += " " + token;
+            }
+            // Remove the extra space at the beginning
+            description = description.substring(1);
+            
+            if (description.matches("\"[^\\n\\t\\\\\\r]*\"")) {
                 description = description.substring(1, description.length()-1);
             } else {
-                return "I";
+                return "I" + "Invalid format for description: " + description;
             }
+            // Check whether MATCH_ID is alphanumeric
+            if (!matchID.matches("[0-9a-zA-Z]*")) {
+                return "I" + "Invalid format for matchID (should be alphanumeric): " + matchID;
+            }
+            
             boolean create = game.createMatch(playerID, matchID, puzzleID, description);
             if (create) {
                 return "V";
@@ -196,6 +223,18 @@ public class TextServer {
             return "I" + "Match was unable to be created";
         }
         else if (command.equals("LOGOUT")) {
+            if (game.logout(playerID)) {
+                return "V";
+            }
+            return "I" + "Failed to log out the player";
+        }
+        else if (command.equals("EXIT_WAIT")) {
+            if (game.exitWait(playerID)) {
+                return "V";
+            }
+            return "I" + "Failed to log out the player";
+        }
+        else if (command.equals("EXIT_PLAY")) {
             throw new RuntimeException("Not Implemented");
         }
         else if (command.equals("TRY")) {
@@ -208,27 +247,9 @@ public class TextServer {
             throw new RuntimeException("Not Implemented");
         }
 
-        /* 
-        else if (command.equals("GET")) {
-        Set<String> puzzleNames = game.getPuzzleNames();
-            StringBuilder allPuzzles = new StringBuilder();
-            allPuzzles.append("Puzzles Available: ");
-            for (String puzzle: puzzleNames) {
-                allPuzzles.append(puzzle + ",");
-            }
-            allPuzzles.deleteCharAt(allPuzzles.length()-1);
-            return allPuzzles.toString();
-        }
-        else if (puzzleNames.contains(command)) {
-            return game.getPuzzleForResponse(command);
-        }
-        else if (!puzzleNames.contains(command)) {
-            return command;
-        }
-        */
         // if we reach here, the client message did not follow the protocol
         // Instead of throwing an except, return a response indicating  failure
-        return "I" + "Sorry, that is not a valid input: " + input;
+        return "I" + "Sorry, that is not a valid command: " + input;
         // throw new UnsupportedOperationException(input);
 
     }
