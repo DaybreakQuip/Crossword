@@ -265,6 +265,8 @@ public class Client {
                         System.out.println("Play response: " + playResponse);
                         
                         // TODO: What should we do with the response for changes in play?
+                        //canvas.setCurrentPuzzle(playResponse.substring(1));
+                        //canvas.repaint();
                         // TODO: Transition to SHOW_SCORE state if the match is done
                     }
                 } catch (IOException ioe) {
@@ -298,7 +300,19 @@ public class Client {
             return;
         }
         
-        canvas.setCurrentPuzzle(response.substring(1));
+        String[] responseParts = response.split(CrosswordCanvas.RESPONSE_DELIM);
+        
+        if (responseParts[1].equals("DONE")) {
+            setCanvasState(State.SHOW_SCORE);
+        }
+        
+        String currentPuzzle = "";
+        for (int i = 1; i < responseParts.length; i++) {
+            currentPuzzle += responseParts[i] + CrosswordCanvas.RESPONSE_DELIM;
+        }
+        
+        System.out.println("Current puzzle: " + currentPuzzle.substring(0, currentPuzzle.length() - 1));
+        canvas.setCurrentPuzzle(currentPuzzle.substring(0, currentPuzzle.length() - 1));
         canvas.repaint();
     }
     
@@ -428,6 +442,7 @@ public class Client {
                         exitPlayFromServer(socketIn, socketOut);
                         setCanvasState(State.SHOW_SCORE);
                     } else {
+                        //transitionToPlayState(socketIn, socketOut);
                         playPuzzle(text, socketIn, socketOut);
                     }
                     break;
