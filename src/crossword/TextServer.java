@@ -173,10 +173,9 @@ public class TextServer {
             return LISTENER;
         }
         else if (command.equals("WAIT_PLAY")) { // blocks and returns only when a play has been made in a match
-            // TODO: Add a player listener
             game.addPlayListener(playerID, new PlayListener() {
                 public void onChange() {
-                    out.println("V" + game.getMatchPuzzleForResponse(playerID));
+                    out.println("V" + game.getGuessesForResponse(playerID));
                 }
             });
             

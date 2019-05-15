@@ -244,8 +244,9 @@ public class Game {
      * @param wordID the ID of the word to attempt to solve
      * @param word the word that is guessed
      * @return true if player managed to guess, false otherwise
+     * @throws IOException 
      */
-    public synchronized boolean tryWord(String playerID, int wordID, String word) {
+    public synchronized boolean tryWord(String playerID, int wordID, String word) throws IOException {
         if (!playerToMatch.containsKey(playerID)) {
             // The player id cannot be found
             return false;
@@ -259,7 +260,12 @@ public class Game {
         if (!match.isOngoing()) {
             return false;
         }
-        return matches.get(matchID).tryWord(playerID, wordID, word);
+        boolean success = match.tryWord(playerID, wordID, word);
+        if (success) {
+            callPlayListener(match.getPlayerOne());
+            callPlayListener(match.getPlayerTwo());
+        }
+        return success;
     }
     
     /**
@@ -268,8 +274,9 @@ public class Game {
      * @param wordID the ID of the word to attempt to challenge
      * @param word the word that the player uses to challenge
      * @return true if player managed to challenge, false otherwise
+     * @throws IOException 
      */
-    public synchronized boolean challengeWord(String playerID, int wordID, String word) {
+    public synchronized boolean challengeWord(String playerID, int wordID, String word) throws IOException {
         if (!playerToMatch.containsKey(playerID)) {
             // The player id cannot be found
             return false;
@@ -283,10 +290,21 @@ public class Game {
         if (!match.isOngoing()) {
             return false;
         }
-        return matches.get(playerToMatch.get(playerID)).challengeWord(playerID, wordID, word);
-    }
+        boolean success = match.challengeWord(playerID, wordID, word);
+        if (success) {
+            callPlayListener(match.getPlayerOne());
+            callPlayListener(match.getPlayerTwo());
+        }   
+        return success;
+     }
     
-    public synchronized boolean exitPlay(String playerID) {
+    /**
+     * Quits the game
+     * @param playerID player
+     * @return true if managed to quit
+     * @throws IOException 
+     */
+    public synchronized boolean exitPlay(String playerID) throws IOException {
         if (!playerToMatch.containsKey(playerID)) {
             // The player id cannot be found
             return false;
@@ -297,7 +315,12 @@ public class Game {
             return false;
         }
         Match match = matches.get(matchID);
-        return match.forfeit();
+        if (match.forfeit()) {
+            callPlayListener(match.getPlayerOne());
+            callPlayListener(match.getPlayerTwo());
+            return true;
+        }
+        return false;
     }
     /**
      * Gets a player's score
