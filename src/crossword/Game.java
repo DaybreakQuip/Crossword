@@ -316,6 +316,7 @@ public class Game {
         }
         Match match = matches.get(matchID);
         if (match.forfeit()) {
+            System.out.println("Forfeiting");
             callPlayListener(match.getPlayerOne());
             callPlayListener(match.getPlayerTwo());
             return true;

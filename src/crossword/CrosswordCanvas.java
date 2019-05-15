@@ -430,10 +430,13 @@ class CrosswordCanvas extends JComponent {
                 printPuzzle(g);
                 println("", g);
 
+                System.out.println("Current puzzle: " + currentPuzzle);
+                
                 if (currentPuzzle.length() > 0) {
                     String[] currentPuzzleState = currentPuzzle.split(RESPONSE_DELIM);
                     for (String currentPlayerState : currentPuzzleState[0].split(ENTRY_DELIM)) {
                         String[] playerPoints = currentPlayerState.split(WORD_DELIM);
+                        System.out.println("Player points: " + Arrays.toString(playerPoints));
                         println(playerPoints[0] + "'s Challenge Points: " + playerPoints[1], g);
                     }
                     

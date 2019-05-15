@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -264,10 +265,7 @@ public class Client {
                         String playResponse = playSocketIn.readLine();
                         System.out.println("Play response: " + playResponse);
                         
-                        // TODO: What should we do with the response for changes in play?
-                        //canvas.setCurrentPuzzle(playResponse.substring(1));
-                        //canvas.repaint();
-                        // TODO: Transition to SHOW_SCORE state if the match is done
+                        processResponseForPlay(playResponse);
                     }
                 } catch (IOException ioe) {
                     System.out.println("Something went wrong in listening for changes in the puzzle");
@@ -277,6 +275,27 @@ public class Client {
         
         listenerThreads.add(playThread);
         playThread.start();
+    }
+    
+    /**
+     * Processes the response for PLAY state by changing canvas state to SHOW_SCORE if the game is done and
+     *  setting the current puzzle for the canvas
+     * @param response the response in PLAY state
+     */
+    private synchronized void processResponseForPlay(String response) {
+        String[] responseParts = response.split(CrosswordCanvas.RESPONSE_DELIM);
+        
+        if (responseParts[1].equals("DONE")) {
+            setCanvasState(State.SHOW_SCORE);
+        }
+        
+        String currentPuzzle = "";
+        for (int i = 1; i < responseParts.length; i++) {
+            currentPuzzle += responseParts[i] + CrosswordCanvas.RESPONSE_DELIM;
+        }
+        
+        canvas.setCurrentPuzzle(currentPuzzle.substring(0, currentPuzzle.length() - 1));
+        canvas.repaint();
     }
     
     /**
@@ -295,24 +314,11 @@ public class Client {
         String request = playerID + " " + command;
         String response = getResponse(request, socketIn, socketOut);
         
-        String[] commandParts = command.split(" ");
         if (response.charAt(0) == 'I') {
             return;
         }
         
-        String[] responseParts = response.split(CrosswordCanvas.RESPONSE_DELIM);
-        
-        if (responseParts[1].equals("DONE")) {
-            setCanvasState(State.SHOW_SCORE);
-        }
-        
-        String currentPuzzle = "";
-        for (int i = 1; i < responseParts.length; i++) {
-            currentPuzzle += responseParts[i] + CrosswordCanvas.RESPONSE_DELIM;
-        }
-        
-        canvas.setCurrentPuzzle(currentPuzzle.substring(0, currentPuzzle.length() - 1));
-        canvas.repaint();
+        processResponseForPlay(response);
     }
     
     /**
@@ -441,7 +447,6 @@ public class Client {
                         exitPlayFromServer(socketIn, socketOut);
                         setCanvasState(State.SHOW_SCORE);
                     } else {
-                        //transitionToPlayState(socketIn, socketOut);
                         playPuzzle(text, socketIn, socketOut);
                     }
                     break;
