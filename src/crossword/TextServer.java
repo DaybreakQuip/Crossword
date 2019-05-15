@@ -11,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
 
+import crossword.Game.PlayListener;
 import crossword.Game.WaitListener;
 import crossword.Game.WatchListener;
 
@@ -171,6 +172,14 @@ public class TextServer {
             
             return LISTENER;
         }
+        else if (command.equals("WAIT_PLAY")) { // blocks and returns only when a play has been made in a match
+            // TODO: Add a player listener
+            game.addPlayListener(playerID, new PlayListener() {
+                public void onChange() {
+                    out.println("V" + game.getMatchPuzzleForResponse(playerID));
+                }
+            });
+        }
         else if (command.equals("LOGIN")) { // Logs in a player and returns the names of all puzzle templates
             if (game.login(playerID)) {
                 // Build the string in 3 parts: add puzzle names -> add response delim -> add available matches
@@ -181,7 +190,7 @@ public class TextServer {
                 builder.append(game.getAvailableMatchesForResponse());
                 return builder.toString();
             } else {
-                return "I" + "Player failed to log in";
+                return "I" + "Player id is already taken";
             }
         }
         else if (command.equals("PLAY")) {
@@ -189,7 +198,7 @@ public class TextServer {
             if (join) {
                 return "V" + game.getPuzzleFromMatchID(tokens[2]);
             }
-            return "I" + "Player was unable to join the match";
+            return "I" + "Failed to join the match";
         }
         else if (command.equals("NEW")) {
             if (tokens.length < 4) {
@@ -206,21 +215,21 @@ public class TextServer {
             // Remove the extra space at the beginning
             description = description.substring(1);
             
-            if (description.matches("\"[^\\n\\t\\\\\\r]*\"")) {
+            if (description.matches("\"[^\\n\\t\\\\\\r]+\"")) {
                 description = description.substring(1, description.length()-1);
             } else {
-                return "I" + "Invalid format for description: " + description;
+                return "I" + "Description should not contain newlines, tabs or \\ and have length > 0" + description;
             }
             // Check whether MATCH_ID is alphanumeric
-            if (!matchID.matches("[0-9a-zA-Z]*")) {
-                return "I" + "Invalid format for matchID (should be alphanumeric): " + matchID;
+            if (!matchID.matches("[0-9a-zA-Z]+")) {
+                return "I" + "MatchID should be alphanumeric and have length > 0: " + matchID;
             }
             
             boolean create = game.createMatch(playerID, matchID, puzzleID, description);
             if (create) {
                 return "V";
             }
-            return "I" + "Match was unable to be created";
+            return "I" + "Failed to create a match";
         }
         else if (command.equals("LOGOUT")) {
             if (game.logout(playerID)) {
