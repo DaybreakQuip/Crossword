@@ -311,7 +311,6 @@ public class Client {
             currentPuzzle += responseParts[i] + CrosswordCanvas.RESPONSE_DELIM;
         }
         
-        System.out.println("Current puzzle: " + currentPuzzle.substring(0, currentPuzzle.length() - 1));
         canvas.setCurrentPuzzle(currentPuzzle.substring(0, currentPuzzle.length() - 1));
         canvas.repaint();
     }
