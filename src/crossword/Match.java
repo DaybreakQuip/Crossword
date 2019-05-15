@@ -1,5 +1,7 @@
 package crossword;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -119,7 +121,7 @@ public class Match {
      * @return the Player with the corresponding player id in the match
      */
     private synchronized Player getPlayer(String id) {
-        throw new RuntimeException("Not Implemented!");
+        return (id.equals(playerOne.getId())) ? playerOne : playerTwo;
     }
     
     /**
@@ -128,11 +130,60 @@ public class Match {
      *   1) the id corresponds to either an empty word or
      *   2) an un-confirmed word entered by the same user and false otherwise
      * @param playerId the id of the player making a guess
-     * @param guess the guess of the player
+     * @param wordID wordID
+     * @param word guessed word
      * @return true if the guess is valid and false otherwise
      */
-    public synchronized boolean tryWord(String playerId, Guess guess) {
-        throw new RuntimeException("Not Implemented!");
+    public synchronized boolean tryWord(String playerId, int wordID, String word) {
+        Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = puzzle.getPlayerEntries();
+        Map<Integer, PuzzleEntry> confirmedEntries = puzzle.getConfirmedEntries();
+        Player player = getPlayer(playerId);
+        PuzzleEntry correctEntry = puzzle.getCorrectEntries().get(wordID);
+        PuzzleEntry guess = new PuzzleEntry(word, correctEntry.getClue(), correctEntry.getOrientation(), correctEntry.getPosition());
+        if (playerEntries.containsKey(wordID) && !playerEntries.get(wordID).getKey().getId().equals(player.getId())) { //if guessed, make sure it's same player
+            return false;
+        } else if (confirmedEntries.containsKey(wordID)) { //makes sure the word entry is not confirmed
+            return false;
+        } else if (word.length() != correctEntry.getWord().length()) { //make sure length of guess matches
+            return false;
+        } else if (!isConsistent(wordID, guess)) {
+            return false;
+        }
+        
+        puzzle.addPlayerEntry(wordID, player, guess);
+        return true;
+     }
+      
+    //TODO: check isConsistent is correct
+    private synchronized boolean isConsistent(int wordID, PuzzleEntry guess) {
+        Map<Integer, PuzzleEntry> entries = puzzle.getFlattenedPlayerEntries();
+        entries.put(wordID, guess);
+        // check whether intersections are constant 
+        Map<Point, Character> pointToLetter = new HashMap<>();
+        for (int i = 0; i < entries.size(); i++) {
+            PuzzleEntry entry = entries.get(i);
+            String word = entry.getWord();
+            Orientation orientation = entry.getOrientation();
+            Point position = entry.getPosition();
+            for (int j = 0; j < word.length(); j++) {
+                Point letterPosition; // Position of the letter in the word
+                if (orientation == Orientation.ACROSS) {
+                    // getCol() + j represents the column of the letter
+                    letterPosition = new Point(position.getRow(), position.getCol() + j);  
+                } else { 
+                    // getRow() + j represents the row of the letter
+                    letterPosition = new Point(position.getRow() + j, position.getCol());
+                }
+                // If the point is already in the map and the letters do not match, return false
+                //  otherwise add the point and letter pair to the map
+                if (pointToLetter.containsKey(letterPosition) && pointToLetter.get(letterPosition) != word.charAt(j)) {
+                    return false;
+                } else {
+                    pointToLetter.put(letterPosition, word.charAt(j));
+                }
+            }
+        }
+        return true;
     }
     
     /**
@@ -161,8 +212,24 @@ public class Match {
      * @param guess the guess of the player
      * @return true if the challenge is valid and false otherwise
      */
-    public synchronized boolean challengeWord(String playerId, Guess guess) {
-        throw new RuntimeException("Not Implemented!");
+    public synchronized boolean challengeWord(String playerId, int wordID, String word) {
+        Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = puzzle.getPlayerEntries();
+        Map<Integer, PuzzleEntry> confirmedEntries = puzzle.getConfirmedEntries();    
+        Map<Integer, PuzzleEntry> correctEntries = puzzle.getCorrectEntries();
+        PuzzleEntry correctEntry = puzzle.getCorrectEntries().get(wordID);
+        PuzzleEntry guess = new PuzzleEntry(word, correctEntry.getClue(), correctEntry.getOrientation(), correctEntry.getPosition());
+        Player player = getPlayer(playerId);
+        if (playerEntries.containsKey(wordID) && playerEntries.get(wordID).getKey().getId().equals(player.getId())) { //can't challenge self
+            return false;
+        } else if (confirmedEntries.containsKey(wordID)) { //makes sure the word entry is not confirmed
+            return false;
+        } else if (word.length() != correctEntry.getWord().length()) { //make sure length of guess matches
+            return false;
+        } else if (!isConsistent(wordID, guess)) {
+            return false;
+        } else if (playerEntries.get(wordID).getValue().getWord().equals(word)) { //can't challenge the same word
+            return false;
+        }
     }
 
     /**
@@ -176,11 +243,23 @@ public class Match {
     /**
      * Returns a string of the playable puzzle with a specific format where every entry 
      *  is separated by a delimiter and words are populated based on the playable puzzle's 
-     *  confirmed and guessed entries
-     * @return a representation of the puzzle with entries separated by delimeters of the same kind
+     *  blank puzzle
+     * @return a representation of the puzzle with entries separated by delimiters of the same kind
      */
     public synchronized String getPuzzleForResponse() {
         return puzzle.getPuzzleForResponse();
+    }
+    
+    /**
+     * Returns a string of the player entries with a specific format where every entry 
+     *  is separated by a delimiter and words are populated based on the playable puzzle's 
+     *  confirmed and guessed entries
+     * @return a representation of the puzzle with entries separated by delimiters of the same kind
+     */
+    public synchronized String getGuessesForResponse() {
+        return playerOne.getId() + Game.WORD_DELIM + playerOne.getScore() + Game.ENTRY_DELIM + 
+                playerTwo.getId() + Game.WORD_DELIM + playerTwo.getScore() +
+                Game.RESPONSE_DELIM + puzzle.getGuessesForResponse();
     }
     
     /**
