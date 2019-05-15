@@ -76,8 +76,7 @@ class CrosswordCanvas extends JComponent {
     private String previousResponse = "No previous response";
     private String puzzleList = "";
     private String matchList = "";
-    // TODO change currentPuzzle to ""
-    private String currentPuzzle = "ze`0~jy`0;ze`F`0`star`ACROSS`1`0~jy`F`3`extra`DOWN`1`5~jy`T`7`loss`DOWN`3`6";
+    private String currentPuzzle = "";
     
     /**
      * @param puzzle string representation of the crossword puzzle
@@ -134,6 +133,13 @@ class CrosswordCanvas extends JComponent {
      */
     public synchronized void setPreviousResponse(String previousResponse) {
         this.previousResponse = previousResponse;
+    }
+    
+    /**
+     * @return current puzzles with guesses
+     */
+    public synchronized String getCurrentPuzzle() {
+        return currentPuzzle;
     }
     
     /**
@@ -325,7 +331,6 @@ class CrosswordCanvas extends JComponent {
                 
                 for (int i = 0; i < length; i++) {
                     drawCell(row, col + i, g, "");
-                    //letterInCell(acrossAns.get(across).substring(i, i+1).toUpperCase(), row, col + i, g);
                 }
                 across++;
             } else { // draw cells for down and record hint
@@ -334,15 +339,12 @@ class CrosswordCanvas extends JComponent {
                 
                 for (int i = 0; i < length; i++) {
                     drawCell(row + i, col, g, "");
-                    //letterInCell(downAns.get(down).substring(i, i+1).toUpperCase(), row + i, col, g);
                 }
                 down++;
             }
         }
         
         // print hints for across and down words
-        resetLine();
-
         // TODO: Remove this when we remove previousResponse
         println("", g);
         
@@ -428,7 +430,6 @@ class CrosswordCanvas extends JComponent {
                 printPuzzle(g);
                 println("", g);
 
-                // "ze`0~jy`0;ze`F`star`ACROSS`1`0~jy`F`extra`DOWN`1`5~jy`T`loss`DOWN`3`6";
                 if (currentPuzzle.length() > 0) {
                     String[] currentPuzzleState = currentPuzzle.split(RESPONSE_DELIM);
                     for (String currentPlayerState : currentPuzzleState[0].split(ENTRY_DELIM)) {
@@ -439,8 +440,6 @@ class CrosswordCanvas extends JComponent {
                     List<String> myWords = new ArrayList<>();
                     List<String> otherWords = new ArrayList<>();
                     
-                    // ze`F`star`ACROSS`1`0
-                    // ze`F`0`star`ACROSS`1`0
                     if (currentPuzzleState.length > 1) {
                         for (String wordEntry : currentPuzzleState[1].split(ENTRY_DELIM)) {
                             String[] wordEntered = wordEntry.split(WORD_DELIM);
