@@ -402,13 +402,12 @@ class CrosswordCanvas extends JComponent {
                         String[] matchEntry = match.split(WORD_DELIM);
                         println("    " + matchEntry[0] + ": " + matchEntry[1], g);
                     }
-                    
-                    println("", g);
-                    println("Available puzzles:", g);
-                    String[] entries = puzzleList.split(ENTRY_DELIM);
-                    for (String entry : entries) {
-                        println("    " + entry, g);
-                    }
+                }
+                println("", g);
+                println("Available puzzles:", g);
+                String[] entries = puzzleList.split(ENTRY_DELIM);
+                for (String entry : entries) {
+                    println("    " + entry, g);
                 }
                 break;
             }
