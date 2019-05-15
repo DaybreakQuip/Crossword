@@ -151,54 +151,14 @@ public class Match {
         } else if (getInconsistentWords(wordID, guess).size() != 0) {
             return false;
         }
-        
         puzzle.addPlayerEntry(wordID, player, guess);
+        if (checkGameEnd()) {
+            state = MatchState.DONE;
+        }
         return true;
      }
     
-    private synchronized List<Integer> getInconsistentWords(int wordID, PuzzleEntry guess){
-        Map<Integer, PuzzleEntry> entries = puzzle.getFlattenedPlayerEntries();
-        Map<Point, Character> pointToLetter = new HashMap<>();
-        String word = guess.getWord();
-        Orientation orientation = guess.getOrientation();
-        Point position = guess.getPosition();
-        //add in the correct challenge
-        for (int j = 0; j < word.length(); j++) {
-            Point letterPosition; // Position of the letter in the word
-            if (orientation == Orientation.ACROSS) {
-                // getCol() + j represents the column of the letter
-                letterPosition = new Point(position.getRow(), position.getCol() + j);  
-            } else { 
-                // getRow() + j represents the row of the letter
-                letterPosition = new Point(position.getRow() + j, position.getCol());
-            }
-            pointToLetter.put(letterPosition, word.charAt(j));
-        }
-        List<Integer> wordIDs = new ArrayList<>();
-        //check for inconsistent words
-        for (Integer i : entries.keySet()) {
-            PuzzleEntry entry = entries.get(i);
-            word = entry.getWord();
-            orientation = entry.getOrientation();
-            position = entry.getPosition();
-            for (int j = 0; j < word.length(); j++) {
-                Point letterPosition; // Position of the letter in the word
-                if (orientation == Orientation.ACROSS) {
-                    // getCol() + j represents the column of the letter
-                    letterPosition = new Point(position.getRow(), position.getCol() + j);  
-                } else { 
-                    // getRow() + j represents the row of the letter
-                    letterPosition = new Point(position.getRow() + j, position.getCol());
-                }
-                // If the point is already in the map and the letters do not match, return false
-                //  otherwise add the point and letter pair to the map
-                if (pointToLetter.containsKey(letterPosition) && pointToLetter.get(letterPosition) != word.charAt(j)) {
-                    wordIDs.add(i);
-                }
-            }
-        }
-        return wordIDs;
-    }
+
     /**
      * Tries to challenge a guess for the match puzzle for the given player id
      * The rules for a challenge guess are as follows:
@@ -257,7 +217,83 @@ public class Match {
                 puzzle.deletePlayerEntry(id);
             }
         }
+        if (checkGameEnd()) {
+            state = MatchState.DONE;
+        }
         return true;
+    }
+    
+    private synchronized List<Integer> getInconsistentWords(int wordID, PuzzleEntry guess){
+        Map<Integer, PuzzleEntry> entries = puzzle.getFlattenedPlayerEntries();
+        Map<Point, Character> pointToLetter = new HashMap<>();
+        String word = guess.getWord();
+        Orientation orientation = guess.getOrientation();
+        Point position = guess.getPosition();
+        //add in the correct challenge
+        for (int j = 0; j < word.length(); j++) {
+            Point letterPosition; // Position of the letter in the word
+            if (orientation == Orientation.ACROSS) {
+                // getCol() + j represents the column of the letter
+                letterPosition = new Point(position.getRow(), position.getCol() + j);  
+            } else { 
+                // getRow() + j represents the row of the letter
+                letterPosition = new Point(position.getRow() + j, position.getCol());
+            }
+            pointToLetter.put(letterPosition, word.charAt(j));
+        }
+        List<Integer> wordIDs = new ArrayList<>();
+        //check for inconsistent words
+        for (Integer i : entries.keySet()) {
+            PuzzleEntry entry = entries.get(i);
+            word = entry.getWord();
+            orientation = entry.getOrientation();
+            position = entry.getPosition();
+            for (int j = 0; j < word.length(); j++) {
+                Point letterPosition; // Position of the letter in the word
+                if (orientation == Orientation.ACROSS) {
+                    // getCol() + j represents the column of the letter
+                    letterPosition = new Point(position.getRow(), position.getCol() + j);  
+                } else { 
+                    // getRow() + j represents the row of the letter
+                    letterPosition = new Point(position.getRow() + j, position.getCol());
+                }
+                // If the point is already in the map and the letters do not match, return false
+                //  otherwise add the point and letter pair to the map
+                if (pointToLetter.containsKey(letterPosition) && pointToLetter.get(letterPosition) != word.charAt(j)) {
+                    wordIDs.add(i);
+                }
+            }
+        }
+        return wordIDs;
+    }
+    
+    private synchronized Map<Point, Character> generateAllPoints(Map<Integer, PuzzleEntry> entries){
+        Map<Point, Character> pointToLetter = new HashMap<>();
+        for (Integer i : entries.keySet()) {
+            PuzzleEntry entry = entries.get(i);
+            String word = entry.getWord();
+            Orientation orientation = entry.getOrientation();
+            Point position = entry.getPosition();
+            for (int j = 0; j < word.length(); j++) {
+                Point letterPosition; // Position of the letter in the word
+                if (orientation == Orientation.ACROSS) {
+                    // getCol() + j represents the column of the letter
+                    letterPosition = new Point(position.getRow(), position.getCol() + j);  
+                } else { 
+                    // getRow() + j represents the row of the letter
+                    letterPosition = new Point(position.getRow() + j, position.getCol());
+                }
+                pointToLetter.put(letterPosition, word.charAt(j));
+            }
+        }
+        return pointToLetter;
+    }
+    
+    private synchronized boolean checkGameEnd() {
+        Map<Integer, PuzzleEntry> entries = puzzle.getFlattenedPlayerEntries();
+        Map<Point, Character> pointToLetterPlayer = generateAllPoints(entries);
+        Map<Point, Character> pointToLetterCorrect = generateAllPoints(puzzle.getCorrectEntries());
+        return pointToLetterPlayer.equals(pointToLetterCorrect);
     }
 
     /**
