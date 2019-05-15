@@ -13,20 +13,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
-
-import crossword.Game.WatchListener;
 /**
  * Text-protocol game client.
  */
@@ -34,12 +31,13 @@ public class Client {
     
     private static final int CANVAS_WIDTH = 1200;
     private static final int CANVAS_HEIGHT = 900;
-    private static final String RESPONSE_DELIM = ";";
+    private static final String EXIT =  "EXIT";
     
     private final String host;
     private final int port;
     private String playerID;
     private CrosswordCanvas canvas;
+    private final List<Thread> listenerThreads; // keeps track of currently running threads
     
     // Abstraction function:
     //  AF(): TODO fill this in
@@ -60,6 +58,7 @@ public class Client {
     public Client(String host, int port) {
         this.host = host;
         this.port = port;
+        listenerThreads = new ArrayList<>();
     }
     
 
@@ -158,19 +157,19 @@ public class Client {
         
         canvas.setPlayerID(id);
         // list of puzzles RESPONSE_DELIM list of matches
-        String[] matchesAndPuzzles = response.substring(1).split(RESPONSE_DELIM);
+        String[] matchesAndPuzzles = response.substring(1).split(CrosswordCanvas.RESPONSE_DELIM);
         canvas.setPuzzleList(matchesAndPuzzles[0]);
         if (matchesAndPuzzles.length == 1) {
             canvas.setMatchList("");
         } else {
             canvas.setMatchList(matchesAndPuzzles[1]);
         }
-        canvas.setState(State.CHOOSE);
+        setCanvasState(State.CHOOSE);
         canvas.repaint();
         playerID = id;
         
         // Create a new thread to watch for changes for available matches
-        new Thread(new Runnable() {
+        Thread watchThread = new Thread(new Runnable() {
             public void run() {
                 try (
                     Socket watchSocket = new Socket(host, port);
@@ -180,9 +179,7 @@ public class Client {
                 ) {
                     while (canvas.getState() == State.CHOOSE) {
                         watchSocketOut.println(playerID + " " + "WATCH");
-                        System.out.println("Waiting for watch response");
                         String watchResponse = watchSocketIn.readLine();
-                        System.out.println("The watch response was: " + watchResponse);
                         canvas.setMatchList(watchResponse.substring(1));
                         canvas.repaint();
                     }
@@ -190,8 +187,10 @@ public class Client {
                     System.out.println("Something went wrong in watching for changes in matches");
                 } 
             }
-         }).start();
-         
+         });
+        
+        listenerThreads.add(watchThread);
+        watchThread.start();
     }
     
     /**
@@ -217,15 +216,15 @@ public class Client {
         }
         
         if (commandParts[0].equals("PLAY")) {
-            canvas.setState(State.PLAY);
+            setCanvasState(State.PLAY);
         } else {
-            canvas.setState(State.WAIT);
+            setCanvasState(State.WAIT);
         }
         canvas.setPuzzle(response.substring(1));
         canvas.repaint();
         
         // Start a new thread that will be waiting for another player to join the match
-        new Thread(new Runnable() {
+        Thread waitThread = new Thread(new Runnable() {
             public void run() {
                 try (
                     Socket waitSocket = new Socket(host, port);
@@ -236,16 +235,82 @@ public class Client {
                     waitSocketOut.println(playerID + " " + "WAIT");
                     // Blocked until another player joins the match
                     String waitResponse = waitSocketIn.readLine();
-                    // TODO: Delete this print later? 
-                    System.out.println("Another player just joined!");
-                    canvas.setState(State.PLAY);
                     canvas.setPuzzle(waitResponse.substring(1));
                     canvas.repaint();
+                    setCanvasState(State.PLAY);
                 } catch (IOException ioe) {
                     System.out.println("Something went wrong in waiting for another player");
                 } 
             }
-         }).start();
+         });
+        
+        listenerThreads.add(waitThread);
+        waitThread.start();
+    }
+    
+    /**
+     * Logs out a player from the server by sending an EXIT request 
+     */
+    private void logoutFromServer(BufferedReader socketIn, PrintWriter socketOut) {
+        String response = getResponse(playerID + " " + "LOGOUT", socketIn, socketOut);
+        if (response.charAt(0) == 'I') {
+            // TODO: Change this to throw exception when EXIT is implemented on server
+            System.out.println("Unable to log out from the server");
+        }
+    }
+    
+    /**
+     * Exits a player from wait state on the server
+     * @param socketIn
+     * @param socketOut
+     */
+    private void exitWaitFromServer(BufferedReader socketIn, PrintWriter socketOut) {
+        String response = getResponse(playerID + " " + "EXIT_WAIT", socketIn, socketOut);
+        if (response.charAt(0) == 'I') {
+            System.out.println("Unable to exit from waiting on the server");
+        }
+    }
+    
+    /**
+     * Exists a player from play state on the server
+     * @param socketIn
+     * @param socketOut
+     */
+    private void exitPlayFromServer(BufferedReader socketIn, PrintWriter socketOut) {
+        String response = getResponse(playerID + " " + "EXIT_PLAY", socketIn, socketOut);
+        if (response.charAt(0) == 'I') {
+            System.out.println("Unable to exit from waiting on the server");
+        }
+    }
+    
+    /**
+     * Resets the state of the client to start
+     */
+    private void resetToStart() {
+        // Reset player information
+        playerID = "";
+        canvas.setPlayerID(playerID);
+        setCanvasState(State.START);
+    }
+    
+    /**
+     * Stops all currently running listener threads and sets a new canvas state
+     * @param state
+     */
+    private void setCanvasState(State state) {
+        stopThreads();
+        canvas.setState(state);
+    }
+    
+    /**
+     * Stops all currently running threads from running and removes the thread from
+     *  listener threads
+     */
+    private synchronized void stopThreads() {
+        for (Thread thread : new ArrayList<>(listenerThreads)) {
+            thread.interrupt();
+            listenerThreads.remove(thread);
+        }
     }
     
     /**
@@ -273,6 +338,10 @@ public class Client {
                 return;
             }
             
+            // TODO: Delete these prints, debugging only
+            System.out.println("Text: " + text);
+            System.out.println("state: " + canvas.getState());
+            
             switch (canvas.getState()) {
             case START:
                 {
@@ -281,15 +350,29 @@ public class Client {
                 }
             case CHOOSE:
                 {
-                    transitionChooseState(text, socketIn, socketOut);
+                    if (text.equals(EXIT)) {
+                        logoutFromServer(socketIn, socketOut);
+                        resetToStart();
+                    } else {
+                        transitionChooseState(text, socketIn, socketOut);
+                    }
                     break;
                 }
             case WAIT:
                 {
+                    if (text.equals(EXIT)) {
+                        exitWaitFromServer(socketIn, socketOut);
+                        setCanvasState(State.CHOOSE);
+                    }
                     break;
                 }
             case PLAY:
                 {
+                    // TODO: Possibly may not work, revisit after implementing PLAY
+                    if (text.equals(EXIT)) {
+                        exitPlayFromServer(socketIn, socketOut);
+                        setCanvasState(State.CHOOSE);
+                    }
                     break;
                 }
             case SHOW_SCORE:

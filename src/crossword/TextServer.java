@@ -94,6 +94,16 @@ public class TextServer {
     }
     
     /**
+     * Prints game stats for debugging including info such as:
+     *  - Number of watch listeners (for CHOOSE state)
+     *  - Number of wait listeners (for WAIT state)
+     *  - Number of play listeners (for PLAY state)
+     */
+    private void printGameStats() {
+        game.printListenerStats();
+    }
+    
+    /**
      * Handle a single client connection.
      * Returns when the client disconnects.
      * 
@@ -113,7 +123,9 @@ public class TextServer {
                     continue;
                 }
                 out.println(output);
-
+                
+                // TODO: Debugging only: remove this
+                // printGameStats();
             }
         } finally {
             out.close();
@@ -184,11 +196,16 @@ public class TextServer {
             String matchID = tokens[2];
             String puzzleID = tokens[3];
             String description = tokens[4];
-            if (description.matches("\"[0-9a-zA-Z ]*\"")) {
+            if (description.matches("\"[^\"\\r\\n\\\\]*\"")) {
                 description = description.substring(1, description.length()-1);
             } else {
-                return "I";
+                return "I" + "Invalid format for description: " + description;
             }
+            // Check whether MATCH_ID is alphanumeric
+            if (!matchID.matches("[0-9a-zA-Z]*")) {
+                return "I" + "Invalid format for matchID (should be alphanumeric): " + matchID;
+            }
+            
             boolean create = game.createMatch(playerID, matchID, puzzleID, description);
             if (create) {
                 return "V";
@@ -196,6 +213,12 @@ public class TextServer {
             return "I" + "Match was unable to be created";
         }
         else if (command.equals("LOGOUT")) {
+            throw new RuntimeException("Not Implemented");
+        }
+        else if (command.equals("EXIT_WAIT")) {
+            throw new RuntimeException("Not Implemented");
+        }
+        else if (command.equals("EXIT_PLAY")) {
             throw new RuntimeException("Not Implemented");
         }
         else if (command.equals("TRY")) {

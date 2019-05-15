@@ -50,7 +50,12 @@ class CrosswordCanvas extends JComponent {
      * Font for small indices used to indicate an ID in the crossword.
      */
     private final Font textFont = new Font("Arial", Font.PLAIN, 16);
-
+    
+    // Delimiters for string responses
+    public static final String ENTRY_DELIM = "~";
+    public static final String WORD_DELIM = "`";
+    public static final String RESPONSE_DELIM = ";";
+    
     // Abstraction function:
     //  AF(originX, originY, delta, mainFont, indexFont, textFont, puzzle, state, puzzleList, matchList) = 
     //              canvas representing the crossword puzzle starting at originX, originY 
@@ -67,9 +72,6 @@ class CrosswordCanvas extends JComponent {
     
     private String playerID = "";
     private String puzzle;
-    private static final String ENTRY_DELIM = "~";
-    private static final String WORD_DELIM = "`";
-    private static final String RESPONSE_DELIM = ";";
     private State state;
     private String previousResponse = "No previous response";
     private String puzzleList = "";
@@ -158,7 +160,7 @@ class CrosswordCanvas extends JComponent {
         } else if (id.equals(playerID)) {
             g.setColor(Color.RED);
         } else {
-            g.setColor(Color.BLUE);
+            g.setColor(Color.GREEN);
         }
         g.fillRect(originX + col * delta,
                 originY + row * delta, delta, delta);

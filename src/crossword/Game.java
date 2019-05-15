@@ -24,7 +24,7 @@ public class Game {
     private final Map<String, Puzzle> puzzles; // map of puzzleID : Puzzle
     private final Map<String, String> playerToMatch; // map of playerID : match_id
     private final Map<String, Match> matches; //  map of match_id : match
-    private Set<WatchListener> listeners;
+    private Set<WatchListener> watchListeners;
     private final Map<String, WaitListener> waitListeners;
     
     /**
@@ -84,7 +84,7 @@ public class Game {
         this.matches = new HashMap<String, Match>();
         this.playerToMatch = new HashMap<String, String>();
         this.players = new HashSet<String>();
-        this.listeners = new HashSet<>();
+        this.watchListeners = new HashSet<>();
         this.waitListeners = new HashMap<>();
     }
     
@@ -259,23 +259,21 @@ public class Game {
         /** 
          * Called when the available matches in the game changes.
          * A change is defined as when a new match becomes available or an available match becomes full
-         * @return String of the available matches since last change
          */
         public void onChange();
     }
     /**
      * Adds a listener for changes to available matches in the game
-     * TODO: Remove?
      * @param listener Adds a new listener
      */
     public synchronized void addWatchListener(WatchListener listener) {
-        listeners.add(listener);
+        watchListeners.add(listener);
     }
     
     private synchronized void callWatchListeners() throws IOException{
-        for (WatchListener listener : new ArrayList<>(listeners)) {
+        for (WatchListener listener : new ArrayList<>(watchListeners)) {
             listener.onChange();
-            listeners.remove(listener);
+            watchListeners.remove(listener);
         }
     }
     
@@ -284,13 +282,11 @@ public class Game {
         /** 
          * Called when the available matches in the game changes.
          * A change is defined as when a new match becomes available or an available match becomes full
-         * @return String of the available matches since last change
          */
         public void onChange();
     }
     /**
      * Adds a listener for a player to wait for another player to join their match
-     * TODO: Remove?
      * @param playerID id of the player
      * @param listener Adds a new listener
      */
@@ -324,6 +320,15 @@ public class Game {
         }
         builder.deleteCharAt(builder.length()-1);
         return builder.toString();
+    }
+    
+    /**
+     * Prints number of each listener currently in-game
+     */
+    public synchronized void printListenerStats() {
+        System.out.println("Game listener stats:");
+        System.out.println("\tWatch listeners: " + this.watchListeners.size());
+        System.out.println("\tWait listeners: " + this.waitListeners.size());
     }
     
     /**
