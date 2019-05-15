@@ -33,6 +33,7 @@ public class Client {
     private static final int CANVAS_WIDTH = 1200;
     private static final int CANVAS_HEIGHT = 900;
     private static final String EXIT =  "EXIT";
+    private static final String NEW_MATCH = "NEW MATCH";
     
     private final String host;
     private final int port;
@@ -453,6 +454,15 @@ public class Client {
                 }
             case SHOW_SCORE:
                 {
+                    if (text.equals(NEW_MATCH)) {
+                        String oldPlayerID = playerID; // in case logging out resets playerID
+                        logoutFromServer(socketIn, socketOut);
+                        transitionStartState(oldPlayerID, socketIn, socketOut);
+                        setCanvasState(State.CHOOSE);
+                    } else if (text.equals(EXIT)) {
+                        logoutFromServer(socketIn, socketOut);
+                        setCanvasState(State.START);
+                    }
                     break;
                 }
             default:

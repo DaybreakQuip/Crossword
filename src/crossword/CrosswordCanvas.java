@@ -481,6 +481,14 @@ class CrosswordCanvas extends JComponent {
                 println("Here are the commands that you can enter in the box:", g);
                 println("    To return to match selection: NEW MATCH", g);
                 println("    To log out: EXIT", g);
+                
+                println("", g);
+                // print scores
+                String[] currentPuzzleState = currentPuzzle.split(RESPONSE_DELIM);
+                for (String currentPlayerState : currentPuzzleState[0].split(ENTRY_DELIM)) {
+                    String[] playerPoints = currentPlayerState.split(WORD_DELIM);
+                    println(playerPoints[0] + "'s Challenge Points: " + playerPoints[1], g);
+                }
                 break;
             }
         default:

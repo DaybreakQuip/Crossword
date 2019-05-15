@@ -151,10 +151,78 @@ public class Match {
         } else if (getInconsistentWords(wordID, guess).size() != 0) {
             return false;
         }
-        
         puzzle.addPlayerEntry(wordID, player, guess);
+        if (checkGameEnd()) {
+            state = MatchState.DONE;
+        }
         return true;
      }
+    
+
+    /**
+     * Tries to challenge a guess for the match puzzle for the given player id
+     * The rules for a challenge guess are as follows:
+     *      A challenge is valid if:
+     *          a) the challenged word was entered by the other player (can’t challenge your own words)
+     *          b) challenged word was not already confirmed
+     *          c) your proposed word is different from the word already there
+     *          d) your proposed word must be of the correct length
+     *      If a challenge is valid:
+     *          1) if the original word is correct,  then it gets confirmed as correct and can no longer 
+     *              be challenged or changed. The challenger loses one point for an incorrect challenge.
+     *          2) if the original word is incorrect: 
+     *              2A) if the challenger is correct, then the challenger 
+     *                  gets the word and it gets confirmed. The challenger also gets two bonus points for a 
+     *                  correct challenge. An important property of a correct challenge is that a challenge does 
+     *                  not have to be consistent with any incorrect words already in the puzzle. Any word that 
+     *                  is inconsistent with the correct challenge will be cleared without penalty regardless of 
+     *                  who had entered it.
+     *              2B) if the challenger is incorrect, then  the word is cleared from the board, and the challenger 
+     *                  loses one point for an incorrect challenge.
+     *      Else if the challenge is invalid: 
+     *          The challenge is invalid
+     * @param playerId the id of the player making a guess
+     * @param guess the guess of the player
+     * @return true if the challenge is valid and false otherwise
+     */
+    public synchronized boolean challengeWord(String playerId, int wordID, String word) {
+        Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = puzzle.getPlayerEntries();
+        Map<Integer, PuzzleEntry> confirmedEntries = puzzle.getConfirmedEntries();    
+        PuzzleEntry correctEntry = puzzle.getCorrectEntries().get(wordID);
+        PuzzleEntry originalEntry = playerEntries.get(wordID).getValue();
+        Player player = getPlayer(playerId);
+        Player opponent = (player.getId().equals(playerOne.getId())) ? playerTwo : playerOne;
+        if (playerEntries.containsKey(wordID) && playerEntries.get(wordID).getKey().getId().equals(player.getId())) { //can't challenge self
+            return false;
+        } else if (confirmedEntries.containsKey(wordID)) { //makes sure the word entry is not confirmed
+            return false;
+        } else if (word.length() != correctEntry.getWord().length()) { //make sure length of guess matches
+            return false;
+        } else if (originalEntry.getWord().equals(word)) { //can't challenge the same word
+            return false;
+        }
+        
+        if (correctEntry.getWord().equals(originalEntry.getWord())) { //original word was correct
+            puzzle.addPlayerEntry(wordID, opponent, correctEntry);
+            puzzle.addConfirmedEntry(wordID, correctEntry);
+            player.changeScore(-1);
+        } else if (!correctEntry.getWord().equals(word)) { //challenger and original word is incorrect
+            puzzle.deletePlayerEntry(wordID);
+            player.changeScore(-1);
+        } else {
+            puzzle.deletePlayerEntry(wordID);
+            puzzle.addPlayerEntry(wordID, player, correctEntry);
+            puzzle.addConfirmedEntry(wordID, correctEntry);
+            player.changeScore(2);
+            for (Integer id: getInconsistentWords(wordID, correctEntry)) {
+                puzzle.deletePlayerEntry(id);
+            }
+        }
+        if (checkGameEnd()) {
+            state = MatchState.DONE;
+        }
+        return true;
+    }
     
     private synchronized List<Integer> getInconsistentWords(int wordID, PuzzleEntry guess){
         Map<Integer, PuzzleEntry> entries = puzzle.getFlattenedPlayerEntries();
@@ -199,65 +267,34 @@ public class Match {
         }
         return wordIDs;
     }
-    /**
-     * Tries to challenge a guess for the match puzzle for the given player id
-     * The rules for a challenge guess are as follows:
-     *      A challenge is valid if:
-     *          a) the challenged word was entered by the other player (can’t challenge your own words)
-     *          b) challenged word was not already confirmed
-     *          c) your proposed word is different from the word already there
-     *          d) your proposed word must be of the correct length
-     *      If a challenge is valid:
-     *          1) if the original word is correct,  then it gets confirmed as correct and can no longer 
-     *              be challenged or changed. The challenger loses one point for an incorrect challenge.
-     *          2) if the original word is incorrect: 
-     *              2A) if the challenger is correct, then the challenger 
-     *                  gets the word and it gets confirmed. The challenger also gets two bonus points for a 
-     *                  correct challenge. An important property of a correct challenge is that a challenge does 
-     *                  not have to be consistent with any incorrect words already in the puzzle. Any word that 
-     *                  is inconsistent with the correct challenge will be cleared without penalty regardless of 
-     *                  who had entered it.
-     *              2B) if the challenger is incorrect, then  the word is cleared from the board, and the challenger 
-     *                  loses one point for an incorrect challenge.
-     *      Else if the challenge is invalid: 
-     *          The challenge is invalid
-     * @param playerId the id of the player making a guess
-     * @param guess the guess of the player
-     * @return true if the challenge is valid and false otherwise
-     */
-    public synchronized boolean challengeWord(String playerId, int wordID, String word) {
-        Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = puzzle.getPlayerEntries();
-        Map<Integer, PuzzleEntry> confirmedEntries = puzzle.getConfirmedEntries();    
-        PuzzleEntry correctEntry = puzzle.getCorrectEntries().get(wordID);
-        PuzzleEntry originalEntry = playerEntries.get(wordID).getValue();
-        Player player = getPlayer(playerId);
-        if (playerEntries.containsKey(wordID) && playerEntries.get(wordID).getKey().getId().equals(player.getId())) { //can't challenge self
-            return false;
-        } else if (confirmedEntries.containsKey(wordID)) { //makes sure the word entry is not confirmed
-            return false;
-        } else if (word.length() != correctEntry.getWord().length()) { //make sure length of guess matches
-            return false;
-        } else if (originalEntry.getWord().equals(word)) { //can't challenge the same word
-            return false;
-        }
-        
-        if (correctEntry.getWord().equals(originalEntry.getWord())) { //original word was correct
-            puzzle.addPlayerEntry(wordID, player, correctEntry);
-            puzzle.addConfirmedEntry(wordID, correctEntry);
-            player.changeScore(-1);
-        } else if (!correctEntry.getWord().equals(word)) { //challenger and original word is incorrect
-            puzzle.deletePlayerEntry(wordID);
-            player.changeScore(-1);
-        } else {
-            puzzle.deletePlayerEntry(wordID);
-            puzzle.addPlayerEntry(wordID, player, correctEntry);
-            puzzle.addConfirmedEntry(wordID, correctEntry);
-            player.changeScore(2);
-            for (Integer id: getInconsistentWords(wordID, correctEntry)) {
-                puzzle.deletePlayerEntry(id);
+    
+    private synchronized Map<Point, Character> generateAllPoints(Map<Integer, PuzzleEntry> entries){
+        Map<Point, Character> pointToLetter = new HashMap<>();
+        for (Integer i : entries.keySet()) {
+            PuzzleEntry entry = entries.get(i);
+            String word = entry.getWord();
+            Orientation orientation = entry.getOrientation();
+            Point position = entry.getPosition();
+            for (int j = 0; j < word.length(); j++) {
+                Point letterPosition; // Position of the letter in the word
+                if (orientation == Orientation.ACROSS) {
+                    // getCol() + j represents the column of the letter
+                    letterPosition = new Point(position.getRow(), position.getCol() + j);  
+                } else { 
+                    // getRow() + j represents the row of the letter
+                    letterPosition = new Point(position.getRow() + j, position.getCol());
+                }
+                pointToLetter.put(letterPosition, word.charAt(j));
             }
         }
-        return true;
+        return pointToLetter;
+    }
+    
+    private synchronized boolean checkGameEnd() {
+        Map<Integer, PuzzleEntry> entries = puzzle.getFlattenedPlayerEntries();
+        Map<Point, Character> pointToLetterPlayer = generateAllPoints(entries);
+        Map<Point, Character> pointToLetterCorrect = generateAllPoints(puzzle.getCorrectEntries());
+        return pointToLetterPlayer.equals(pointToLetterCorrect);
     }
 
     /**
