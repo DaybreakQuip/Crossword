@@ -179,6 +179,8 @@ public class TextServer {
                     out.println("V" + game.getMatchPuzzleForResponse(playerID));
                 }
             });
+            
+            return LISTENER;
         }
         else if (command.equals("LOGIN")) { // Logs in a player and returns the names of all puzzle templates
             if (game.login(playerID)) {

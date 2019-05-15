@@ -216,7 +216,7 @@ public class Client {
         }
         
         if (commandParts[0].equals("PLAY")) {
-            setCanvasState(State.PLAY);
+            transitionToPlayState(socketIn, socketOut);
         } else {
             setCanvasState(State.WAIT);
         }
@@ -237,7 +237,8 @@ public class Client {
                     String waitResponse = waitSocketIn.readLine();
                     canvas.setPuzzle(waitResponse.substring(1));
                     canvas.repaint();
-                    setCanvasState(State.PLAY);
+                    // It's time to play!
+                    transitionToPlayState(socketIn, socketOut);
                 } catch (IOException ioe) {
                     System.out.println("Something went wrong in waiting for another player");
                 } 
@@ -246,6 +247,36 @@ public class Client {
         
         listenerThreads.add(waitThread);
         waitThread.start();
+    }
+    
+    private synchronized void transitionToPlayState(BufferedReader socketIn, PrintWriter socketOut) {
+        setCanvasState(State.PLAY);
+        
+        // Create a new thread to listen for changes in the puzzle being played
+        Thread playThread = new Thread(new Runnable() {
+            public void run() {
+                try (
+                    Socket playSocket = new Socket(host, port);
+                    BufferedReader playSocketIn = new BufferedReader(new InputStreamReader(playSocket.getInputStream(), UTF_8));
+                    PrintWriter playSocketOut = new PrintWriter(new OutputStreamWriter(playSocket.getOutputStream(), UTF_8), true);
+                    BufferedReader playSystemIn = new BufferedReader(new InputStreamReader(System.in));
+                ) {
+                    while (canvas.getState() == State.PLAY) {
+                        playSocketOut.println(playerID + " " + "WAIT_PLAY");
+                        String playResponse = playSocketIn.readLine();
+                        System.out.println("Play response: " + playResponse);
+                        
+                        // TODO: What should we do with the response for changes in play?
+                        // TODO: Transition to SHOW_SCORE state if the match is done
+                    }
+                } catch (IOException ioe) {
+                    System.out.println("Something went wrong in listening for changes in the puzzle");
+                } 
+            }
+         });
+        
+        listenerThreads.add(playThread);
+        playThread.start();
     }
     
     /**
@@ -298,7 +329,8 @@ public class Client {
      * @param state
      */
     private void setCanvasState(State state) {
-        stopThreads();
+        // TODO: Try stopping the threads if something goes wrong :) 
+        // stopThreads();
         canvas.setState(state);
     }
     
