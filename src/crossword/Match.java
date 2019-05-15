@@ -228,12 +228,9 @@ public class Match {
     public synchronized boolean challengeWord(String playerId, int wordID, String word) {
         Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = puzzle.getPlayerEntries();
         Map<Integer, PuzzleEntry> confirmedEntries = puzzle.getConfirmedEntries();    
-        Map<Integer, PuzzleEntry> correctEntries = puzzle.getCorrectEntries();
         PuzzleEntry correctEntry = puzzle.getCorrectEntries().get(wordID);
         PuzzleEntry originalEntry = playerEntries.get(wordID).getValue();
-        PuzzleEntry guess = new PuzzleEntry(word, correctEntry.getClue(), correctEntry.getOrientation(), correctEntry.getPosition());
         Player player = getPlayer(playerId);
-        Player opponent = (player.equals(playerOne)) ? playerTwo : playerOne;
         if (playerEntries.containsKey(wordID) && playerEntries.get(wordID).getKey().getId().equals(player.getId())) { //can't challenge self
             return false;
         } else if (confirmedEntries.containsKey(wordID)) { //makes sure the word entry is not confirmed
@@ -292,7 +289,7 @@ public class Match {
      * @return a representation of the puzzle with entries separated by delimiters of the same kind
      */
     public synchronized String getGuessesForResponse() {
-        return playerOne.getId() + Game.WORD_DELIM + playerOne.getScore() + Game.ENTRY_DELIM + 
+        return state + Game.RESPONSE_DELIM +  playerOne.getId() + Game.WORD_DELIM + playerOne.getScore() + Game.ENTRY_DELIM + 
                 playerTwo.getId() + Game.WORD_DELIM + playerTwo.getScore() +
                 Game.RESPONSE_DELIM + puzzle.getGuessesForResponse();
     }
