@@ -191,6 +191,7 @@ public class Match {
         PuzzleEntry correctEntry = puzzle.getCorrectEntries().get(wordID);
         PuzzleEntry originalEntry = playerEntries.get(wordID).getValue();
         Player player = getPlayer(playerId);
+        Player opponent = (player.getId().equals(playerOne.getId())) ? playerTwo : playerOne;
         if (playerEntries.containsKey(wordID) && playerEntries.get(wordID).getKey().getId().equals(player.getId())) { //can't challenge self
             return false;
         } else if (confirmedEntries.containsKey(wordID)) { //makes sure the word entry is not confirmed
@@ -202,7 +203,7 @@ public class Match {
         }
         
         if (correctEntry.getWord().equals(originalEntry.getWord())) { //original word was correct
-            puzzle.addPlayerEntry(wordID, player, correctEntry);
+            puzzle.addPlayerEntry(wordID, opponent, correctEntry);
             puzzle.addConfirmedEntry(wordID, correctEntry);
             player.changeScore(-1);
         } else if (!correctEntry.getWord().equals(word)) { //challenger and original word is incorrect
