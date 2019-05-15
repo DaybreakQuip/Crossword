@@ -137,7 +137,10 @@ public class Client {
     private synchronized String getResponse(String request, BufferedReader socketIn, PrintWriter socketOut) {
         try {
             socketOut.println(request);
-            String response = socketIn.readLine();            
+            String response = socketIn.readLine();     
+            socketOut.println(request);
+            canvas.setPreviousResponse(response);
+            
             checkRep();
             return response;
         } catch (IOException ioe) {
