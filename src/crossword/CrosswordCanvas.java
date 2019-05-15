@@ -211,7 +211,11 @@ class CrosswordCanvas extends JComponent {
         if (id.length() == 0) {
             g.setColor(Color.YELLOW);
         } else if (id.equals(CONFIRMED_WORD)) {
-            g.setColor(Color.ORANGE);
+            if (id.equals(playerID)) {
+                g.setColor(Color.ORANGE);
+            } else {
+                g.setColor(Color.CYAN);
+            }
         } else if (id.equals(playerID)) {
             g.setColor(Color.RED);
         } else {
@@ -526,7 +530,11 @@ class CrosswordCanvas extends JComponent {
                             }
                         }
                         
+                        Color oldColor = g.getColor();
+
+                        g.setColor(Color.ORANGE);
                         println("My confirmed words: " + myWords.toString(), g);
+                        g.setColor(Color.CYAN);
                         println("Other confirmed words: " + otherWords.toString(), g);
                     }
                 }                
