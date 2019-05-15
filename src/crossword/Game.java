@@ -255,6 +255,10 @@ public class Game {
             // The match id cannot be found
             return false;
         }
+        Match match = matches.get(matchID);
+        if (!match.isOngoing()) {
+            return false;
+        }
         return matches.get(matchID).tryWord(playerID, wordID, word);
     }
     
@@ -273,6 +277,10 @@ public class Game {
         String matchID = playerToMatch.get(playerID);
         if (!matches.containsKey(matchID)) {
             // The match id cannot be found
+            return false;
+        }
+        Match match = matches.get(matchID);
+        if (!match.isOngoing()) {
             return false;
         }
         return matches.get(playerToMatch.get(playerID)).challengeWord(playerID, wordID, word);
