@@ -249,10 +249,20 @@ public class TextServer {
             throw new RuntimeException("Not Implemented");
         }
         else if (command.equals("TRY")) {
-            throw new RuntimeException("Not Implemented");
+            int wordID = Integer.parseInt(tokens[2]);
+            String word = tokens[3];
+            if(game.tryWord(playerID, wordID, word)) {
+                return "V" + game.getGuessesForResponse(playerID);
+            }
+            return "I" + "Failed to guess word.";
         }
         else if (command.equals("CHALLENGE")) {
-            throw new RuntimeException("Not Implemented");
+            int wordID = Integer.parseInt(tokens[2]);
+            String word = tokens[3];
+            if(game.challengeWord(playerID, wordID, word)) {
+                return "V" + game.getGuessesForResponse(playerID);
+            }
+            return "I" + "Failed to challenge word.";        
         }
         else if (command.equals("NEW_MATCH")) {
             throw new RuntimeException("Not Implemented");

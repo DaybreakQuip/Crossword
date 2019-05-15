@@ -1,5 +1,6 @@
 package crossword;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,9 +25,10 @@ public class PlayablePuzzle {
     private final String description;
     // TODO: Add player information (i.e. player 1 id and player 2 id or something)
     // New map of puzzle id : player OR player id : (list or set) puzzle id
-    private final Map<Integer, PuzzleEntry> playerEntries = new HashMap<>(); // unconfirmed puzzle id : puzzle entry
+    private final Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = new HashMap<>(); // unconfirmed word id : puzzle entry
     private final Map<Integer, PuzzleEntry> confirmedEntries  = new HashMap<>();
     private final Map<Integer, PuzzleEntry> correctEntries;
+    
     // TODO: DELETE this in the future (it's the template puzzle)
     private final Puzzle puzzle;
     /**
@@ -46,8 +48,9 @@ public class PlayablePuzzle {
      * @param word word to add as a puzzle entry 
      * @return true if word is added, false otherwise
      */
-    public synchronized boolean addPlayerEntry(int wordID, PuzzleEntry word) {
-        throw new RuntimeException("Not Implemented");
+    public synchronized boolean addPlayerEntry(int wordID, Player player, PuzzleEntry word) {
+        playerEntries.put(wordID, new SimpleImmutableEntry<>(player, word));
+        return true;
     }
     /**
      * Deletes the entry of the word from the playerEntries
@@ -55,7 +58,11 @@ public class PlayablePuzzle {
      * @return true if entry is deleted, false otherwise
      */
     public synchronized boolean deletePlayerEntry(int wordID) {
-        throw new RuntimeException("Not Implemented");
+        if (!playerEntries.containsKey(wordID)) {
+            return false;
+        }
+        playerEntries.remove(wordID);
+        return true;
     }
     
     /**
@@ -65,22 +72,25 @@ public class PlayablePuzzle {
      * @return true if word is added, false otherwise
      */
     public synchronized boolean addConfirmedEntry(int wordID, PuzzleEntry word) {
-        throw new RuntimeException("Not Implemented");
+        if (confirmedEntries.containsKey(wordID)) {
+            return false;
+        }
+        confirmedEntries.put(wordID, word);
+        return true;
     }
     /**
      * Deletes the entry of the word from the confirmedEntry
      * @param wordID the id of the word on the crossword puzzle
      * @return true if entry is deleted, false otherwise
 
-     */
     public synchronized boolean deleteConfirmedEntry(int wordID) {
         throw new RuntimeException("Not Implemented");
-    }
+    }*/
     
     /**
      * @return map of playerEntries in the puzzle
      */
-    public synchronized Map<Integer, PuzzleEntry> getPlayerEntries() {
+    public synchronized Map<Integer, SimpleImmutableEntry<Player,PuzzleEntry>> getPlayerEntries() {
         return new HashMap<>(playerEntries);
     }
     
@@ -99,8 +109,19 @@ public class PlayablePuzzle {
     }
     
     /**
+     * Flattens playerEntries to <Integer, PuzzleEntry>
+     * @return flattened player entries
+     */
+    public synchronized Map<Integer, PuzzleEntry> getFlattenedPlayerEntries()  {
+        Map<Integer, PuzzleEntry> flattened = new HashMap<>();
+        for (Map.Entry<Integer, SimpleImmutableEntry<Player,PuzzleEntry>> entry: playerEntries.entrySet()) {
+            flattened.put(entry.getKey(), entry.getValue().getValue());
+        }
+        return flattened;
+    }
+    
+    /**
      * @return puzzle formatted for responses
-     * TODO: Modify this later 
      */
     public synchronized String getPuzzleForResponse() {
         String puzzleString = "";
@@ -108,6 +129,24 @@ public class PlayablePuzzle {
             Integer id = entry.getKey();
             PuzzleEntry puzzleEntry = entry.getValue();
             puzzleString += id + Game.WORD_DELIM + puzzleEntry.getWord().length() + Game.WORD_DELIM + puzzleEntry.getClue() + Game.WORD_DELIM + 
+                    puzzleEntry.getOrientation() + Game.WORD_DELIM + puzzleEntry.getPosition().getRow() 
+                            + Game.WORD_DELIM + puzzleEntry.getPosition().getCol() + Game.ENTRY_DELIM;
+        }
+        return puzzleString.substring(0,puzzleString.length()-1);
+    }
+    
+    /**
+     * 
+     * @return player entries for responses
+     */
+    public synchronized String getGuessesForResponse() {
+        String puzzleString = "";
+        for (Map.Entry<Integer, SimpleImmutableEntry<Player,PuzzleEntry>> entry: playerEntries.entrySet()) {
+            Integer wordID = entry.getKey();
+            String playerID = entry.getValue().getKey().getId();
+            PuzzleEntry puzzleEntry = entry.getValue().getValue();
+            String confirmed = (confirmedEntries.containsKey(wordID)) ? "T" : "F";
+            puzzleString += playerID + Game.WORD_DELIM + confirmed + Game.WORD_DELIM + wordID + Game.WORD_DELIM + puzzleEntry.getWord() + Game.WORD_DELIM + 
                     puzzleEntry.getOrientation() + Game.WORD_DELIM + puzzleEntry.getPosition().getRow() 
                             + Game.WORD_DELIM + puzzleEntry.getPosition().getCol() + Game.ENTRY_DELIM;
         }
