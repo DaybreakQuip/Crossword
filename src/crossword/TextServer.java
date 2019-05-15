@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 
 import crossword.Game.WaitListener;
 import crossword.Game.WatchListener;
@@ -145,7 +146,7 @@ public class TextServer {
         
         // Check whether the playerID is valid
         if (!(playerID.matches("[A-Za-z0-9]*") && playerID.length() > 0)) {
-            throw new RuntimeException("Player ID must be alphanumeric and have a length > 0");
+            return "I" + "Player ID must be alphanumeric and have a length > 0";
         }
         
         if (command.equals("quit")) {
@@ -191,10 +192,21 @@ public class TextServer {
             return "I" + "Player was unable to join the match";
         }
         else if (command.equals("NEW")) {
+            if (tokens.length < 4) {
+                return "I" + "NEW command must contain matchID, puzzleID, and description";
+            }
+            
             String matchID = tokens[2];
             String puzzleID = tokens[3];
-            String description = tokens[4];
-            if (description.matches("\"[^\"\\r\\n\\\\]*\"")) {
+            String description = "";
+            // The rest of the string is the description
+            for (String token : Arrays.copyOfRange(tokens, 4, tokens.length)) {
+                description += " " + token;
+            }
+            // Remove the extra space at the beginning
+            description = description.substring(1);
+            
+            if (description.matches("\"[^\\n\\t\\\\\\r]*\"")) {
                 description = description.substring(1, description.length()-1);
             } else {
                 return "I" + "Invalid format for description: " + description;
@@ -237,7 +249,7 @@ public class TextServer {
 
         // if we reach here, the client message did not follow the protocol
         // Instead of throwing an except, return a response indicating  failure
-        return "I" + "Sorry, that is not a valid input: " + input;
+        return "I" + "Sorry, that is not a valid command: " + input;
         // throw new UnsupportedOperationException(input);
 
     }

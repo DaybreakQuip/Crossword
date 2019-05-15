@@ -29,7 +29,7 @@ class CrosswordCanvas extends JComponent {
     /**
      * Vertical offset from corner for first cell.
      */
-    private final int originY = 60;
+    private final int originY = 90;
     /**
      * Size of each cell in crossword. Use this to rescale your crossword to have
      * larger or smaller cells.
@@ -176,7 +176,18 @@ class CrosswordCanvas extends JComponent {
      * @param g Graphics environment to use.
      */
     private synchronized void drawPlayerID(Graphics g) {
-        g.drawString("Player ID: " + playerID, 0, originY/2);
+        g.drawString("Player ID: " + playerID, 0, 30);
+    }
+    
+    /**
+     * Place error message from entering a command at the top-left corner of the canvas, 
+     *  below the player id
+     * @param g Graphics environment to use
+     */
+    private synchronized void drawErrorMessage(Graphics g) {
+        if (previousResponse.length() > 0 && previousResponse.charAt(0) == 'I') {
+            g.drawString("Error: " + previousResponse.substring(1), 310, 60);
+        } 
     }
 
     /**
@@ -366,6 +377,8 @@ class CrosswordCanvas extends JComponent {
         resetLine();
         println("Previous response: " + previousResponse, g);
         drawPlayerID(g);
+        // Draws the error message (i.e. invalid ID) if there is one
+        drawErrorMessage(g);
         switch (state) {
         case START:
             {
