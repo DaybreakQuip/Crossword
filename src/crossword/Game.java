@@ -129,8 +129,6 @@ public class Game {
         String playerOne = match.getPlayerOne();
         String playerTwo = match.getPlayerTwo();
         if (match.isDone()) {
-            players.remove(playerOne);
-            players.remove(playerTwo);
             playerToMatch.remove(playerOne);
             playerToMatch.remove(playerTwo);
             matches.remove(matchID);
@@ -343,11 +341,6 @@ public class Game {
             System.out.println("Forfeiting");
             callPlayListener(playerOne);
             callPlayListener(playerTwo);
-            players.remove(playerOne);
-            players.remove(playerTwo);
-            playerToMatch.remove(playerOne);
-            playerToMatch.remove(playerTwo);
-            matches.remove(matchID);
             return true;
         }
         return false;
