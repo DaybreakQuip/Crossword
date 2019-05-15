@@ -235,24 +235,6 @@ public class TextServer {
             throw new RuntimeException("Not Implemented");
         }
 
-        /* 
-        else if (command.equals("GET")) {
-        Set<String> puzzleNames = game.getPuzzleNames();
-            StringBuilder allPuzzles = new StringBuilder();
-            allPuzzles.append("Puzzles Available: ");
-            for (String puzzle: puzzleNames) {
-                allPuzzles.append(puzzle + ",");
-            }
-            allPuzzles.deleteCharAt(allPuzzles.length()-1);
-            return allPuzzles.toString();
-        }
-        else if (puzzleNames.contains(command)) {
-            return game.getPuzzleForResponse(command);
-        }
-        else if (!puzzleNames.contains(command)) {
-            return command;
-        }
-        */
         // if we reach here, the client message did not follow the protocol
         // Instead of throwing an except, return a response indicating  failure
         return "I" + "Sorry, that is not a valid input: " + input;
