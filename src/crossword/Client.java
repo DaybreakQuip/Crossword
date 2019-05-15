@@ -14,7 +14,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -58,7 +57,9 @@ public class Client {
     //  This uses the monitor pattern
     
     /**
-     * creates a new client
+     * Creates a new client
+     * @param host host value
+     * @param port port value
      */
     public Client(String host, int port) {
         this.host = host;

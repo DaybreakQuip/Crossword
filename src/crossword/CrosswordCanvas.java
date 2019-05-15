@@ -105,6 +105,9 @@ class CrosswordCanvas extends JComponent {
         this.state = State.START;
     }
     
+    /**
+     * Asserts that the RI is true
+     */
     private void checkRep() {
         assert originX >= 0;
         assert originY >= 0;

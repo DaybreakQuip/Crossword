@@ -470,7 +470,6 @@ public class Game {
      * @throws IOException if calling play listener does not work out
      */
     private synchronized void callPlayListener(String playerID) throws IOException {
-        // TODO: Call then when a try or challenge is made
         if (!playListeners.containsKey(playerID)) {
             throw new RuntimeException("PlayerID must be playing to call their play listener: " + playerID);
         }
