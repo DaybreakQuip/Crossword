@@ -11,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
 
+import crossword.Game.PlayListener;
 import crossword.Game.WaitListener;
 import crossword.Game.WatchListener;
 
@@ -170,6 +171,14 @@ public class TextServer {
             });
             
             return LISTENER;
+        }
+        else if (command.equals("WAIT_PLAY")) { // blocks and returns only when a play has been made in a match
+            // TODO: Add a player listener
+            game.addPlayListener(playerID, new PlayListener() {
+                public void onChange() {
+                    out.println("V" + game.getMatchPuzzleForResponse(playerID));
+                }
+            });
         }
         else if (command.equals("LOGIN")) { // Logs in a player and returns the names of all puzzle templates
             if (game.login(playerID)) {

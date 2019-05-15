@@ -26,6 +26,7 @@ public class Game {
     private final Map<String, Match> matches; //  map of match_id : match
     private Set<WatchListener> watchListeners;
     private final Map<String, WaitListener> waitListeners;
+    private final Map<String, PlayListener> playListeners;
     
     /**
      * Main method. Makes the Game from Puzzle objects from parsing.
@@ -86,6 +87,7 @@ public class Game {
         this.players = new HashSet<String>();
         this.watchListeners = new HashSet<>();
         this.waitListeners = new HashMap<>();
+        this.playListeners = new HashMap<>();
     }
     
     /**
@@ -314,7 +316,7 @@ public class Game {
         }
     }
     
-    /** A watch listener for the board  */
+    /** A watch listener for the game  */
     public interface WaitListener {
         /** 
          * Called when the available matches in the game changes.
@@ -322,8 +324,9 @@ public class Game {
          */
         public void onChange();
     }
+    
     /**
-     * Adds a listener for a player to wait for another player to join their match
+     * Adds a wait listener for a player to wait for another player to join their match
      * @param playerID id of the player
      * @param listener Adds a new listener
      */
@@ -334,16 +337,49 @@ public class Game {
     /**
      * Calls the wait listener corresponding to the player ID
      * @param playerID the ID of the player
-     * @throws IOException calling wait listener does not work out
+     * @throws IOException if calling wait listener does not work out
      */
-    private synchronized void callWaitListener(String playerID) throws IOException{
-        System.out.println("id: "+playerID);
+    private synchronized void callWaitListener(String playerID) throws IOException {
         if (!waitListeners.containsKey(playerID)) {
-            throw new RuntimeException("PlayerID must be waiting to call their listener");
+            throw new RuntimeException("PlayerID must be waiting to call their wait listener: " + playerID);
         }
         WaitListener listener = waitListeners.get(playerID);
         listener.onChange();
         waitListeners.remove(playerID);
+    }
+    
+    /** A play listener for the game */
+    public interface PlayListener {
+        /**
+         * Called when a playable puzzle in the game changes.
+         * A change is defined as when a change is made in a playable puzzle (such as when a play successfully
+         *  TRYs or CHALLENGEs a word
+         */
+        public void onChange();
+    }
+    
+    /**
+     * Adds a play listener for a player to listen for changes in a playable puzzle
+     * @param playerID id of the player
+     * @param listener the player listener to add
+     */
+    public synchronized void addPlayListener(String playerID, PlayListener listener) {
+        playListeners.put(playerID, listener);
+    }
+    
+    /**
+     * Calls the play listener corresponding to the player ID
+     * @param playerID the ID of the player
+     * @throws IOException if calling play listener does not work out
+     */
+    private synchronized void callPlayListener(String playerID) throws IOException {
+        // TODO: Call then when a try or challenge is made
+        if (!playListeners.containsKey(playerID)) {
+            throw new RuntimeException("PlayerID must be playing to call their play listener: " + playerID);
+        }
+        PlayListener listener = playListeners.get(playerID);
+        listener.onChange();
+        playListeners.remove(playerID);
     }
     
     /**
