@@ -30,62 +30,6 @@ public class Puzzle {
     private final Map<Integer, PuzzleEntry> entries;
     
     /**
-     * @return a dummy puzzle for testing
-     */
-    public static Puzzle makeDummyPuzzle() {
-        List<PuzzleEntry> entries = new ArrayList<>();
-        entries.add(new PuzzleEntry("star", "twinkle twinkle", Orientation.ACROSS, new Point(1, 0)));
-        entries.add(new PuzzleEntry("market", "Farmers ______", Orientation.DOWN, new Point(0, 2)));
-        entries.add(new PuzzleEntry("kettle", "It's tea time!", Orientation.ACROSS, new Point(3, 2)));
-        entries.add(new PuzzleEntry("extra", "more", Orientation.DOWN, new Point(1, 5)));
-        entries.add(new PuzzleEntry("bee", "Everyone loves honey", Orientation.ACROSS, new Point(4, 0)));
-        entries.add(new PuzzleEntry("treasure", "Every pirate's dream", Orientation.ACROSS, new Point(5, 2)));
-        entries.add(new PuzzleEntry("troll", "Everyone's favorite twitter pastime", Orientation.ACROSS, new Point(4, 4)));
-        entries.add(new PuzzleEntry("loss", "This is not a gain", Orientation.DOWN, new Point(3, 6)));
-        //entries.add(new PuzzleEntry("moo", "cows", Orientation.ACROSS, new Point(0, 2)));
-        Puzzle simplePuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
-        
-        return simplePuzzle;
-    }
-    
-    /**
-     * @return an inconsistent dummy puzzle for testing
-     */
-    public static Puzzle makeInconsistentPuzzle() {
-        List<PuzzleEntry> entries = new ArrayList<>();
-        entries.add(new PuzzleEntry("cat", "twinkle twinkle", Orientation.ACROSS, new Point(0, 0)));
-        entries.add(new PuzzleEntry("market", "Farmers ______", Orientation.DOWN, new Point(0, 2)));
-        entries.add(new PuzzleEntry("kettle", "It's tea time!", Orientation.ACROSS, new Point(3, 2)));
-        entries.add(new PuzzleEntry("extra", "more", Orientation.DOWN, new Point(1, 5)));
-        entries.add(new PuzzleEntry("bee", "Everyone loves honey", Orientation.ACROSS, new Point(4, 0)));
-        entries.add(new PuzzleEntry("treasure", "Every pirate's dream", Orientation.ACROSS, new Point(5, 2)));
-        entries.add(new PuzzleEntry("troll", "Everyone's favorite twitter pastime", Orientation.ACROSS, new Point(4, 4)));
-        entries.add(new PuzzleEntry("loss", "This is not a gain", Orientation.DOWN, new Point(3, 6)));
-        Puzzle simplePuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
-        
-        return simplePuzzle;
-    }
-    
-    /**
-     * @return an inconsistent dummy puzzle for testing 
-     */
-    public static Puzzle makeInconsistentPuzzleOverlap() {
-        List<PuzzleEntry> entries = new ArrayList<>();
-        entries.add(new PuzzleEntry("star", "twinkle twinkle", Orientation.ACROSS, new Point(1, 0)));
-        entries.add(new PuzzleEntry("market", "Farmers ______", Orientation.DOWN, new Point(0, 2)));
-        entries.add(new PuzzleEntry("kettle", "It's tea time!", Orientation.ACROSS, new Point(3, 2)));
-        entries.add(new PuzzleEntry("extra", "more", Orientation.DOWN, new Point(1, 5)));
-        entries.add(new PuzzleEntry("bee", "Everyone loves honey", Orientation.ACROSS, new Point(4, 0)));
-        entries.add(new PuzzleEntry("treasure", "Every pirate's dream", Orientation.ACROSS, new Point(5, 2)));
-        entries.add(new PuzzleEntry("troll", "Everyone's favorite twitter pastime", Orientation.ACROSS, new Point(4, 4)));
-        entries.add(new PuzzleEntry("loss", "This is not a gain", Orientation.DOWN, new Point(3, 6)));
-        entries.add(new PuzzleEntry("rye", "Bread", Orientation.ACROSS, new Point(1, 3)));
-        Puzzle simplePuzzle = new Puzzle("Easy", "An easy puzzle to get started", entries);
-        
-        return simplePuzzle;
-    }
-    
-    /**
      * Returns a new Puzzle by parsing a file
      * @param filename the name of the .puzzle file
      * @return a new Puzzle parsed from the file

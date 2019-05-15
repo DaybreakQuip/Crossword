@@ -284,10 +284,9 @@ public class Client {
      * @param response the response in PLAY state
      */
     private synchronized void processResponseForPlay(String response) {
-        System.out.println("We're getting here");
-        String[] responseParts = response.split(CrosswordCanvas.RESPONSE_DELIM);
+        String[] responseParts = response.substring(1).split(CrosswordCanvas.RESPONSE_DELIM);
         
-        if (responseParts[1].equals("DONE")) {
+        if (responseParts[0].equals("DONE")) {
             setCanvasState(State.SHOW_SCORE);
         }
         

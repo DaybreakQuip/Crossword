@@ -1,0 +1,4 @@
+>> "Cross" "A simple puzzle with a simple purpose"
+
+(cat, "Not a dog", ACROSS, 1, 0)
+(mat, "On the floor", DOWN, 0, 1)
