@@ -389,9 +389,9 @@ class CrosswordCanvas extends JComponent {
         case CHOOSE:
             {
                 println("Here are the commands that you can enter in the box:", g);
-                println("    PLAY Match_ID", g);
-                println("    NEW Match_ID Puzzle_ID \"Description\"", g);
-                println("    EXIT", g);
+                println("    To play in an available match: PLAY Match_ID", g);
+                println("    To create a new match: NEW Match_ID Puzzle_ID \"Description\"", g);
+                println("    To log out: EXIT", g);
                 
                 println("", g);
                 println("Available matches (Match_ID: Description):", g);
@@ -414,11 +414,18 @@ class CrosswordCanvas extends JComponent {
             }
         case WAIT:
             {
-                println("Wait state:", g);
+                println("You are currently waiting for another player to join your match.", g);
+                println("    To exit to match selection, enter: EXIT", g);
+                println("    No other command may be entered.", g);
                 break;
             }
         case PLAY:
             {
+                println("Here are the commands that you can enter in the box:", g);
+                println("    To try a word: TRY id word", g);
+                println("    To challenge a word: CHALLENGE id word", g);
+                println("    To forfeit: EXIT", g);
+                
                 printPuzzle(g);
                 println("", g);
 
@@ -470,7 +477,9 @@ class CrosswordCanvas extends JComponent {
             }
         case SHOW_SCORE:
             {
-                println("Show score state:", g);
+                println("Here are the commands that you can enter in the box:", g);
+                println("    To return to match selection: NEW MATCH", g);
+                println("    To log out: EXIT", g);
                 break;
             }
         default:

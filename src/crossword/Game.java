@@ -183,6 +183,10 @@ public class Game {
         if (playerToMatch.containsKey(playerID) || matches.containsKey(matchID)) {
             return false;
         }
+        if (!puzzles.containsKey(puzzleID)) {
+            // No such puzzleID exists
+            return false;
+        }
         playerToMatch.put(playerID, matchID);
         matches.put(matchID, new Match(matchID, description, puzzles.get(puzzleID), playerID));
         callWatchListeners();
