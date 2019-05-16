@@ -25,9 +25,15 @@ public class GameTest {
     @Test
     public void testSimpleGame() {
         Game test = createSimpleGame();
-        assertEquals("0`4`twinkle twinkle`ACROSS`1`0~1`6`Farmers ______`DOWN`0`2~2`6`It's tea time!"
-                + "`ACROSS`3`2~3`5`more`DOWN`1`5~4`3`Everyone loves honey`ACROSS`4`0~5`8`Every pirate's dream`"
-                + "ACROSS`5`2~6`5`Everyone's favorite twitter pastime`ACROSS`4`4~7`4`This is not a gain`DOWN`3`6", 
+        assertEquals("0 bs1fc 4 bs1fc twinkle twinkle bs1fc ACROSS bs1fc 1 bs1fc 0 as3fb "
+                + "1 bs1fc 6 bs1fc Farmers ______ bs1fc DOWN bs1fc 0 bs1fc 2 as3fb "
+                + "2 bs1fc 6 bs1fc It's tea time! bs1fc ACROSS bs1fc 3 bs1fc 2 as3fb "
+                + "3 bs1fc 5 bs1fc more bs1fc DOWN bs1fc 1 bs1fc 5 as3fb "
+                + "4 bs1fc 3 bs1fc Everyone loves honey bs1fc ACROSS bs1fc 4 bs1fc 0 as3fb "
+                + "5 bs1fc 8 bs1fc Every pirate's dream bs1fc ACROSS bs1fc 5 bs1fc 2 as3fb "
+                + "6 bs1fc 5 bs1fc Everyone's favorite twitter pastime bs1fc ACROSS bs1fc 4 bs1fc 4 as3fb "
+                + "7 bs1fc 4 bs1fc This is not a gain bs1fc DOWN bs1fc 3 bs1fc 6", 
                 test.getPuzzleForResponse("Easy"), "not correct Puzzle entries");
     }
+    
 }

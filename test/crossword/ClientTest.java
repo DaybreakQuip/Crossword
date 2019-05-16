@@ -2,7 +2,7 @@ package crossword;
 
 
 public class ClientTest {
-    // Partition
+    // Partitions:
     //     Length of player id = 1, > 1
     //     State transitions = START->CHOOSE, CHOOSE->WAIT, CHOOSE->PLAY, CHOOSE->START,
     //                         WAIT->CHOOSE, WAIT->PLAY, PLAY->PLAY, PLAY->SHOW_SCORE,
