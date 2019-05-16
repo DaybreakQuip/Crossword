@@ -141,8 +141,12 @@ public class TextServer {
      * @return output message to client
      * @throws IOException 
      */
-    private String handleRequest(String input, PrintWriter out) throws IOException {
+    private String handleRequest(String input, PrintWriter out) throws IOException {  
         String[] tokens = input.split(" ");
+        if (tokens.length < 2) {
+            return "I" + "Invalid command";
+        }
+        
         String playerID = tokens[0];
         String command = tokens[1];  
         
@@ -176,7 +180,7 @@ public class TextServer {
         else if (command.equals("WAIT_PLAY")) { // blocks and returns only when a play has been made in a match
             game.addPlayListener(playerID, new PlayListener() {
                 public void onChange() {
-                    out.println("V" + game.getGuessesForResponse(playerID));
+                    out.println("V" + game.getPlayListenerResponse(playerID));
                 }
             });
             
@@ -206,7 +210,7 @@ public class TextServer {
             return "I" + "Failed to join the match";
         }
         else if (command.equals("NEW")) {
-            if (tokens.length < 4) {
+            if (tokens.length < 5) {
                 return "I" + "NEW command must contain matchID, puzzleID, and description";
             }
             

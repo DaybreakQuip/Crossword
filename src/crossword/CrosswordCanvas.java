@@ -56,9 +56,9 @@ class CrosswordCanvas extends JComponent {
     private final Font textFont = new Font("Arial", Font.PLAIN, 16);
     
     // Delimiters for string responses
-    public static final String ENTRY_DELIM = "~";
-    public static final String WORD_DELIM = "`";
-    public static final String RESPONSE_DELIM = ";";
+    public static final String ENTRY_DELIM = "\\sasfb\\s";
+    public static final String WORD_DELIM = "\\sbsfc\\s";
+    public static final String RESPONSE_DELIM = "\\scsfd\\s";
     
     // Abstraction function:
     //  AF(originX, originY, delta, mainFont, indexFont, textFont, 
@@ -258,7 +258,7 @@ class CrosswordCanvas extends JComponent {
      * @param g
      */
     private synchronized void drawPlayerColors(Graphics g) {
-        g.drawString("Red:Me|Green:Other|Orange:Confirmed", 0, 60);
+        g.drawString("Colors: (Red) Me, (Green) Other", 0, 60);
     }
     
     /**
@@ -408,7 +408,12 @@ class CrosswordCanvas extends JComponent {
         String[] unsortedEntries = puzzle.split(ENTRY_DELIM);
         List<String> entries = new ArrayList<>(unsortedEntries.length);
         for (String entry: unsortedEntries) {
-            entries.add(Integer.parseInt(entry.substring(0, entry.indexOf(WORD_DELIM))), entry);
+            if (entry.length() == 0) {
+                throw new RuntimeException("Entry cannot be empty");
+            }
+            // extract the word id 
+            int wordID = Integer.parseInt(entry.split(WORD_DELIM)[0]);
+            entries.add(wordID, entry);
         }
                 
         for (String entry: entries) {

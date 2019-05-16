@@ -136,9 +136,16 @@ public class Client {
      */
     private synchronized String getResponse(String request, BufferedReader socketIn, PrintWriter socketOut) {
         try {
+            
+            // Delete this
+            System.out.println("Request: " + request + ":END");
+            
             socketOut.println(request);
             String response = socketIn.readLine();
             canvas.setPreviousResponse(response);
+            
+            // DELETE this
+            System.out.println("Response:" + response + ":END");
             
             checkRep();
             return response;
@@ -301,15 +308,18 @@ public class Client {
         String[] responseParts = response.substring(1).split(CrosswordCanvas.RESPONSE_DELIM);
         
         if (responseParts[0].equals("DONE")) {
+            canvas.setOverallScore(responseParts[1]);
             setCanvasState(State.SHOW_SCORE);
         }
         
+        String delim = CrosswordCanvas.RESPONSE_DELIM.replace("\\s", " ");
+        
         String currentPuzzle = "";
         for (int i = 1; i < responseParts.length; i++) {
-            currentPuzzle += responseParts[i] + CrosswordCanvas.RESPONSE_DELIM;
+            currentPuzzle += responseParts[i] + delim;
         }
         
-        canvas.setCurrentPuzzle(currentPuzzle.substring(0, currentPuzzle.length() - 1));
+        canvas.setCurrentPuzzle(currentPuzzle.substring(0, currentPuzzle.length() - delim.length()));
         canvas.repaint();
         checkRep();
     }
