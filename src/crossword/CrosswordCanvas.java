@@ -605,6 +605,9 @@ class CrosswordCanvas extends JComponent {
                 
                 println("", g);
                 // print scores
+                if (overallScore.length() == 0) {
+                    break;
+                }
                 String[] playerScores = overallScore.split(ENTRY_DELIM);
                 for (String playerScore : playerScores) {
                     String[] playerPoints = playerScore.split(WORD_DELIM);
