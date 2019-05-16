@@ -95,16 +95,6 @@ public class TextServer {
     }
     
     /**
-     * Prints game stats for debugging including info such as:
-     *  - Number of watch listeners (for CHOOSE state)
-     *  - Number of wait listeners (for WAIT state)
-     *  - Number of play listeners (for PLAY state)
-     */
-    private void printGameStats() {
-        game.printListenerStats();
-    }
-    
-    /**
      * Handle a single client connection.
      * Returns when the client disconnects.
      * 
@@ -128,9 +118,6 @@ public class TextServer {
                 } catch (NumberFormatException nfe) {
                     out.println("I" + "Expected number instead of word");
                 }
-                
-                // For debugging only: 
-                // printGameStats();
             }
         } finally {
             out.close();
@@ -141,6 +128,10 @@ public class TextServer {
     /**
      * Handle a single client request and return the server response.
      * 
+     * Returns "I" + "<Error message>" if the request is invalid and 
+     *         "V" + "<Response body>" if the request is valid and the 
+     *         request is successful
+     * 
      * @param input message from client
      * @return output message to client
      * @throws IOException 
@@ -150,10 +141,8 @@ public class TextServer {
         if (tokens.length < 2) {
             return "I" + "Invalid command";
         }
-        
         String playerID = tokens[0];
         String command = tokens[1];  
-        
         // Check whether the playerID is valid
         if (!(playerID.matches("[A-Za-z0-9]*") && playerID.length() > 0)) {
             return "I" + "Player ID must be alphanumeric and have a length > 0";
@@ -201,7 +190,8 @@ public class TextServer {
             return "V" + game.getPuzzlesAndAvailableMatchesForResponse();
         }
         else if (command.equals("PLAY")) {
-            if (tokens.length < 3) {
+            final int numTokens = 3;
+            if (tokens.length < numTokens) {
                 return "I" + "PLAY command must include matchID";
             }
             boolean join = game.joinMatch(playerID, tokens[2]);
@@ -211,15 +201,17 @@ public class TextServer {
             return "I" + "Failed to join the match";
         }
         else if (command.equals("NEW")) {
-            if (tokens.length < 5) {
+            final int numTokens = 5;
+            if (tokens.length < numTokens) {
                 return "I" + "NEW command must contain matchID, puzzleID, and description";
             }
-            
             String matchID = tokens[2];
-            String puzzleID = tokens[3];
+            final int puzzleIndex = 3;
+            String puzzleID = tokens[puzzleIndex];
+            final int descriptionIndex = 4;
             String description = "";
             // The rest of the string is the description
-            for (String token : Arrays.copyOfRange(tokens, 4, tokens.length)) {
+            for (String token : Arrays.copyOfRange(tokens, descriptionIndex, tokens.length)) {
                 description += " " + token;
             }
             // Remove the extra space at the beginning
@@ -262,12 +254,13 @@ public class TextServer {
             return "I" + "Failed to exit game";
         }
         else if (command.equals("TRY")) {
-            if (tokens.length < 4) {
+            final int numTokens = 4;
+            if (tokens.length < numTokens) {
                 return "I" + "TRY command must contain entry ID and word";
             }
-            
             int wordID = Integer.parseInt(tokens[2]);
-            String word = tokens[3].toLowerCase();
+            final int wordIndex = 3;
+            String word = tokens[wordIndex].toLowerCase();
             if (game.tryWord(playerID, wordID, word)) {
                 String response = game.getGuessesForResponse(playerID);
                 game.removePlayerAndMatch(playerID);
@@ -276,12 +269,13 @@ public class TextServer {
             return "I" + "Failed to guess word";
         }
         else if (command.equals("CHALLENGE")) {
-            if (tokens.length < 4) {
+            final int numTokens = 4;
+            if (tokens.length < numTokens) {
                 return "I" + "CHALLENGE command must contain entry ID and word";
             }
-            
             int wordID = Integer.parseInt(tokens[2]);
-            String word = tokens[3].toLowerCase();
+            final int wordIndex = 3;
+            String word = tokens[wordIndex].toLowerCase();
             if (game.challengeWord(playerID, wordID, word)) {
                 String response = game.getGuessesForResponse(playerID);
                 game.removePlayerAndMatch(playerID);
@@ -290,9 +284,6 @@ public class TextServer {
             return "I" + "Failed to challenge word";        
         }
         // if we reach here, the client message did not follow the protocol
-        // Instead of throwing an except, return a response indicating  failure
         return "I" + "Sorry, that is not a valid command: " + input;
-        // throw new UnsupportedOperationException(input);
-
     }
 }
