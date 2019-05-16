@@ -401,6 +401,41 @@ class CrosswordCanvas extends JComponent {
     }
     
     /**
+     * Prints the numbers of the crossword puzzle
+     * @param g
+     */
+    private synchronized void printNumbers(Graphics g) {
+        // sort entries by word id
+        String[] unsortedEntries = puzzle.split(ENTRY_DELIM);
+        List<String> entries = new ArrayList<>(unsortedEntries.length);
+        for (String entry: unsortedEntries) {
+            if (entry.length() == 0) {
+                throw new RuntimeException("Entry cannot be empty");
+            }
+            // extract the word id 
+            int wordID = Integer.parseInt(entry.split(WORD_DELIM)[0]);
+            entries.add(wordID, entry);
+        }
+                
+        for (String entry: entries) {
+            // info has the following format: 
+            //     id WORD_DELIM length WORD_DELIM hint WORD_DELIM 
+            //     orientation WORD_DELIM row WORD_DELIM col ENTRY_DELIM
+            String[] info = entry.split(WORD_DELIM);
+            int id = Integer.parseInt(info[0]);
+            int row = Integer.parseInt(info[4]);
+            int col = Integer.parseInt(info[5]);
+            
+            // draw cells for across and record hint
+            if (info[3].equals("ACROSS")) {
+                horizontalId(Integer.toString(id), row, col, g);
+            } else { // draw cells for down and record hint
+                verticalId(Integer.toString(id), row, col, g);
+            }
+        }
+    }
+    
+    /**
      * Prints a crossword puzzle with no words filled in and
      * hints for each word divided into horizontal words and
      * vertical words. 
@@ -608,6 +643,7 @@ class CrosswordCanvas extends JComponent {
                         printlnFancier(playerID + "'s confirmed words: " + myWords.toString(), g, Color.ORANGE);
                         printlnFancier(otherPlayerID + "'s confirmed words: " + otherWords.toString(), g, Color.CYAN);
                     }
+                    printNumbers(g);
                 }                
                 break;
             }

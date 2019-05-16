@@ -54,6 +54,10 @@ public class Game {
                 Puzzle newPuzzle = Puzzle.parseFromFile(directory + file.getName()); 
                 if (newPuzzle.isConsistent()) {
                     String puzzleID = newPuzzle.getName();
+                    if (puzzleID.length() == 0) {
+                        puzzleID = "JYZ";
+                    }
+                    
                     // If the puzzle name is already in puzzles, try 
                     //  using puzzleName1, puzzleName2, etc. until one of them hasn't been taken yet
                     if (puzzles.containsKey(puzzleID)) {
