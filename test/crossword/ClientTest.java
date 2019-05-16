@@ -19,7 +19,7 @@ public class ClientTest {
     //      and instructions on the right for how to login.
     // 4. Type "A" (without quotation marks) into the text box and press the enter button.
     // 5. Make sure the GUI appears with lists of commands, available matches, and available puzzles. 
-    //
+    
     // Covers: length of player id > 1, transition = CHOOSE->WAIT
     // 1. Create a new TextServer with one of these commands: 
     //      Windows: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
@@ -32,7 +32,7 @@ public class ClientTest {
     // 5. Make sure the GUI appears with lists of commands, available matches, and available puzzles. 
     // 6. Type "NEW 0 Easy \"easy puzzle\"" (without quotation marks) into the text box and press enter.
     // 7. Make sure the GUI appears with instructions for waiting for another player to join the match.
-    // 
+    
     // Covers: length of player id > 1, transition = WAIT->PLAY, CHOOSE->PLAY
     // 1. Create a new TextServer with one of these commands: 
     //      Windows: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
@@ -54,7 +54,7 @@ public class ClientTest {
     // 12. Type "PLAY 0" (without quotation marks) into the text box and press the enter button.
     // 13. Make sure a crossword puzzle with blank yellow squares as cells appear with the list of 
     //     commands and hints on both client #1 and client #2.
-    //
+    
     // Covers: length of player id > 1, transition = CHOOSE->START
     // 1. Create a new TextServer with one of these commands: 
     //      Windows: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
@@ -67,7 +67,7 @@ public class ClientTest {
     // 5. Make sure the GUI appears with lists of commands, available matches, and available puzzles. 
     // 6. Type "EXIT" (without quotation marks) into the text box and press enter.
     // 7. Make sure the GUI appears with instructions for how to login.
-    // 
+    
     // Covers: length of player id > 1, transition = WAIT->CHOOSE
     // 1. Create a new TextServer with one of these commands: 
     //      Windows: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
@@ -82,7 +82,7 @@ public class ClientTest {
     // 7. Make sure the GUI appears with instructions for waiting for another player to join the match.
     // 8. Type "EXIT" (without quotation marks) into the text box and press enter.
     // 9. Make sure the GUI appears with lists of commands, available matches, and available puzzles. 
-    // 
+    
     // Covers: length of player id > 1, transition = PLAY->PLAY
     // 1. Create a new TextServer with one of these commands: 
     //      Windows: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
@@ -109,7 +109,7 @@ public class ClientTest {
     //     filled with the letters 'S' 'T' 'A' 'R' and the hint for word 0 is highlighted with a red background.
     // 16. Make sure the cells for word 0 in the puzzle in client #2's window have a green background and are
     //     filled with the letters 'S' 'T' 'A' 'R' and the hint for word 0 is highlighted with a green background.
-    //
+    
     // Covers: length of player id > 1, transition = PLAY->SHOW_SCORE
     // 1. Create a new TextServer with one of these commands: 
     //      Windows: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
@@ -139,7 +139,7 @@ public class ClientTest {
     // 17. In client #1, type in the command "EXIT" (without quotation marks) into the text box and press enter. 
     // 18. Make sure the GUIs in both client #1 and client #2 appear with a list of commands, the challenge points 
     //     and total score for each player, and which player won the game (or tied the game).
-    // 
+
     // Covers: length of player id > 1, transition = SHOW_SCORE->CHOOSE
     // 1. Create a new TextServer with one of these commands: 
     //      Windows: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
@@ -171,7 +171,7 @@ public class ClientTest {
     //     and total score for each player, and which player won the game (or tied the game).
     // 19. Type "NEW MATCH" (without quotation marks) into the text box and press the enter button.
     // 20. Make sure the GUI appears with lists of commands, available matches, and available puzzles. 
-    //
+    
     // Covers: length of player id > 1, transition = SHOW_SCORE->CHOOSE
     // 1. Create a new TextServer with one of these commands: 
     //      Windows: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
