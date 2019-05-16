@@ -121,4 +121,62 @@ public class TextServerTest {
         
         assertValidServerResponse(directory, commands, responses);
     }
+    
+    // This test covers
+    //     Number of connecting clients > 1
+    //     Number of puzzles > 1
+    //     Number of ongoing matches = 0
+    //     Number of matches waiting to start = 1
+    //     Number of clients (players) choosing a match = 1
+    //     Number of clients (players) waiting for a match to start = 1
+    //     Number of clients (players) playing in a match = 0
+    //     Includes commands: LOGIN, NEW
+
+    @Test
+    public void testMultipleLogin() throws IOException, URISyntaxException, UnableToParseException {
+        String directory = "puzzles/";
+        List<String> commands = new ArrayList<String>();
+        List<String> responses = new ArrayList<String>();
+        commands.add("player420 LOGIN");
+        responses.add("V6031 as3fb Easy as3fb SimpleComments as3fb Cross as3fb Easy1 as3fb Reactions as3fb Metamorphic cs2fd ");
+        commands.add("player360 LOGIN");
+        responses.add("V6031 as3fb Easy as3fb SimpleComments as3fb Cross as3fb Easy1 as3fb Reactions as3fb Metamorphic cs2fd ");
+        commands.add("player420 NEW 0 Easy \"easy puzzle\"");
+        responses.add("V");
+        assertValidServerResponse(directory, commands, responses);
+    }
+    
+    // This test covers
+    //     Number of connecting clients > 1
+    //     Number of puzzles > 1
+    //     Number of ongoing matches = 0
+    //     Number of matches waiting to start > 1
+    //     Number of clients (players) choosing a match = 0
+    //     Number of clients (players) waiting for a match to start > 1
+    //     Number of clients (players) playing in a match = 0
+    //     Includes commands: LOGIN, NEW, LOGOUT
+
+    @Test
+    public void testMultipleLogout() throws IOException, URISyntaxException, UnableToParseException {
+        String directory = "puzzles/";
+        List<String> commands = new ArrayList<String>();
+        List<String> responses = new ArrayList<String>();
+        commands.add("player420 LOGIN");
+        responses.add("V6031 as3fb Easy as3fb SimpleComments as3fb Cross as3fb Easy1 as3fb Reactions as3fb Metamorphic cs2fd ");
+        commands.add("player360 LOGIN");
+        responses.add("V6031 as3fb Easy as3fb SimpleComments as3fb Cross as3fb Easy1 as3fb Reactions as3fb Metamorphic cs2fd ");
+        commands.add("player200 LOGIN");
+        responses.add("V6031 as3fb Easy as3fb SimpleComments as3fb Cross as3fb Easy1 as3fb Reactions as3fb Metamorphic cs2fd ");
+        commands.add("player100 LOGIN");
+        responses.add("V6031 as3fb Easy as3fb SimpleComments as3fb Cross as3fb Easy1 as3fb Reactions as3fb Metamorphic cs2fd ");
+        commands.add("player420 NEW 0 Easy \"easy puzzle\"");
+        responses.add("V");
+        commands.add("player360 NEW 1 Cross \"cross puzzle\"");
+        responses.add("V");
+        commands.add("player200 LOGOUT");
+        responses.add("V");
+        commands.add("player100 LOGOUT");
+        responses.add("V");
+        assertValidServerResponse(directory, commands, responses);
+    }
 }
