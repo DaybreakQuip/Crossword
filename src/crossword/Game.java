@@ -263,7 +263,7 @@ public class Game {
      * Exits a player from a match that is waiting
      * @param playerID player id
      * @return true if the player managed to exit the match, false otherwise
-     * @throws IOException
+     * @throws IOException if something goes wrong
      */
     public synchronized boolean exitWait(String playerID) throws IOException {
         if (!playerToMatch.containsKey(playerID)) {
