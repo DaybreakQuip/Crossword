@@ -158,7 +158,6 @@ public class TextServer {
         if (command.equals("quit")) {
             return QUIT;
         }
-        //TODO: implement each command as needed
         if (command.equals("WATCH")) { // blocks and returns only when there is a change in available matches
             game.addWatchListener(new WatchListener() {
                 public void onChange() {
@@ -189,15 +188,13 @@ public class TextServer {
         else if (command.equals("LOGIN")) { // Logs in a player and returns the names of all puzzle templates
             if (game.login(playerID)) {
                 // Build the string in 3 parts: add puzzle names -> add response delim -> add available matches
-                StringBuilder builder = new StringBuilder();
-                builder.append("V");
-                builder.append(game.getPuzzleNamesForResponse());
-                builder.append(Game.RESPONSE_DELIM);
-                builder.append(game.getAvailableMatchesForResponse());
-                return builder.toString();
+                return "V" + game.getPuzzlesAndAvailableMatchesForResponse();
             } else {
                 return "I" + "Player id is already taken";
             }
+        }
+        else if (command.equals("NEW_MATCH")) {
+            return "V" + game.getPuzzlesAndAvailableMatchesForResponse();
         }
         else if (command.equals("PLAY")) {
             if (tokens.length < 3) {

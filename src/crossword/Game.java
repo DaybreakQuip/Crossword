@@ -495,12 +495,21 @@ public class Game {
      * @return string of puzzle names with format:
      *  response = puzzleName (ENTRY_DELIM puzzleName)*
      */
-    public synchronized String getPuzzleNamesForResponse() {
+    private synchronized String getPuzzleNamesForResponse() {
         StringBuilder builder = new StringBuilder();
         for (String puzzleName : puzzles.keySet()) {
             builder.append(puzzleName + Game.ENTRY_DELIM);
         }
         return builder.toString().substring(0, builder.length()-ENTRY_DELIM.length());
+    }
+    
+    public synchronized String getPuzzlesAndAvailableMatchesForResponse() {
+        // Build the string in 3 parts: add puzzle names -> add response delim -> add available matches
+        StringBuilder builder = new StringBuilder();
+        builder.append(getPuzzleNamesForResponse());
+        builder.append(RESPONSE_DELIM);
+        builder.append(getAvailableMatchesForResponse());
+        return builder.toString();
     }
     
     /**
