@@ -56,9 +56,9 @@ class CrosswordCanvas extends JComponent {
     private final Font textFont = new Font("Arial", Font.PLAIN, 16);
     
     // Delimiters for string responses
-    public static final String ENTRY_DELIM = "\\sasfb\\s";
-    public static final String WORD_DELIM = "\\sbsfc\\s";
-    public static final String RESPONSE_DELIM = "\\scsfd\\s";
+    public static final String ENTRY_DELIM = "\\sas3fb\\s";
+    public static final String WORD_DELIM = "\\sbs1fc\\s";
+    public static final String RESPONSE_DELIM = "\\scs2fd\\s";
     
     // Abstraction function:
     //  AF(originX, originY, delta, mainFont, indexFont, textFont, 
@@ -100,6 +100,7 @@ class CrosswordCanvas extends JComponent {
     private String matchList = "";
     private String currentPuzzle = "";
     private String overallScore = "";
+    private String winner = "";
     private final Map<Integer, SimpleImmutableEntry<Integer, String>> wordToLine = new HashMap<>();
     
     /**
@@ -145,6 +146,7 @@ class CrosswordCanvas extends JComponent {
         puzzleList = "";
         matchList = "";
         currentPuzzle = "";
+        winner = "";
     }
     
     /**
@@ -208,6 +210,13 @@ class CrosswordCanvas extends JComponent {
      */
     public synchronized void setOverallScore(String overallScore) {
         this.overallScore = overallScore;
+    }
+    
+    /**
+     * @param winner the winner of the match
+     */
+    public synchronized void setWinner(String winner) {
+        this.winner = winner;
     }
     
     /**
@@ -619,6 +628,14 @@ class CrosswordCanvas extends JComponent {
                     println(playerPoints[0] + "'s Challenge Points: " + playerPoints[1], g);
                     println(playerPoints[0] + "'s Total Points: " + playerPoints[2], g);
                 }
+                
+                // print the winner
+                if (winner.length() == 0) {
+                    break;
+                }
+                // Add an empty line for emphasis
+                println("", g);
+                println(winner, g);
                 break;
             }
         default:

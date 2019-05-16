@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO: Implement this class
  * Mutable class representing a crossword game match between two players
  */
 public class Match {
@@ -182,7 +181,8 @@ public class Match {
      *      Else if the challenge is invalid: 
      *          The challenge is invalid
      * @param playerId the id of the player making a guess
-     * @param guess the guess of the player
+     * @param wordID the id of the entry being challenged
+     * @param word the challenger word
      * @return true if the challenge is valid and false otherwise
      */
     public synchronized boolean challengeWord(String playerId, int wordID, String word) {
@@ -273,7 +273,7 @@ public class Match {
         return wordIDs;
     }
     
-    private synchronized Map<Point, Character> generateAllPoints(Map<Integer, PuzzleEntry> entries){
+    private synchronized Map<Point, Character> generateAllPoints(Map<Integer, PuzzleEntry> entries) {
         Map<Point, Character> pointToLetter = new HashMap<>();
         for (Integer i : entries.keySet()) {
             PuzzleEntry entry = entries.get(i);
@@ -336,12 +336,20 @@ public class Match {
                 Game.RESPONSE_DELIM + puzzle.getGuessesForResponse();
     }
     
+    /**
+     * Returns total score of a player
+     * @param player the player
+     * @return total score of the player
+     */
     private synchronized int getTotalScore(Player player) {
         int numCorrect = 0;
         Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = puzzle.getPlayerEntries();
-        Map<Integer, PuzzleEntry> confirmedEntries = puzzle.getConfirmedEntries();
-        for (Map.Entry<Integer, PuzzleEntry> entry: confirmedEntries.entrySet()) {
+        Map<Integer, PuzzleEntry> correctEntries = puzzle.getCorrectEntries();
+        for (Map.Entry<Integer, PuzzleEntry> entry: correctEntries.entrySet()) {
             Integer id = entry.getKey();
+            if (!playerEntries.containsKey(id)) {
+                continue;
+            }
             if (playerEntries.get(id).getKey().getId().equals(player.getId())) {
                 numCorrect++;
             }
@@ -353,7 +361,21 @@ public class Match {
      * @return string representing the score of each player
      */
     public synchronized String showScore() {
-        return state + Game.RESPONSE_DELIM + playerOne.getId() + Game.WORD_DELIM + playerOne.getScore() + Game.WORD_DELIM + getTotalScore(playerOne)
-                        + Game.ENTRY_DELIM + playerTwo.getId() + Game.WORD_DELIM + playerTwo.getScore() + Game.WORD_DELIM + getTotalScore(playerTwo);
+        String winner = "";
+        int scoreOne = getTotalScore(playerOne);
+        int scoreTwo = getTotalScore(playerTwo);
+        if (scoreOne > scoreTwo) {
+            winner = playerOne.getId() + " wins";
+        } else if (scoreTwo > scoreOne) {
+            winner = playerTwo.getId() + " wins";
+        } else {
+            winner = "Tie";
+        }
+        // Add ! for excitement
+        winner += "!";
+            
+        return state + Game.RESPONSE_DELIM + playerOne.getId() + Game.WORD_DELIM + playerOne.getScore() + Game.WORD_DELIM + scoreOne
+                        + Game.ENTRY_DELIM + playerTwo.getId() + Game.WORD_DELIM + playerTwo.getScore() + Game.WORD_DELIM + scoreTwo
+                        + Game.RESPONSE_DELIM + winner;
     }
 }

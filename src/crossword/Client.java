@@ -14,7 +14,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -145,7 +145,6 @@ public class Client {
             socketOut.println(request);
             String response = socketIn.readLine();
             canvas.setPreviousResponse(response);
-            System.out.println("Response: " + response);
             
             // DELETE this
             System.out.println("Response:" + response + ":END");
@@ -320,6 +319,10 @@ public class Client {
         
         if (responseParts[0].equals("DONE")) {
             canvas.setOverallScore(responseParts[1]);
+            // Only set a winner if a winner exists
+            if (responseParts.length > 2) {
+                canvas.setWinner(responseParts[2]);
+            }
             setCanvasState(State.SHOW_SCORE);
         }
         

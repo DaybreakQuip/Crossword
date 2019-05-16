@@ -16,9 +16,9 @@ import edu.mit.eecs.parserlib.UnableToParseException;
  *
  */
 public class Game {
-    public static final String ENTRY_DELIM = " asfb ";
-    public static final String WORD_DELIM = " bsfc ";
-    public static final String RESPONSE_DELIM = " csfd ";
+    public static final String ENTRY_DELIM = " as3fb ";
+    public static final String WORD_DELIM = " bs1fc ";
+    public static final String RESPONSE_DELIM = " cs2fd ";
     private final Set<String> players; // set of all playerIDs currently logged in
     private final Map<String, Puzzle> puzzles; // map of puzzleID : Puzzle
     private final Map<String, String> playerToMatch; // map of playerID : match_id
@@ -503,6 +503,9 @@ public class Game {
         return builder.toString().substring(0, builder.length()-ENTRY_DELIM.length());
     }
     
+    /**
+     * @return puzzles and available matches
+     */
     public synchronized String getPuzzlesAndAvailableMatchesForResponse() {
         // Build the string in 3 parts: add puzzle names -> add response delim -> add available matches
         StringBuilder builder = new StringBuilder();
