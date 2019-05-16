@@ -17,6 +17,20 @@ public class PuzzleEntryTest {
     @Test
     public void testEmptyEntry() {
         PuzzleEntry puzzleEntry = new PuzzleEntry("", "", Orientation.ACROSS, new Point(0,0));
-        
+        assertEquals(puzzleEntry, new PuzzleEntry("", "", Orientation.ACROSS, new Point(0,0)));
+    }
+    
+    // Covers: length of word = 1, length of clue > 1, orientation = DOWN, row > 1, column = 1
+    @Test
+    public void testSimpleEntry() {
+        PuzzleEntry puzzleEntry = new PuzzleEntry("b", "bee", Orientation.DOWN, new Point(51,1));
+        assertEquals(puzzleEntry, new PuzzleEntry("b", "bee", Orientation.DOWN, new Point(51,1)));
+    }
+    
+    // Covers: length of word > 1, length of clue = 1, orientation = ACROSS, row = 1, column > 1
+    @Test
+    public void testAnotherSimpleEntry() {
+        PuzzleEntry puzzleEntry = new PuzzleEntry("apple", "a", Orientation.ACROSS, new Point(1,34));
+        assertEquals(puzzleEntry, new PuzzleEntry("apple", "a", Orientation.ACROSS, new Point(1,34)));
     }
 }
