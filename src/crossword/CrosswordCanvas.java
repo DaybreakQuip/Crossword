@@ -108,6 +108,8 @@ class CrosswordCanvas extends JComponent {
     public CrosswordCanvas(String puzzle) {
         this.puzzle = puzzle;
         this.state = State.START;
+        
+        checkRep();
     }
     
     /**
@@ -462,8 +464,6 @@ class CrosswordCanvas extends JComponent {
             }
         }
     }
-
-    private int x = 1;
 
     /**
      * Simple demo code just to illustrate how to paint cells in a crossword puzzle.
