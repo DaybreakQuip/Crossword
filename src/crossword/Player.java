@@ -1,9 +1,5 @@
 package crossword;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Mutable, threadsafe class that represents a player in the crossword game
  *

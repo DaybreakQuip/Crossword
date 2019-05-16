@@ -1,8 +1,7 @@
 package crossword;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +12,13 @@ import org.junit.jupiter.api.Test;
 import edu.mit.eecs.parserlib.UnableToParseException;
 
 public class PuzzleTest {
+    // Partitions:
+    //  Length of name = 0, 1, > 1
+    //  Length of description = 0, 1, > 1
+    //  Number of puzzle entries in entries = 0, 1, > 1
+    //  Number of puzzle entries that overlap = 0, 1, > 1
+    //  Number of puzzle entries that intersect = 0, 1, > 1
+    //  Puzzle name contains numbers, letters, or non-alphanumeric characters
     
     /**
      * @return a simple puzzle for testing
@@ -32,6 +38,9 @@ public class PuzzleTest {
         return simplePuzzle;
     }
     
+    /**
+     * @return a simple inconsistent puzzle for testing
+     */
     public static Puzzle makeSimpleInconsistentPuzzle() {
         List<PuzzleEntry> entries = new ArrayList<>();
         entries.add(new PuzzleEntry("cat", "twinkle twinkle", Orientation.ACROSS, new Point(0, 0)));
@@ -48,6 +57,9 @@ public class PuzzleTest {
         return simpleInconsistentPuzzle;
     }
     
+    /**
+     * @return a simple overlapping puzzle for testing
+     */
     public static Puzzle makeSimpleOverlapPuzzle() {
         List<PuzzleEntry> entries = new ArrayList<>();
         entries.add(new PuzzleEntry("star", "twinkle twinkle", Orientation.ACROSS, new Point(1, 0)));
@@ -64,7 +76,58 @@ public class PuzzleTest {
         return simplePuzzle;
     }
     
-    // Test covers whether simple puzzle is consistent
+    /**
+     * @return an empty puzzle for testing
+     */
+    public static Puzzle makeEmptyPuzzle() {
+        List<PuzzleEntry> entries = new ArrayList<>();
+        Puzzle emptyPuzzle = new Puzzle("", "", entries);
+        
+        return emptyPuzzle;
+    }
+    
+    // This test covers:
+    //  Length of name = 0
+    //  Length of description = 0
+    //  Number of puzzle entries in entries = 0
+    //  Number of puzzle entries that overlap = 0
+    //  Number of puzzle entries that intersect = 0
+    //  Puzzle name contains no characters
+    @Test
+    public void testEmptyPuzzle() {
+        Puzzle emptyPuzzle = makeEmptyPuzzle();
+        assertEquals(emptyPuzzle.getDescription(), "");
+        assertEquals(emptyPuzzle.getName(), "");
+        assertTrue(emptyPuzzle.isConsistent());
+        assertTrue(emptyPuzzle.getEntries().size() == 0);
+    }
+    
+    // This test covers:
+    //  Length of name > 1
+    //  Length of description = 1
+    //  Number of puzzle entries in entries = 1
+    //  Number of puzzle entries that overlap = 0
+    //  Number of puzzle entries that intersect = 0
+    //  Puzzle name contains numbers and non-alphanumeric characters
+    @Test
+    public void testWeirdPuzzle() {
+        List<PuzzleEntry> entries = new ArrayList<>();
+        entries.add(new PuzzleEntry("star", "twinkle twinkle", Orientation.ACROSS, new Point(1, 0)));
+        Puzzle weirdPuzzle = new Puzzle("E4$y!", "Ez", entries);
+
+        assertEquals(weirdPuzzle.getDescription(), "Ez");
+        assertEquals(weirdPuzzle.getName(), "E4$y!");
+        assertTrue(weirdPuzzle.isConsistent());
+        assertTrue(weirdPuzzle.getEntries().size() == 1);
+    }
+    
+    // This test covers:
+    //  Length of name = 1, > 1
+    //  Length of description = 1, > 1
+    //  Number of puzzle entries in entries = 1, > 1
+    //  Number of puzzle entries that overlap = 0, 1, > 1
+    //  Number of puzzle entries that intersect = 0, 1, > 1
+    //  Puzzle name contains letters
     @Test
     public void testConsistentSimplePuzzle() throws IOException, UnableToParseException {
         // Test with premade puzzle objects
@@ -80,6 +143,13 @@ public class PuzzleTest {
         assertTrue(parsedReactionsConsistent.isConsistent(), "Expected puzzle to be consistent");
     }
     
+    // This test covers:
+    //  Length of name = 1, > 1
+    //  Length of description = 1, > 1
+    //  Number of puzzle entries in entries = 1, > 1
+    //  Number of puzzle entries that overlap = 0, 1, > 1
+    //  Number of puzzle entries that intersect = 0, 1, > 1
+    //  Puzzle name contains letters
     @Test
     public void testInconsistentSimplePuzzle() throws IOException, UnableToParseException {
         // Test with premade puzzle objects

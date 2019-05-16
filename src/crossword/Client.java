@@ -14,7 +14,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -108,7 +107,7 @@ public class Client {
                 BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in));
         ) {
             Client client = new Client(host, port);
-            client.launchGameWindow(socketIn, socketOut, host, port);
+            client.launchGameWindow(socketIn, socketOut);
             boolean showRaw = false;
             while (!socket.isClosed()) {
                 System.out.print("? ");
@@ -417,21 +416,7 @@ public class Client {
      * @param state
      */
     private void setCanvasState(State state) {
-        // The threads should stop themselves, but use this if necessary
-        // stopThreads();
         canvas.setState(state);
-        checkRep();
-    }
-    
-    /**
-     * Stops all currently running threads from running and removes the thread from
-     *  listener threads
-     */
-    private synchronized void stopThreads() {
-        for (Thread thread : new ArrayList<>(listenerThreads)) {
-            thread.interrupt();
-            listenerThreads.remove(thread);
-        }
         checkRep();
     }
     
@@ -497,12 +482,14 @@ public class Client {
      * Starter code to display a window with a CrosswordCanvas,
      * a text box to enter commands and an Enter button.
      */
-    private synchronized void launchGameWindow(BufferedReader socketIn, PrintWriter socketOut, String host, int port) {
+    private synchronized void launchGameWindow(BufferedReader socketIn, PrintWriter socketOut) {
         canvas = new CrosswordCanvas("");
         canvas.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
-
-        JTextField textbox = new JTextField(30);
-        textbox.setFont(new Font("Arial", Font.BOLD, 20));
+        
+        final int textboxSize = 30;
+        final int fontSize = 20;
+        JTextField textbox = new JTextField(textboxSize);
+        textbox.setFont(new Font("Arial", Font.BOLD, fontSize));
                 
         JButton enterButton = new JButton("Enter");
         enterButton.addActionListener((event) -> {
@@ -576,7 +563,9 @@ public class Client {
                 }
             }
         });
-        enterButton.setSize(10, 10);
+        
+        final int enterLength = 10;
+        enterButton.setSize(enterLength, enterLength);
 
         JFrame window = new JFrame("Crossword Client");
         window.setLayout(new BorderLayout());
@@ -588,7 +577,8 @@ public class Client {
 
         window.add(contentPane, BorderLayout.SOUTH);
 
-        window.setSize(CANVAS_WIDTH + 50, CANVAS_HEIGHT + 50);
+        final int widowDisplacement = 50;
+        window.setSize(CANVAS_WIDTH + widowDisplacement, CANVAS_HEIGHT + widowDisplacement);
 
         window.getContentPane().add(contentPane);
 
