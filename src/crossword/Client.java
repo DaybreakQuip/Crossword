@@ -143,6 +143,7 @@ public class Client {
             socketOut.println(request);
             String response = socketIn.readLine();
             canvas.setPreviousResponse(response);
+            System.out.println("Response: " + response);
             
             // DELETE this
             System.out.println("Response:" + response + ":END");
