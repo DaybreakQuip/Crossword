@@ -230,6 +230,7 @@ public class Match {
     
     private synchronized List<Integer> getInconsistentWords(int wordID, PuzzleEntry guess){
         Map<Integer, PuzzleEntry> entries = puzzle.getFlattenedPlayerEntries();
+        entries.remove(wordID);
         Map<Point, Character> pointToLetter = new HashMap<>();
         String word = guess.getWord();
         Orientation orientation = guess.getOrientation();
