@@ -126,7 +126,8 @@ public class Match {
     }
     
     /**
-     * Tries to make a guess for the match puzzle for the given player id
+     * Tries to make a guess for the match puzzle for the given player i
+     * 
      * The rules for a try guess are as follows:
      *   1) the id corresponds to either an empty word or
      *   2) an un-confirmed word entered by the same user and false otherwise
@@ -160,6 +161,7 @@ public class Match {
 
     /**
      * Tries to challenge a guess for the match puzzle for the given player id
+     * Preconditions: Match must have two players and game must be ongoing
      * The rules for a challenge guess are as follows:
      *      A challenge is valid if:
      *          a) the challenged word was entered by the other player (can’t challenge your own words)
@@ -337,6 +339,7 @@ public class Match {
     }
     
     /**
+     * Preconditions: Match must have two players and game must be done
      * Returns total score of a player
      * @param player the player
      * @return total score of the player
@@ -358,6 +361,7 @@ public class Match {
     }
     
     /**
+     * Preconditions: Match must have two players and game must be done
      * @return string representing the score of each player
      */
     public synchronized String showScore() {
