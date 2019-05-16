@@ -121,4 +121,101 @@ public class TextServerTest {
         
         assertValidServerResponse(directory, commands, responses);
     }
+    //MANUAL TEST:
+    // Covers Playing a Game With Multiple Matches
+    // Covers: length of player id = 1, transition = START->CHOOSE
+    // 1. Create a new TextServer with one of these commands: 
+    //      Windows: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
+    //      Mac: java -cp bin:lib/parserlib.jar crossword.ServerMain puzzles/ 4444
+    // 2. Open another terminal window and connect to the client with the command: 
+    //      java -cp bin crossword.Client localhost 4444
+    // 3. Make sure the crossword client (GUI) appears with a text box and enter button across the top
+    //      and instructions on the right for how to login.
+    // 4. Open another three more terminals and connect to the client. From here on out, clients will be labeled by their player name:
+    //  "me", "you", "nome", and "noyou"
+    // 5. me: Type me
+    // 6. you Type you
+    // 7. me: Type NEW 0 Reactions "Having Fun"; expects valid response
+    // 8. you: Type PLAY 0; expects valid response
+    // 9. me: Type TRY 0 PRODUCTS; expects valid response
+    // 10. me: Type TRY 1 ababafffbaba; expects invalid
+    // 11. you: TRY 0 products; expects invalid
+    // 12. you: TRY 2 enzyems; expects valid
+    // 13. me: TRY 12 doommgeys; expects valid
+    // 14. me: CHALLENGE 2 enzymes; expects valid
+    // 15. you: CHALLENGE 12 decreases; expects invalid
+    // 16. me: TRY 10 increasing; expects invalid
+    // 17. you: TRY 1 catalysts; expects valid
+    // 18. me: CHALLENGE 1 catablots; expects valid
+    // 19. you: TRY 13 activation; expects valid
+    // 20. me: TRY 14 lechatelet; expects invalid
+    // 21. me: TRY 14 le chatelier; expects invalid
+    // 22. me: TRY 14 lechatelier; expects valid
+    // 23. you: TRY 4 exothermic; expects valid
+    // 24. me: CHALLENGE 4 octivation; expects valid
+    // 25. you: CHALLENGE 14 lechateliee; expects valid
+    // 26. you: CHALLENGE 15 balanced; expects invalid
+    // 27. you: TRY 8 areas; expects valid
+    // 28. me: TRY 5 aaaaaaaaaa; expects invalid
+    // 29. me: TRY 5 aaaaaaaaaa; expects invalid
+    // 30. you; TRY 6 reversible; expects valid
+    // 31. me: TRY 11 equal; expects valid
+    // 32. you: TRY 9 energy; expects valid
+    // 33. you: CHALLENGE 5 reactants; expects valid
+    // 34. you: TRY 7 dynamic; expects valid
+    // 35. me: TRY 15 goesfaster; expects valid
+    // 36. me: TRY 10 increased; expects valid
+    // 37. me: TRY 12 decreased; expects valid
+    // 38. me: TRY 3 collide; expects valid
+    // Should display score of me: 0 challenge points, 8 points, you 1 challenge point, 9 points, you wins
+    // 39. nome: nome
+    // 40. noyou: noyou
+    // 41. nome: TRY 0 MAT; expects valid
+    // 42. noyou: TRY 0 CAT; expects invalid
+    // 42. noyou: CHALLENGE 0 CAT; expects valid
+    // 43. noyou: CHALLENGE 1 MAT; expects invalid
+    // 44. nome: TRY 1 MAT; expects valid
+    // 45. nome: 0 challenge points, 1 point, noyou: 2 challenge points, 3 points
+    
+ 
+    // Covers Playing a Match with forfeit
+    // Covers: length of player id = 1, transition = START->CHOOSE
+    // 1. Create a new TextServer with one of these commands: 
+    //      Windows: java -cp "bin;lib/parserlib.jar" crossword.ServerMain puzzles/ 4444
+    //      Mac: java -cp bin:lib/parserlib.jar crossword.ServerMain puzzles/ 4444
+    // 2. Open another terminal window and connect to the client with the command: 
+    //      java -cp bin crossword.Client localhost 4444
+    // 3. Make sure the crossword client (GUI) appears with a text box and enter button across the top
+    //      and instructions on the right for how to login.
+    // 4. Open another three more terminals and connect to the client. From here on out, clients will be labeled by their player name:
+    //  "me", "you", "nome", and "noyou"
+    // 5. me: Type me
+    // 6. you Type you
+    // 7. me: Type NEW 0 Reactions "Having Fun"; expects valid response
+    // 8. you: Type PLAY 0; expects valid response
+    // 9. me: Type TRY 0 PRODUCTS; expects valid response
+    // 10. me: Type TRY 1 ababafffbaba; expects invalid
+    // 11. you: TRY 0 products; expects invalid
+    // 12. you: TRY 2 enzyems; expects valid
+    // 13. me: TRY 12 doommgeys; expects valid
+    // 14. me: CHALLENGE 2 enzymes; expects valid
+    // 15. you: CHALLENGE 12 decreases; expects invalid
+    // 16. me: TRY 10 increasing; expects invalid
+    // 17. you: TRY 1 catalysts; expects valid
+    // 18. me: CHALLENGE 1 catablots; expects valid
+    // 19. you: TRY 13 activation; expects valid
+    // 20. me: TRY 14 lechatelet; expects invalid
+    // 21. me: TRY 14 le chatelier; expects invalid
+    // 22. me: TRY 14 lechatelier; expects valid
+    // 23. you: TRY 4 exothermic; expects valid
+    // 24. me: CHALLENGE 4 octivation; expects valid
+    // 25. you: CHALLENGE 14 lechateliee; expects valid
+    // 26. you: CHALLENGE 15 balanced; expects invalid
+    // 27. you: TRY 8 areas; expects valid
+    // 28. me: TRY 5 aaaaaaaaaa; expects invalid
+    // 29. me: TRY 5 aaaaaaaaaa; expects invalid
+    // 30. you; TRY 6 reversible; expects valid
+    // 31. me: TRY 11 equal; expects valid
+    // 32. me: EXIT_PLAY
+    // 33. me: 0 challenge points, 6 points, you -1 challenge points and 4 points
 }
