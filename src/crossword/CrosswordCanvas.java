@@ -103,6 +103,8 @@ class CrosswordCanvas extends JComponent {
     public CrosswordCanvas(String puzzle) {
         this.puzzle = puzzle;
         this.state = State.START;
+        
+        checkRep();
     }
     
     /**
