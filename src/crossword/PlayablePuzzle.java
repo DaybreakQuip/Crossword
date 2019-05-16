@@ -28,7 +28,6 @@ public class PlayablePuzzle {
     //  Uses monitor Pattern
     private final String name; 
     private final String description;
-    // New map of puzzle id : player OR player id : (list or set) puzzle id
     private final Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = Collections.synchronizedMap(new HashMap<>()); // unconfirmed word id : puzzle entry
     private final Map<Integer, PuzzleEntry> confirmedEntries  = Collections.synchronizedMap(new HashMap<>());
     private final Map<Integer, PuzzleEntry> correctEntries;

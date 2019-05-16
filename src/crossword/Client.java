@@ -369,10 +369,12 @@ public class Client {
      */
     private void exitPlayFromServer(BufferedReader socketIn, PrintWriter socketOut) {
         String response = getResponse(playerID + " " + "EXIT_PLAY", socketIn, socketOut);
-        checkRep();
         if (response.charAt(0) == 'I') {
             throw new RuntimeException("Unable to exit from waiting on the server");
         }
+        String[] responseParts = response.substring(1).split(CrosswordCanvas.RESPONSE_DELIM);
+        canvas.setOverallScore(responseParts[1]);
+        checkRep();
     }
     
     /**

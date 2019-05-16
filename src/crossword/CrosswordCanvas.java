@@ -8,9 +8,12 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import javax.swing.JComponent;
 
@@ -56,11 +59,10 @@ class CrosswordCanvas extends JComponent {
     public static final String ENTRY_DELIM = "~";
     public static final String WORD_DELIM = "`";
     public static final String RESPONSE_DELIM = ";";
-    private static final String CONFIRMED_WORD = "CONFIRMED_WORD";
     
     // Abstraction function:
     //  AF(originX, originY, delta, mainFont, indexFont, textFont, 
-    //     playerID, puzzle, state, puzzleList, matchList, currentPuzzle) = 
+    //     playerID, puzzle, state, puzzleList, matchList, currentPuzzle, wordToLine) = 
     //          canvas representing the crossword puzzle with with puzzle cells of size delta
     //          starting at originX, originY and text using mainFont, indexFont, and textFont.
     //          playerID represents the unique identifier for the client drawing on the canvas.
@@ -77,7 +79,8 @@ class CrosswordCanvas extends JComponent {
     //          WORD_DELIM. Each player-score entry is separated by ENTRY_DELIM. The scores and
     //          the list of guessed/confirmed words are separated by RESPONSE_DELIM, and the entry
     //          for each guessed/confirmed word is separated by ENTRY_DELIM. Each word entry has
-    //          information about the word separated by WORD_DELIM.
+    //          information about the word separated by WORD_DELIM. wordToLine maps each word id to
+    //          the line that its hint is drawn on in the PLAY state.
     // Representation invariant:
     //  originX >= 0, 
     //  originY >= 0, 
@@ -96,6 +99,8 @@ class CrosswordCanvas extends JComponent {
     private String puzzleList = "";
     private String matchList = "";
     private String currentPuzzle = "";
+    private String overallScore = "";
+    private final Map<Integer, SimpleImmutableEntry<Integer, String>> wordToLine = new HashMap<>();
     
     /**
      * @param puzzle string representation of the crossword puzzle
@@ -199,21 +204,32 @@ class CrosswordCanvas extends JComponent {
     }
     
     /**
+     * @param overallScore the overall scores of both players from the server
+     */
+    public synchronized void setOverallScore(String overallScore) {
+        this.overallScore = overallScore;
+    }
+    
+    /**
      * Draw a cell at position (row, col) in a crossword.
      * @param row Row where the cell is to be placed.
      * @param col Column where the cell is to be placed.
      * @param g Graphics environment used to draw the cell.
      * @param id id of the owner of the cell.
      */
-    private synchronized void drawCell(int row, int col, Graphics g, String id) {
+    private synchronized void drawCell(int row, int col, Graphics g, String id, boolean confirmed) {
         // Before changing the color it is a good idea to record what the old color
         // was.
         Color oldColor = g.getColor();
         
         if (id.length() == 0) {
             g.setColor(Color.YELLOW);
-        } else if (id.equals(CONFIRMED_WORD)) {
-            g.setColor(Color.ORANGE);
+        } else if (confirmed) {
+            if (id.equals(playerID)) {
+                g.setColor(Color.ORANGE);
+            } else {
+                g.setColor(Color.CYAN);
+            }
         } else if (id.equals(playerID)) {
             g.setColor(Color.RED);
         } else {
@@ -332,9 +348,12 @@ class CrosswordCanvas extends JComponent {
 
     // This code shows one approach for fancier formatting by changing the
     // background color of the line of text.
-    private synchronized void printlnFancy(String s, Graphics g) {
-
-        g.setFont(textFont);
+    private synchronized void printlnFancy(String s, Graphics g, Color highlight, int lineNumber) {
+        final int oldLine = line;
+        line = lineNumber;
+        
+        final Font fancierFont = new Font("Arial", Font.BOLD, 16);
+        g.setFont(fancierFont);
         FontMetrics fm = g.getFontMetrics();
         int lineHeight = fm.getAscent() * 6 / 5;
         int xpos = originX + 500;
@@ -344,12 +363,31 @@ class CrosswordCanvas extends JComponent {
         // was.
         Color oldColor = g.getColor();
 
-        g.setColor(new Color(0, 0, 0));
+        g.setColor(highlight);
         g.fillRect(xpos, ypos - fm.getAscent(), fm.stringWidth(s), lineHeight);
-        g.setColor(new Color(200, 200, 0));
-        g.drawString(s, xpos, ypos);
-        // After writing the text you can return to the previous color.
         g.setColor(oldColor);
+        g.drawString(s, xpos, ypos);
+        line = oldLine;
+    }
+    
+    // This code shows one approach for fancier formatting by changing the
+    // background color and font type of the line of text.
+    private synchronized void printlnFancier(String s, Graphics g, Color highlight) {
+        final Font fancierFont = new Font("Arial", Font.BOLD, 16);
+        g.setFont(fancierFont);
+        FontMetrics fm = g.getFontMetrics();
+        int lineHeight = fm.getAscent() * 6 / 5;
+        int xpos = originX + 500;
+        int ypos = originY + line * lineHeight;
+
+        // Before changing the color it is a good idea to record what the old color
+        // was.
+        Color oldColor = g.getColor();
+
+        g.setColor(highlight);
+        g.fillRect(xpos, ypos - fm.getAscent(), fm.stringWidth(s), lineHeight);
+        g.setColor(oldColor);
+        g.drawString(s, xpos, ypos);
         ++line;
     }
     
@@ -389,7 +427,7 @@ class CrosswordCanvas extends JComponent {
                 acrossHints.add(id + ". " + info[2] + "\n");
                 
                 for (int i = 0; i < length; i++) {
-                    drawCell(row, col + i, g, "");
+                    drawCell(row, col + i, g, "", false);
                 }
                 across++;
             } else { // draw cells for down and record hint
@@ -397,7 +435,7 @@ class CrosswordCanvas extends JComponent {
                 downHints.add(id + ". " + info[2] + "\n");
                 
                 for (int i = 0; i < length; i++) {
-                    drawCell(row + i, col, g, "");
+                    drawCell(row + i, col, g, "", false);
                 }
                 down++;
             }
@@ -406,9 +444,12 @@ class CrosswordCanvas extends JComponent {
         // print hints for across and down words
         println("", g);
         
+        int wordID;
         if (across > 0) {
             println("Across\n", g);
             for (String hint: acrossHints) {
+                wordID = Integer.parseInt(hint.substring(0, hint.indexOf('.')));
+                wordToLine.put(wordID, new SimpleImmutableEntry<>(line, hint));
                 println(hint, g);
             }
         }
@@ -417,6 +458,8 @@ class CrosswordCanvas extends JComponent {
         if (down > 0) {
             println("Down\n", g);
             for (String hint: downHints) {
+                wordID = Integer.parseInt(hint.substring(0, hint.indexOf('.')));
+                wordToLine.put(wordID, new SimpleImmutableEntry<>(line, hint));
                 println(hint, g);
             }
         }
@@ -490,10 +533,12 @@ class CrosswordCanvas extends JComponent {
                 println("", g);
                 
                 if (currentPuzzle.length() > 0) {
+                    List<String> playerIDs = new ArrayList<>();
                     String[] currentPuzzleState = currentPuzzle.split(RESPONSE_DELIM);
                     for (String currentPlayerState : currentPuzzleState[0].split(ENTRY_DELIM)) {
                         String[] playerPoints = currentPlayerState.split(WORD_DELIM);
                         println(playerPoints[0] + "'s Challenge Points: " + playerPoints[1], g);
+                        playerIDs.add(playerPoints[0]);
                     }
                     
                     List<String> myWords = new ArrayList<>();
@@ -502,20 +547,38 @@ class CrosswordCanvas extends JComponent {
                     if (currentPuzzleState.length > 1) {
                         for (String wordEntry : currentPuzzleState[1].split(ENTRY_DELIM)) {
                             String[] wordEntered = wordEntry.split(WORD_DELIM);
+                            int wordID = Integer.parseInt(wordEntered[2]);
                             int row = Integer.parseInt(wordEntered[5]);
                             int col = Integer.parseInt(wordEntered[6]);
                             boolean confirmed = wordEntered[1].equals("T");
-                            String player = (!confirmed) ? wordEntered[0] : CONFIRMED_WORD;  
+                            String player = wordEntered[0];  
+                            Color highlight;
+                                                        
+                            if (confirmed && player.equals(playerID)) { 
+                                // player's confirmed word
+                                highlight = Color.ORANGE;
+                            } else if (confirmed) { 
+                                // other player's confirmed word
+                                highlight = Color.CYAN;
+                            } else if (player.equals(playerID)) { 
+                                // player's unconfirmed word
+                                highlight = Color.RED;
+                            } else { 
+                                // other player's unconfirmed word
+                                highlight = Color.GREEN;
+                            }
+                            
+                            printlnFancy(wordToLine.get(wordID).getValue(), g, highlight, wordToLine.get(wordID).getKey());
 
                             // draw words entered
                             if (wordEntered[4].equals("ACROSS")) {
                                 for (int i = 0; i < wordEntered[3].length(); i++) {
-                                    drawCell(row, col + i, g, player);
+                                    drawCell(row, col + i, g, player, confirmed);
                                     letterInCell(wordEntered[3].substring(i, i+1).toUpperCase(), row, col + i, g);
                                 }
                             } else {
                                 for (int i = 0; i < wordEntered[3].length(); i++) {
-                                    drawCell(row + i, col, g, player);
+                                    drawCell(row + i, col, g, player, confirmed);
                                     letterInCell(wordEntered[3].substring(i, i+1).toUpperCase(), row + i, col, g);
                                 }
                             }
@@ -528,8 +591,10 @@ class CrosswordCanvas extends JComponent {
                             }
                         }
                         
-                        println("My confirmed words: " + myWords.toString(), g);
-                        println("Other confirmed words: " + otherWords.toString(), g);
+                        String otherPlayerID = (playerID.equals(playerIDs.get(0))) ? playerIDs.get(1) : playerIDs.get(0);
+
+                        printlnFancier(playerID + "'s confirmed words: " + myWords.toString(), g, Color.ORANGE);
+                        printlnFancier(otherPlayerID + "'s confirmed words: " + otherWords.toString(), g, Color.CYAN);
                     }
                 }                
                 break;
@@ -542,10 +607,11 @@ class CrosswordCanvas extends JComponent {
                 
                 println("", g);
                 // print scores
-                String[] currentPuzzleState = currentPuzzle.split(RESPONSE_DELIM);
-                for (String currentPlayerState : currentPuzzleState[0].split(ENTRY_DELIM)) {
-                    String[] playerPoints = currentPlayerState.split(WORD_DELIM);
+                String[] playerScores = overallScore.split(ENTRY_DELIM);
+                for (String playerScore : playerScores) {
+                    String[] playerPoints = playerScore.split(WORD_DELIM);
                     println(playerPoints[0] + "'s Challenge Points: " + playerPoints[1], g);
+                    println(playerPoints[0] + "'s Total Points: " + playerPoints[2], g);
                 }
                 break;
             }
@@ -554,22 +620,5 @@ class CrosswordCanvas extends JComponent {
                 throw new AssertionError("should never get here");
             }
         }
-        
-        /*
-        for (int i = 0; i < x; ++i) {
-            drawCell(i, i, g);
-            letterInCell(Character.toString(i + 65), i, i, g);
-            verticalId(Integer.toString(i), i, i, g);
-            horizontalId(Integer.toString(i), i, i, g);
-            resetLine();
-            println("This is an example of adding text to the canvas.", g);
-            println("You can use formatting to convey information about the state of the game.", g);
-            println("Remember, this code is mostly here to show you how things work.", g);
-            println("Make it your own.", g);
-            printlnFancy("It's ok to get fancy with format.", g);
-            printlnFancy("Have some fun with your UI!", g);
-        }
-        x = x + 1;
-        */
     }
 }

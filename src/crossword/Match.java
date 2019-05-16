@@ -335,11 +335,24 @@ public class Match {
                 Game.RESPONSE_DELIM + puzzle.getGuessesForResponse();
     }
     
+    private synchronized int getTotalScore(Player player) {
+        int numCorrect = 0;
+        Map<Integer, SimpleImmutableEntry<Player, PuzzleEntry>> playerEntries = puzzle.getPlayerEntries();
+        Map<Integer, PuzzleEntry> confirmedEntries = puzzle.getConfirmedEntries();
+        for (Map.Entry<Integer, PuzzleEntry> entry: confirmedEntries.entrySet()) {
+            Integer id = entry.getKey();
+            if (playerEntries.get(id).getKey().getId().equals(player.getId())) {
+                numCorrect++;
+            }
+        }
+        return numCorrect + player.getScore();
+    }
+    
     /**
      * @return string representing the score of each player
      */
     public synchronized String showScore() {
-        return state + Game.RESPONSE_DELIM + playerOne.getId() + Game.WORD_DELIM + playerOne.getScore() + Game.ENTRY_DELIM + 
-                playerTwo.getId() + Game.WORD_DELIM + playerTwo.getScore();
+        return state + Game.RESPONSE_DELIM + playerOne.getId() + Game.WORD_DELIM + playerOne.getScore() + Game.WORD_DELIM + getTotalScore(playerOne)
+                        + Game.ENTRY_DELIM + playerTwo.getId() + Game.WORD_DELIM + playerTwo.getScore() + Game.WORD_DELIM + getTotalScore(playerTwo);
     }
 }
