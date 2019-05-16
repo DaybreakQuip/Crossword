@@ -465,8 +465,6 @@ class CrosswordCanvas extends JComponent {
         }
     }
 
-    private int x = 1;
-
     /**
      * Simple demo code just to illustrate how to paint cells in a crossword puzzle.
      * The paint method is called every time the JComponent is refreshed, or every
