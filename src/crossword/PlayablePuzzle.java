@@ -46,6 +46,7 @@ public class PlayablePuzzle {
     /**
      * Adds a player entry/guess to a map of words player guessed
      * @param wordID the id of the word on the crossword puzzle
+     * @param player the player that is making a guess
      * @param word word to add as a puzzle entry 
      * @return true if word is added, false otherwise
      */
