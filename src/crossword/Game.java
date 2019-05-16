@@ -16,9 +16,9 @@ import edu.mit.eecs.parserlib.UnableToParseException;
  *
  */
 public class Game {
-    public static final String ENTRY_DELIM = "~";
-    public static final String WORD_DELIM = "`";
-    public static final String RESPONSE_DELIM = ";";
+    public static final String ENTRY_DELIM = " as3fb ";
+    public static final String WORD_DELIM = " bs1fc ";
+    public static final String RESPONSE_DELIM = " cs2fd ";
     private final Set<String> players; // set of all playerIDs currently logged in
     private final Map<String, Puzzle> puzzles; // map of puzzleID : Puzzle
     private final Map<String, String> playerToMatch; // map of playerID : match_id
@@ -128,7 +128,7 @@ public class Game {
                     puzzleEntry.getOrientation() + WORD_DELIM + puzzleEntry.getPosition().getRow() 
                             + WORD_DELIM + puzzleEntry.getPosition().getCol() + ENTRY_DELIM;
         }
-        return puzzleString.substring(0,puzzleString.length()-1);
+        return puzzleString.substring(0,puzzleString.length()-ENTRY_DELIM.length());
     }
     
     /**
@@ -495,20 +495,53 @@ public class Game {
      * @return string of puzzle names with format:
      *  response = puzzleName (ENTRY_DELIM puzzleName)*
      */
-    public synchronized String getPuzzleNamesForResponse() {
+    private synchronized String getPuzzleNamesForResponse() {
         StringBuilder builder = new StringBuilder();
         for (String puzzleName : puzzles.keySet()) {
             builder.append(puzzleName + Game.ENTRY_DELIM);
         }
-        builder.deleteCharAt(builder.length()-1);
+        return builder.toString().substring(0, builder.length()-ENTRY_DELIM.length());
+    }
+    
+    /**
+     * @return puzzles and available matches
+     */
+    public synchronized String getPuzzlesAndAvailableMatchesForResponse() {
+        // Build the string in 3 parts: add puzzle names -> add response delim -> add available matches
+        StringBuilder builder = new StringBuilder();
+        builder.append(getPuzzleNamesForResponse());
+        builder.append(RESPONSE_DELIM);
+        builder.append(getAvailableMatchesForResponse());
         return builder.toString();
     }
+    
+    /**
+     * Returns response for a play listener
+     * @param playerID the ID of the player
+     * @return either a response containing a puzzle or the total score of the game based on whether
+     *  the the match has ended or not
+     */
+    public synchronized String getPlayListenerResponse(String playerID) {
+        if (!playerToMatch.containsKey(playerID)) {
+            throw new RuntimeException("Player is not in a match");
+        }
+        Match match = matches.get(playerToMatch.get(playerID));
+        if (match.isDone()) {
+            return match.showScore();
+        } else {
+            return getGuessesForResponse(playerID);
+        }
+    }
+    
     /**
      * Returns response of the puzzle
      * @param playerID player
      * @return puzzle
      */
     public synchronized String getGuessesForResponse(String playerID) {
+        if (!playerToMatch.containsKey(playerID)) {
+            throw new RuntimeException("Player is not in a match");
+        }
         return matches.get(playerToMatch.get(playerID)).getGuessesForResponse();
     }
     /**

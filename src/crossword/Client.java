@@ -14,10 +14,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -136,10 +138,16 @@ public class Client {
      */
     private synchronized String getResponse(String request, BufferedReader socketIn, PrintWriter socketOut) {
         try {
+            
+            // Delete this
+            System.out.println("Request: " + request + ":END");
+            
             socketOut.println(request);
             String response = socketIn.readLine();
             canvas.setPreviousResponse(response);
-            System.out.println("Response: " + response);
+            
+            // DELETE this
+            System.out.println("Response:" + response + ":END");
             
             checkRep();
             return response;
@@ -178,6 +186,21 @@ public class Client {
     }
     
     /**
+     * Sets matches and puzzles for the canvas to draw
+     * @param response that contains matches and puzzles information
+     */
+    private synchronized void setMatchesAndPuzzles(String response) {
+        // list of puzzles RESPONSE_DELIM list of matches
+        String[] matchesAndPuzzles = response.substring(1).split(CrosswordCanvas.RESPONSE_DELIM);
+        canvas.setPuzzleList(matchesAndPuzzles[0]);
+        if (matchesAndPuzzles.length == 1) {
+            canvas.setMatchList("");
+        } else {
+            canvas.setMatchList(matchesAndPuzzles[1]);
+        }
+    }
+    
+    /**
      * Transition crossword canvas from start state to choose state
      * @param id id of the player/client
      * @param socketIn buffered reader to read input from server
@@ -192,14 +215,7 @@ public class Client {
         }
         
         canvas.setPlayerID(id);
-        // list of puzzles RESPONSE_DELIM list of matches
-        String[] matchesAndPuzzles = response.substring(1).split(CrosswordCanvas.RESPONSE_DELIM);
-        canvas.setPuzzleList(matchesAndPuzzles[0]);
-        if (matchesAndPuzzles.length == 1) {
-            canvas.setMatchList("");
-        } else {
-            canvas.setMatchList(matchesAndPuzzles[1]);
-        }
+        setMatchesAndPuzzles(response);
         setCanvasState(State.CHOOSE);
         canvas.repaint();
         playerID = id;
@@ -302,15 +318,22 @@ public class Client {
         String[] responseParts = response.substring(1).split(CrosswordCanvas.RESPONSE_DELIM);
         
         if (responseParts[0].equals("DONE")) {
+            canvas.setOverallScore(responseParts[1]);
+            // Only set a winner if a winner exists
+            if (responseParts.length > 2) {
+                canvas.setWinner(responseParts[2]);
+            }
             setCanvasState(State.SHOW_SCORE);
         }
         
+        String delim = CrosswordCanvas.RESPONSE_DELIM.replace("\\s", " ");
+        
         String currentPuzzle = "";
         for (int i = 1; i < responseParts.length; i++) {
-            currentPuzzle += responseParts[i] + CrosswordCanvas.RESPONSE_DELIM;
+            currentPuzzle += responseParts[i] + delim;
         }
         
-        canvas.setCurrentPuzzle(currentPuzzle.substring(0, currentPuzzle.length() - 1));
+        canvas.setCurrentPuzzle(currentPuzzle.substring(0, currentPuzzle.length() - delim.length()));
         canvas.repaint();
         checkRep();
     }
@@ -413,6 +436,64 @@ public class Client {
     }
     
     /**
+     * Starts a new match after the player enters SHOW_SCORE state
+     */
+    private synchronized void startNewMatch(BufferedReader socketIn, PrintWriter socketOut) {
+        startNewWatchThread();
+        setCanvasState(State.CHOOSE);
+        canvas.clearPuzzleInfo();
+        String response = getResponse(playerID + " " + "NEW_MATCH", socketIn, socketOut);
+        // Get available matches and puzzles
+        setMatchesAndPuzzles(response);
+    }
+    
+    /**
+     * Checks whether a command is valid or not
+     * @param input the input entered by the player, must have 1 or more characters
+     */
+    private synchronized boolean isValidCommand(String input) {
+        String[] tokens = input.split(" ");
+        String command = tokens[0];
+        Set<String> validCommands;
+        switch (canvas.getState()) {
+        case START:
+            {
+                // Only playerID is allowed for logging in
+                return (tokens.length == 1);
+            }
+        case CHOOSE:
+            {
+                validCommands = Set.of("PLAY", "NEW", "EXIT");
+                break;
+            }
+        case WAIT:
+            {
+                validCommands = Set.of("EXIT");
+                break;
+            }
+        case PLAY:
+            {
+                validCommands = Set.of("TRY", "CHALLENGE", "EXIT");
+                break;
+            }
+        case SHOW_SCORE:
+            {
+                if (tokens.length == 1) {
+                    return command.equals("EXIT");
+                } else if (tokens.length == 2) {
+                    return tokens[0].equals("NEW") && tokens[1].equals("MATCH");
+                } else {
+                    return false;
+                }
+            }
+        default:
+            throw new RuntimeException(canvas.getState() + " is not a valid state!");
+        }
+        
+        return validCommands.contains(command);
+    }
+    
+    /**
      * Starter code to display a window with a CrosswordCanvas,
      * a text box to enter commands and an Enter button.
      */
@@ -434,6 +515,11 @@ public class Client {
             canvas.repaint();
             
             if (text.length() == 0) {
+                return;
+            }
+            // Check whether the input is a valid command 
+            if (!isValidCommand(text)) {
+                canvas.setPreviousResponse("I" + "Invalid command");
                 return;
             }
             
@@ -475,9 +561,7 @@ public class Client {
             case SHOW_SCORE:
                 {
                     if (text.equals(NEW_MATCH)) {
-                        startNewWatchThread();
-                        setCanvasState(State.CHOOSE);
-                        canvas.clearPuzzleInfo();
+                        startNewMatch(socketIn, socketOut);
                     } else if (text.equals(EXIT)) {
                         logoutFromServer(socketIn, socketOut);
                         canvas.clearPuzzleInfo();

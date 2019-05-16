@@ -117,13 +117,17 @@ public class TextServer {
         
         try {
             for (String input = in.readLine(); input != null; input = in.readLine()) {
-                String output = handleRequest(input, out);
-                if (output.equals(QUIT)) {
-                    break;
-                } else if (output.equals(LISTENER)) {
-                    continue;
+                try {
+                    String output = handleRequest(input, out);
+                    if (output.equals(QUIT)) {
+                        break;
+                    } else if (output.equals(LISTENER)) {
+                        continue;
+                    }
+                    out.println(output);
+                } catch (NumberFormatException nfe) {
+                    out.println("I" + "Expected number instead of word");
                 }
-                out.println(output);
                 
                 // For debugging only: 
                 // printGameStats();
@@ -141,8 +145,12 @@ public class TextServer {
      * @return output message to client
      * @throws IOException 
      */
-    private String handleRequest(String input, PrintWriter out) throws IOException {
+    private String handleRequest(String input, PrintWriter out) throws IOException {  
         String[] tokens = input.split(" ");
+        if (tokens.length < 2) {
+            return "I" + "Invalid command";
+        }
+        
         String playerID = tokens[0];
         String command = tokens[1];  
         
@@ -154,7 +162,6 @@ public class TextServer {
         if (command.equals("quit")) {
             return QUIT;
         }
-        //TODO: implement each command as needed
         if (command.equals("WATCH")) { // blocks and returns only when there is a change in available matches
             game.addWatchListener(new WatchListener() {
                 public void onChange() {
@@ -176,7 +183,7 @@ public class TextServer {
         else if (command.equals("WAIT_PLAY")) { // blocks and returns only when a play has been made in a match
             game.addPlayListener(playerID, new PlayListener() {
                 public void onChange() {
-                    out.println("V" + game.getGuessesForResponse(playerID));
+                    out.println("V" + game.getPlayListenerResponse(playerID));
                 }
             });
             
@@ -185,15 +192,13 @@ public class TextServer {
         else if (command.equals("LOGIN")) { // Logs in a player and returns the names of all puzzle templates
             if (game.login(playerID)) {
                 // Build the string in 3 parts: add puzzle names -> add response delim -> add available matches
-                StringBuilder builder = new StringBuilder();
-                builder.append("V");
-                builder.append(game.getPuzzleNamesForResponse());
-                builder.append(Game.RESPONSE_DELIM);
-                builder.append(game.getAvailableMatchesForResponse());
-                return builder.toString();
+                return "V" + game.getPuzzlesAndAvailableMatchesForResponse();
             } else {
                 return "I" + "Player id is already taken";
             }
+        }
+        else if (command.equals("NEW_MATCH")) {
+            return "V" + game.getPuzzlesAndAvailableMatchesForResponse();
         }
         else if (command.equals("PLAY")) {
             if (tokens.length < 3) {
@@ -206,7 +211,7 @@ public class TextServer {
             return "I" + "Failed to join the match";
         }
         else if (command.equals("NEW")) {
-            if (tokens.length < 4) {
+            if (tokens.length < 5) {
                 return "I" + "NEW command must contain matchID, puzzleID, and description";
             }
             
@@ -223,7 +228,7 @@ public class TextServer {
             if (description.matches("\"[^\\n\\t\\\\\\r]+\"")) {
                 description = description.substring(1, description.length()-1);
             } else {
-                return "I" + "Description should not contain newlines, tabs or \\ and have length > 0" + description;
+                return "I" + "Description should not contain newlines, tabs or \\ and have length > 0: " + description;
             }
             // Check whether MATCH_ID is alphanumeric
             if (!matchID.matches("[0-9a-zA-Z]+")) {
@@ -257,6 +262,10 @@ public class TextServer {
             return "I" + "Failed to exit game";
         }
         else if (command.equals("TRY")) {
+            if (tokens.length < 4) {
+                return "I" + "TRY command must contain entry ID and word";
+            }
+            
             int wordID = Integer.parseInt(tokens[2]);
             String word = tokens[3].toLowerCase();
             if (game.tryWord(playerID, wordID, word)) {
@@ -264,9 +273,13 @@ public class TextServer {
                 game.removePlayerAndMatch(playerID);
                 return "V" + response;
             }
-            return "I" + "Failed to guess word.";
+            return "I" + "Failed to guess word";
         }
         else if (command.equals("CHALLENGE")) {
+            if (tokens.length < 4) {
+                return "I" + "CHALLENGE command must contain entry ID and word";
+            }
+            
             int wordID = Integer.parseInt(tokens[2]);
             String word = tokens[3].toLowerCase();
             if (game.challengeWord(playerID, wordID, word)) {
@@ -274,9 +287,8 @@ public class TextServer {
                 game.removePlayerAndMatch(playerID);
                 return "V" + response;
             }
-            return "I" + "Failed to challenge word.";        
+            return "I" + "Failed to challenge word";        
         }
-
         // if we reach here, the client message did not follow the protocol
         // Instead of throwing an except, return a response indicating  failure
         return "I" + "Sorry, that is not a valid command: " + input;

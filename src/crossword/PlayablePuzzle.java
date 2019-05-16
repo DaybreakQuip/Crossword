@@ -133,7 +133,7 @@ public class PlayablePuzzle {
                     puzzleEntry.getOrientation() + Game.WORD_DELIM + puzzleEntry.getPosition().getRow() 
                             + Game.WORD_DELIM + puzzleEntry.getPosition().getCol() + Game.ENTRY_DELIM;
         }
-        return puzzleString.substring(0,puzzleString.length()-1);
+        return puzzleString.substring(0,puzzleString.length()-Game.ENTRY_DELIM.length());
     }
     
     /**
@@ -155,7 +155,7 @@ public class PlayablePuzzle {
                     puzzleEntry.getOrientation() + Game.WORD_DELIM + puzzleEntry.getPosition().getRow() 
                             + Game.WORD_DELIM + puzzleEntry.getPosition().getCol() + Game.ENTRY_DELIM;
         }
-        return puzzleString.substring(0,puzzleString.length()-1);
+        return puzzleString.substring(0,puzzleString.length()-Game.ENTRY_DELIM.length());
     }
     
     /**
