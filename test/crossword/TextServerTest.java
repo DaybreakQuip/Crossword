@@ -110,7 +110,6 @@ public class TextServerTest {
     //     Number of clients (players) waiting for a match to start = 0
     //     Number of clients (players) playing in a match = 0
     //     Includes commands: LOGIN
-
     @Test
     public void testLoginValid() throws IOException, URISyntaxException, UnableToParseException {
         String directory = "puzzles/";
